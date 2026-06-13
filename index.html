@@ -227,7 +227,7 @@
           <label class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Username</label>
           <div class="relative">
             <i data-lucide="user" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
-            <input type="text" id="loginUsername" class="w-full pl-10 pr-4 py-3 rounded-ios-md glass-input text-sm focus:outline-none focus:ring-2 focus:ring-ios-blue text-slate-900 dark:text-white" placeholder="Username prodi / pangkat" required>
+            <input type="text" id="loginUsername" class="w-full pl-10 pr-4 py-3 rounded-ios-md glass-input text-sm focus:outline-none focus:ring-2 focus:ring-ios-blue text-slate-900 dark:text-white" placeholder="Username" required>
           </div>
         </div>
 
@@ -235,7 +235,7 @@
           <label class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Kata Sandi</label>
           <div class="relative">
             <i data-lucide="lock" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
-            <input type="password" id="loginPassword" class="w-full pl-10 pr-4 py-3 rounded-ios-md glass-input text-sm focus:outline-none focus:ring-2 focus:ring-ios-blue text-slate-900 dark:text-white" placeholder="Kata sandi anda" required>
+            <input type="password" id="loginPassword" class="w-full pl-10 pr-4 py-3 rounded-ios-md glass-input text-sm focus:outline-none focus:ring-2 focus:ring-ios-blue text-slate-900 dark:text-white" placeholder="Password" required>
           </div>
         </div>
 
@@ -249,12 +249,15 @@
       </div>
       
       <div class="text-center py-3.5 px-4 bg-slate-100/50 dark:bg-zinc-800/30 rounded-ios-md text-[11px] leading-relaxed text-slate-500 dark:text-zinc-400 border border-slate-200/50 dark:border-zinc-800/40">
-        <strong class="text-slate-700 dark:text-zinc-200">Akun Percobaan Simulator:</strong><br>
-        Kompi 1 (IF 1): <code>if1</code> / <code>kadet123</code><br>
-        Akses Piket: <code>piket</code> / <code>piket123</code><br>
+        <strong class="text-slate-700 dark:text-zinc-200">Akun & Password</strong><br>
+        IF 1: <code>if1</code> / <code>kadet123</code><br>
+	FK 2: <code>fk2</code> / <code>kadet123</code><br>
+        
       </div>
     </div>
-  </div>
+Informatika'6 © 2026
+ </div>
+</div>
 
   <div class="app-container flex-1 max-w-[1400px] w-full mx-auto p-4 sm:p-6 flex flex-col lg:flex-row gap-6">
     <!-- Sidebar Navigation (Desktop) -->
@@ -1103,13 +1106,19 @@
         storage.setItem('e_arvy_kepulangan', JSON.stringify([]));
         storage.setItem('e_arvy_absence_statuses', JSON.stringify(['Sakit', 'Izin', 'Alpa', 'Dinas', 'Bajaga', 'Gasuh', 'Kontrol RSPPN', 'Rawat Jalan', 'Tanpa Keterangan']));
         storage.setItem('e_arvy_initialized_real_data', 'true');
+    }
+  } 
+
+  function callServer(methodName, params, successCallback, errorCallback) {
+    setTimeout(() => {
+      try { 
+        const result = simulateServerCall(methodName, params); 
+        if (successCallback) successCallback(result); 
+      } catch (e) { 
+        if (errorCallback) errorCallback(e); 
       }
-    }
-      setTimeout(() => {
-        try { const result = simulateServerCall(methodName, params); if (successCallback) successCallback(result); } 
-        catch (e) { if (errorCallback) errorCallback(e); }
-      }, 150);
-    }
+    }, 150);
+  }
 
     function simulateServerCall(methodName, params) {
       if (methodName === 'login') {
