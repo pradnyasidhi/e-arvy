@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>e-Arvy - Nara Arvyaksa #6 (iOS 26 Premium)</title>
+  <title>e-Arvy - Nara Arvyaksa #6</title>
  
   <!-- Google Fonts - Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -219,7 +219,7 @@
           <!-- Default Logo SVG -->
         </div>
         <h1 class="text-2xl font-black tracking-tight text-slate-950 dark:text-white">Sistem e-Arvy #6</h1>
-        <p class="text-xs text-slate-500 dark:text-zinc-400 font-semibold">Interoperabilitas Roster & Presensi Batalyon Nara Arvyaksa</p>
+        <p class="text-xs text-slate-500 dark:text-zinc-400 font-semibold">Sistem Interoperabilitas & Presensi Batalyon Nara Arvyaksa</p>
       </div>
 
       <form id="loginForm" onsubmit="handleLogin(event)" class="flex flex-col gap-4">
@@ -296,7 +296,7 @@
         <div class="p-6 rounded-ios-lg bg-gradient-to-r from-ios-blue via-blue-600 to-indigo-600 text-white flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-[0_0_20px_rgba(0,122,255,0.4)]">
           <div class="flex flex-col gap-1">
             <h2 class="text-xl sm:text-2xl font-black tracking-tight">Portal e-Arvy #6</h2>
-            <p class="text-sm text-blue-100 font-medium">Batalyon Nara Arvyaksa - Presensi Terpadu & Interoperabilitas Instan.</p>
+            <p class="text-sm text-blue-100 font-medium">Batalyon Nara Arvyaksa - Sistem Interoperabilitas & Presensi Terpadu</p>
           </div>
           <button onclick="switchTab('kehadiran')" class="px-5 py-2.5 bg-white text-ios-blue font-bold text-sm rounded-ios-md hover:bg-slate-50 active:scale-95 transition-all shadow-md">
             Mulai Presensi
@@ -1161,7 +1161,7 @@
         
         // Daftar Absen Keseluruhan per Status
         if (absentCount === 0) {
-            textRecap += `NIHIL\n\n`;
+            textRecap += `LENGKAP\n\n`;
         } else {
             const groupedStatus = {};
             params.absents.forEach(a => {
@@ -1921,7 +1921,18 @@
                   <div><h4 id="prodi-sum-absent-${prodi.prodiId}" class="text-base font-extrabold text-slate-500">${cadetsList.length - draftPresentCount}</h4><p class="text-[9px] text-slate-400 uppercase font-bold">Kurang</p></div>
                 </div>
                 <div class="text-xs pt-2 border-t" id="prodi-sum-detail-${prodi.prodiId}"></div>
-                ${isEditable ? `<div class="pt-3 flex justify-end gap-2"><button type="button" onclick="saveSingleProdiAttendance(${prodi.prodiId}, '${prodi.currentName}')" class="px-4 py-2 bg-ios-blue text-white rounded text-xs font-black shadow-sm">Simpan Sementara</button></div>` : ''}
+                ${isEditable ? `
+  <div class="pt-3 flex justify-end gap-2">
+    ${isSaved ? `
+      <button type="button" onclick="resetSingleProdiAttendance(${prodi.prodiId}, '${prodi.currentName}')" class="px-4 py-2 bg-ios-red text-white rounded text-xs font-black shadow-sm hover:opacity-90 active:scale-95 transition-all">
+        Reset Kehadiran
+      </button>
+    ` : ''}
+    <button type="button" onclick="saveSingleProdiAttendance(${prodi.prodiId}, '${prodi.currentName}')" class="px-4 py-2 bg-ios-blue text-white rounded text-xs font-black shadow-sm hover:opacity-90 active:scale-95 transition-all">
+      Simpan Sementara
+    </button>
+  </div>
+` : ''}
               </div>
             </div>
           `;
@@ -2046,7 +2057,10 @@
 
       const cadets = (appData.cadets[prodiName] || []).filter(c => activeCategory === 'Batalyon' || (activeCategory === 'Putra' && c.gender === 'Laki-Laki') || (activeCategory === 'Putri' && c.gender === 'Perempuan'));
       let presentCnt = 0, absentCnt = 0;
-      cadets.forEach(c => { const st = storage.getItem(`draft_status_${dateStr}_${act}_${prodiId}_${c.no}`) || 'Hadir'; if (st === 'Hadir') presentCnt++; else absentCnt++; });
+      cadets.forEach(c => { 
+        const st = storage.getItem(`draft_status_${dateStr}_${act}_${prodiId}_${c.no}`) || 'Hadir'; 
+        if (st === 'Hadir') presentCnt++; else absentCnt++; 
+      });
 
       storage.setItem(`saved_present_cnt_${dateStr}_${act}_${prodiId}`, presentCnt);
       storage.setItem(`saved_absent_cnt_${dateStr}_${act}_${prodiId}`, absentCnt);
@@ -2054,6 +2068,39 @@
       storage.setItem(`saved_${dateStr}_${act}_${prodiName}`, 'true');
       showToast('Tersimpan Sementara', `Prodi ${prodiName} diperbarui.`, 'success');
       loadDashboardAndAppData();
+    }
+
+    function resetSingleProdiAttendance(prodiId, prodiName) {
+      if (!confirm(`Apakah Anda yakin ingin membatalkan simpan sementara dan mereset kehadiran prodi ${prodiName}?`)) return;
+
+      const dateStr = document.getElementById('presensiDate').value; 
+      let act = document.getElementById('presensiActivitySelect').value; 
+      if (act === 'kustom') act = document.getElementById('customActivityName').value; 
+      if (!act) { 
+        showToast('Validasi', 'Tentukan kegiatan!', 'warning'); 
+        return; 
+      }
+
+      // 1. Ambil seluruh daftar kadet asli di prodi ini
+      const cadets = appData.cadets[prodiName] || []; 
+
+      // 2. Hapus draft lokal per individu kadet (kembali default Hadir)
+      cadets.forEach(c => {
+        storage.removeItem(`draft_status_${dateStr}_${act}_${prodiId}_${c.no}`); 
+        storage.removeItem(`draft_reason_${dateStr}_${act}_${prodiId}_${c.no}`); 
+        storage.removeItem(`draft_proof_${dateStr}_${act}_${prodiId}_${c.no}`); 
+      });
+
+      // 3. Hapus metrik kuota ringkasan simpan sementara prodi
+      storage.removeItem(`saved_present_cnt_${dateStr}_${act}_${prodiId}`); 
+      storage.removeItem(`saved_absent_cnt_${dateStr}_${act}_${prodiId}`); 
+      storage.removeItem(`saved_total_cnt_${dateStr}_${act}_${prodiId}`); 
+      storage.removeItem(`saved_${dateStr}_${act}_${prodiName}`); 
+
+      showToast('Reset Berhasil', `Data presensi prodi ${prodiName} telah dibersihkan.`, 'info');
+
+      // 4. Refresh data dan render ulang UI
+      loadDashboardAndAppData(); 
     }
 
     function verifyAndSaveAttendance() {
