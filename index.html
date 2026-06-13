@@ -1,0 +1,2500 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>e-Arvy - Nara Arvyaksa #6 (iOS 26 Premium)</title>
+ 
+  <!-- Google Fonts - Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            ios: {
+              blue: '#007aff',
+              green: '#34c759',
+              red: '#ff3b30',
+              orange: '#ff9500',
+              yellow: '#ffcc00',
+              teal: '#5ac8fa',
+              indigo: '#5856d6',
+              gray: {
+                light: '#f2f2f7',
+                dark: '#1c1c1e',
+                secondary: '#8e8e93'
+              }
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'sans-serif'],
+          },
+          borderRadius: {
+            'ios-sm': '10px',
+            'ios-md': '14px',
+            'ios-lg': '22px',
+            'ios-xl': '28px'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      font-family: 'Inter', -apple-system, sans-serif;
+    }
+    .transition-all-300 {
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 0.5; }
+      50% { transform: scale(1.08); opacity: 0.8; }
+      100% { transform: scale(0.95); opacity: 0.5; }
+    }
+    .active-pulse { animation: pulse-ring 2s infinite ease-in-out; }
+    
+    @keyframes highlight-fade {
+      0% { background-color: rgba(0, 122, 255, 0.3); }
+      100% { background-color: transparent; }
+    }
+    .highlight-search { animation: highlight-fade 3s ease-out; }
+
+    .liquid-glass {
+      background: rgba(255, 255, 255, 0.45);
+      backdrop-filter: blur(25px) saturate(210%);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.04), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+    }
+    .dark .liquid-glass {
+      background: rgba(20, 20, 22, 0.55);
+      backdrop-filter: blur(25px) saturate(210%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    .glass-input {
+      background: rgba(242, 242, 247, 0.7);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      transition: all 0.2s ease;
+    }
+    .dark .glass-input {
+      background: rgba(28, 28, 30, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-input:focus {
+      border-color: #007aff;
+      background: rgba(255, 255, 255, 1);
+      box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
+    }
+    .dark .glass-input:focus {
+      background: rgba(20, 20, 22, 1);
+      box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.25);
+    }
+
+    #iosToastContainer {
+      position: fixed;
+      top: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 90%;
+      max-width: 380px;
+      pointer-events: none;
+    }
+    .ios-toast {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(20px) saturate(190%);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      border-radius: 18px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      pointer-events: auto;
+      transform: translateY(-50px);
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .dark .ios-toast {
+      background: rgba(28, 28, 30, 0.85);
+      backdrop-filter: blur(20px) saturate(190%);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    .ios-toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    @media print {
+      .no-print { display: none !important; }
+      .print-area {
+        display: block !important;
+        width: 100% !important;
+        background-color: white !important;
+        color: black !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-zinc-100 dark:bg-black text-slate-900 dark:text-zinc-100 min-h-screen flex flex-col font-sans transition-all-300 pb-16 lg:pb-4">
+
+  <!-- iOS Floating Toast Container -->
+  <div id="iosToastContainer"></div>
+
+  <!-- Top Navigation Bar -->
+  <header class="sticky top-0 z-50 bg-white/60 dark:bg-zinc-950/60 backdrop-blur-xl border-b border-white/20 dark:border-zinc-900/40 transition-all-300">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div id="headerLogoContainer" class="relative flex items-center justify-center">
+          <svg class="w-10 h-10 filter drop-shadow-md" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#007aff" />
+                <stop offset="100%" stop-color="#5856d6" />
+              </linearGradient>
+              <linearGradient id="sixGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#ffffff" />
+                <stop offset="100%" stop-color="#e2e8f0" />
+              </linearGradient>
+            </defs>
+            <path d="M50 5 L85 15 V45 C85 70 50 92 50 92 C50 92 15 70 15 45 V15 L50 5 Z" fill="url(#shieldGrad)" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+            <path d="M52 26 C40 26 34 35 34 48 C34 60 41 68 53 68 C63 68 70 60 70 49 C70 39 63 32 52 32 C47 32 42 35 40 39 C40 33 45 28 52 28 Z M52 38 C58 38 62 42 62 49 C62 55 58 59 52 59 C46 59 42 55 42 49 C42 42 46 38 52 38 Z" fill="url(#sixGrad)"/>
+          </svg>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-xl font-black tracking-tight bg-gradient-to-r from-slate-950 via-blue-600 to-ios-blue dark:from-white dark:via-blue-400 dark:to-ios-blue bg-clip-text text-transparent">e-Arvy</span>
+          <span class="text-[9px] font-black tracking-widest text-slate-400 dark:text-zinc-500 uppercase">Secure Roster R6</span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 sm:gap-4">
+        <button onclick="toggleTheme()" id="themeToggleBtn" class="p-2.5 rounded-ios-md hover:bg-slate-200/50 dark:hover:bg-zinc-800/50 text-slate-600 dark:text-zinc-400 transition-colors" title="Ubah Tema">
+          <i data-lucide="moon" class="w-5 h-5 dark:hidden"></i>
+          <i data-lucide="sun" class="w-5 h-5 hidden dark:block text-ios-orange"></i>
+        </button>
+
+        <div id="userInfoHeader" class="hidden sm:flex items-center gap-2 bg-slate-200/60 dark:bg-zinc-900/60 py-1.5 px-3.5 rounded-full border border-white/20 dark:border-zinc-800/40">
+          <span id="userHeaderRole" class="text-[9px] font-black text-ios-blue uppercase tracking-wider bg-blue-100 dark:bg-blue-950/60 px-2 py-0.5 rounded-full">Piket</span>
+          <span id="userHeaderName" class="text-xs font-bold text-slate-700 dark:text-zinc-200">piket</span>
+        </div>
+
+        <button id="logoutBtn" onclick="logout()" class="flex items-center gap-1.5 py-2 px-3 text-sm font-bold text-ios-red rounded-ios-md hover:bg-rose-100/50 dark:hover:bg-rose-950/20 transition-all">
+          <i data-lucide="log-out" class="w-4 h-4"></i>
+          <span class="hidden md:inline">Keluar</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Login Screen -->
+  <div id="loginWrapper" class="fixed inset-0 bg-slate-100/90 dark:bg-black/95 backdrop-blur-2xl z-[2000] flex items-center justify-center p-4 hidden">
+    <div class="w-full max-w-md bg-white/70 dark:bg-zinc-900/70 backdrop-blur-md rounded-ios-xl shadow-2xl border border-white/20 dark:border-zinc-800/40 p-8 flex flex-col gap-6 transition-all-300">
+      <div class="text-center flex flex-col gap-2">
+        <div id="loginLogoContainer" class="mx-auto flex items-center justify-center bg-gradient-to-tr from-ios-blue to-indigo-600 text-white p-4.5 rounded-ios-xl shadow-xl shadow-blue-500/20 w-fit mb-2">
+          <!-- Default Logo SVG -->
+        </div>
+        <h1 class="text-2xl font-black tracking-tight text-slate-950 dark:text-white">Sistem e-Arvy #6</h1>
+        <p class="text-xs text-slate-500 dark:text-zinc-400 font-semibold">Interoperabilitas Roster & Presensi Batalyon Nara Arvyaksa</p>
+      </div>
+
+      <form id="loginForm" onsubmit="handleLogin(event)" class="flex flex-col gap-4">
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Username</label>
+          <div class="relative">
+            <i data-lucide="user" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+            <input type="text" id="loginUsername" class="w-full pl-10 pr-4 py-3 rounded-ios-md glass-input text-sm focus:outline-none focus:ring-2 focus:ring-ios-blue text-slate-900 dark:text-white" placeholder="Username prodi / pangkat" required>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Kata Sandi</label>
+          <div class="relative">
+            <i data-lucide="lock" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+            <input type="password" id="loginPassword" class="w-full pl-10 pr-4 py-3 rounded-ios-md glass-input text-sm focus:outline-none focus:ring-2 focus:ring-ios-blue text-slate-900 dark:text-white" placeholder="Kata sandi anda" required>
+          </div>
+        </div>
+
+        <button type="submit" id="loginSubmitBtn" class="w-full bg-gradient-to-r from-ios-blue via-blue-600 to-indigo-600 text-white font-bold py-3.5 rounded-ios-md hover:opacity-90 active:scale-95 transition-all shadow-md shadow-blue-500/20 flex items-center justify-center gap-2">
+          <i data-lucide="log-in" class="w-4 h-4"></i> Masuk Aplikasi
+        </button>
+      </form>
+
+      <div id="loginErrorMsg" class="hidden bg-rose-500/10 text-ios-red text-center py-2.5 px-3 rounded-ios-md text-xs font-semibold border border-rose-500/20">
+        Kredensial salah! Harap periksa kembali.
+      </div>
+      
+      <div class="text-center py-3.5 px-4 bg-slate-100/50 dark:bg-zinc-800/30 rounded-ios-md text-[11px] leading-relaxed text-slate-500 dark:text-zinc-400 border border-slate-200/50 dark:border-zinc-800/40">
+        <strong class="text-slate-700 dark:text-zinc-200">Akun Percobaan Simulator:</strong><br>
+        Kompi 1 (IF 1): <code>if1</code> / <code>kadet123</code><br>
+        Akses Piket: <code>piket</code> / <code>piket123</code><br>
+        Akses Admin: <code>admin</code> / <code>admin123</code>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-container flex-1 max-w-[1400px] w-full mx-auto p-4 sm:p-6 flex flex-col lg:flex-row gap-6">
+    <!-- Sidebar Navigation (Desktop) -->
+    <aside class="no-print hidden lg:flex flex-col gap-1.5 w-[260px] shrink-0 liquid-glass rounded-ios-xl border p-4 shadow-lg h-fit sticky top-24 transition-all-300">
+      <div class="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-zinc-500 px-3 mb-2">Navigasi Utama</div>
+      
+      <button onclick="switchTab('dashboard')" id="side-dashboard" class="sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-ios-md text-sm font-semibold transition-all text-ios-blue bg-blue-50/50 dark:bg-blue-950/20">
+        <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard
+      </button>
+      <button onclick="switchTab('kehadiran')" id="side-kehadiran" class="sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-ios-md text-sm font-semibold transition-all text-slate-600 dark:text-zinc-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/30">
+        <i data-lucide="clipboard-list" class="w-5 h-5"></i> Kehadiran
+      </button>
+      <button onclick="switchTab('statistik')" id="side-statistik" class="sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-ios-md text-sm font-semibold transition-all text-slate-600 dark:text-zinc-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/30">
+        <i data-lucide="trending-up" class="w-5 h-5"></i> Analisis Statistik
+      </button>
+      <button onclick="switchTab('kepulangan')" id="side-kepulangan" class="sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-ios-md text-sm font-semibold transition-all text-slate-600 dark:text-zinc-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/30">
+        <i data-lucide="plane-takeoff" class="w-5 h-5"></i> Kepulangan
+      </button>
+      <button onclick="switchTab('announce')" id="side-announce" class="sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-ios-md text-sm font-semibold transition-all text-slate-600 dark:text-zinc-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/30">
+        <i data-lucide="megaphone" class="w-5 h-5"></i> Pengumuman
+      </button>
+      <button onclick="switchTab('profile')" id="side-profile" class="sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-ios-md text-sm font-semibold transition-all text-slate-600 dark:text-zinc-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/30">
+        <i data-lucide="user-cog" class="w-5 h-5"></i> Profil Pengguna
+      </button>
+      <button onclick="switchTab('admin-panel')" id="side-admin-panel" class="sidebar-item admin-only hidden items-center gap-3 px-3 py-2.5 rounded-ios-md text-sm font-black transition-all text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/20 border-t border-slate-200/50 mt-2 pt-4">
+        <i data-lucide="settings" class="w-5 h-5 animate-spin"></i> Panel Admin
+      </button>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="content-area flex-1 flex flex-col gap-6 min-w-0 mb-16 lg:mb-0">
+
+      <!-- View: Dashboard -->
+      <section id="view-dashboard" class="view-screen active flex flex-col gap-6 transition-all-300">
+        
+        <!-- Welcome Banner with Glow Effect -->
+        <div class="p-6 rounded-ios-lg bg-gradient-to-r from-ios-blue via-blue-600 to-indigo-600 text-white flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-[0_0_20px_rgba(0,122,255,0.4)]">
+          <div class="flex flex-col gap-1">
+            <h2 class="text-xl sm:text-2xl font-black tracking-tight">Portal e-Arvy #6</h2>
+            <p class="text-sm text-blue-100 font-medium">Batalyon Nara Arvyaksa - Presensi Terpadu & Interoperabilitas Instan.</p>
+          </div>
+          <button onclick="switchTab('kehadiran')" class="px-5 py-2.5 bg-white text-ios-blue font-bold text-sm rounded-ios-md hover:bg-slate-50 active:scale-95 transition-all shadow-md">
+            Mulai Presensi
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="lg:col-span-2 flex flex-col gap-6">
+            
+            <div class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg border border-slate-200/60 dark:border-zinc-800/60 shadow-lg shadow-black/5 flex flex-col gap-4">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <i data-lucide="activity" class="w-5 h-5 text-ios-blue"></i>
+                  <h3 class="font-extrabold text-lg tracking-tight">Rekap Presensi Terakhir</h3>
+                </div>
+                <span id="dashLastActCat" class="text-xs font-extrabold px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-ios-green border border-emerald-100 dark:border-emerald-900">Lengkap</span>
+              </div>
+
+              <div id="dashLastActBox" onclick="viewLastRecapDetail()" class="p-4 bg-slate-50 dark:bg-zinc-800/40 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-ios-md border border-slate-200/50 cursor-pointer transition-all flex flex-col gap-4">
+                <div class="flex justify-between items-center border-b border-slate-200 dark:border-zinc-800 pb-3">
+                  <div class="flex flex-col">
+                    <h4 id="dashLastActName" class="text-base font-extrabold">Apel Pagi</h4>
+                    <span id="dashLastActDate" class="text-[11px] text-slate-400 dark:text-zinc-500 font-bold">2026-06-11</span>
+                  </div>
+                  <i data-lucide="chevron-right" class="w-5 h-5 text-slate-400"></i>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4">
+                  <div class="bg-white dark:bg-zinc-800/80 p-3 rounded-ios-md text-center border border-slate-100 dark:border-zinc-800">
+                    <span class="text-[9px] uppercase tracking-wider font-extrabold text-slate-400">Kuota</span>
+                    <h5 id="dashLastActTotal" class="text-base font-black text-slate-900 dark:text-white mt-1">600</h5>
+                  </div>
+                  <div class="bg-white dark:bg-zinc-800/80 p-3 rounded-ios-md text-center border border-slate-100 dark:border-zinc-800">
+                    <span class="text-[9px] uppercase tracking-wider font-extrabold text-slate-400">Hadir</span>
+                    <h5 id="dashLastActPresent" class="text-base font-black text-ios-green mt-1">599</h5>
+                  </div>
+                  <div class="bg-white dark:bg-zinc-800/80 p-3 rounded-ios-md text-center border border-slate-100 dark:border-zinc-800">
+                    <span class="text-[9px] uppercase tracking-wider font-extrabold text-slate-400">Kurang</span>
+                    <h5 id="dashLastActAbsent" class="text-base font-black text-ios-red mt-1">1</h5>
+                  </div>
+                </div>
+
+                <p id="dashLastActVer" class="text-xs text-slate-500 flex items-center gap-1.5 mt-1">
+                  <i data-lucide="shield-check" class="w-3.5 h-3.5 text-ios-blue"></i> Diverifikasi oleh: Piket
+                </p>
+              </div>
+            </div>
+
+            <!-- Dashboard Schedules (Active & Next Only) -->
+            <div class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg border border-slate-200/60 dark:border-zinc-800/60 shadow-lg shadow-black/5 flex flex-col gap-4">
+              <div class="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-3">
+                <div class="flex items-center gap-2">
+                  <i data-lucide="calendar" class="w-5 h-5 text-ios-blue"></i>
+                  <h3 class="font-extrabold text-lg tracking-tight">Status Kegiatan & Jadwal</h3>
+                </div>
+                <button onclick="switchTab('announce')" class="text-xs font-bold text-ios-blue hover:underline">Lihat Jadwal Penuh</button>
+              </div>
+              <div id="dashScheduleFlowWrapper" class="flex flex-col gap-4">
+                <!-- Rendered dynamically (Active & Next) -->
+              </div>
+            </div>
+
+          </div>
+
+          <div class="flex flex-col gap-6">
+            
+            <div class="p-6 bg-gradient-to-br from-slate-950 via-slate-900 to-zinc-900 text-white rounded-ios-lg shadow-xl flex flex-col items-center justify-center text-center gap-1 border border-white/10">
+              <i data-lucide="clock" class="w-8 h-8 text-ios-blue mb-2"></i>
+              <h2 id="realTimeClock" class="text-4xl font-black tracking-tight">12:06:13</h2>
+              <p id="realTimeDate" class="text-[10px] text-slate-400 font-extrabold tracking-widest uppercase">Kamis, 11 Juni 2026</p>
+            </div>
+
+            <!-- General Announcement moved here -->
+            <div class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg border border-slate-200/60 dark:border-zinc-800/60 shadow-lg shadow-black/5 flex flex-col gap-3">
+              <div class="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-3">
+                <h3 class="font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">Pengumuman Umum</h3>
+                <button onclick="openEditGeneralAnnounceModal()" class="admin-piket-only hidden text-xs font-bold text-ios-blue hover:underline">Edit</button>
+              </div>
+              <p id="dashGeneralAnnouncement" class="text-sm text-slate-600 dark:text-zinc-300 bg-blue-50/40 dark:bg-zinc-800/30 p-4 rounded-ios-md border-l-4 border-ios-blue leading-relaxed">
+                Selamat datang di E-Arvy. Silakan laksanakan presensi harian tepat waktu.
+              </p>
+            </div>
+
+            <div class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg border border-slate-200/60 dark:border-zinc-800/60 shadow-lg shadow-black/5 flex flex-col gap-4">
+              <div class="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-3">
+                <h3 class="font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">Pakaian & Petugas Piket</h3>
+                <button onclick="switchTab('announce')" class="admin-piket-only hidden text-xs font-bold text-ios-blue hover:underline">Edit</button>
+              </div>
+
+              <div class="flex flex-col gap-3">
+                <div class="bg-slate-50 dark:bg-zinc-800/40 p-3.5 rounded-ios-md border border-slate-100 dark:border-zinc-800/60">
+                  <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Seragam Dinas Hari Ini:</span>
+                  <p id="dashPakaianText" class="font-extrabold text-sm text-slate-900 dark:text-white">Pakaian Dinas Harian (PDH)</p>
+                </div>
+                
+                <div class="p-3.5 bg-slate-50 dark:bg-zinc-800/40 rounded-ios-md border border-slate-100 dark:border-zinc-800/60 flex justify-between items-center">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full border border-ios-blue/30 overflow-hidden bg-slate-200 flex items-center justify-center shadow-inner">
+                      <img id="dashPiketPaAvatar" src="" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100?text=Pa'">
+                    </div>
+                    <div>
+                      <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">Piket Batalyon Putra</span>
+                      <h4 id="dashPiketBatPaName" class="text-xs font-extrabold text-slate-900 dark:text-white">-</h4>
+                    </div>
+                  </div>
+                  <a id="dashPiketBatPaTg" target="_blank" href="#" class="p-2 rounded-full bg-blue-50 dark:bg-blue-950/50 text-ios-blue hover:bg-blue-100 transition-colors">
+                    <i data-lucide="send" class="w-4 h-4"></i>
+                  </a>
+                </div>
+
+                <div class="p-3.5 bg-slate-50 dark:bg-zinc-800/40 rounded-ios-md border border-slate-100 dark:border-zinc-800/60 flex justify-between items-center">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full border border-ios-blue/30 overflow-hidden bg-slate-200 flex items-center justify-center shadow-inner">
+                      <img id="dashPiketPiAvatar" src="" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100?text=Pi'">
+                    </div>
+                    <div>
+                      <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">Piket Batalyon Putri</span>
+                      <h4 id="dashPiketBatPiName" class="text-xs font-extrabold text-slate-900 dark:text-white">-</h4>
+                    </div>
+                  </div>
+                  <a id="dashPiketBatPiTg" target="_blank" href="#" class="p-2 rounded-full bg-blue-50 dark:bg-blue-950/50 text-ios-blue hover:bg-blue-100 transition-colors">
+                    <i data-lucide="send" class="w-4 h-4"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- View: Kehadiran -->
+      <section id="view-kehadiran" class="view-screen hidden flex flex-col gap-6 transition-all-300">
+        
+        <div class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg border border-slate-200/60 shadow-lg flex flex-col gap-6">
+          <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-3 gap-3">
+            <h3 class="font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">Formulir Presensi Kehadiran</h3>
+            
+            <!-- Pencarian Nama -->
+            <div class="relative w-full md:w-64">
+              <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+              <input type="text" id="searchCadetInput" onkeyup="if(event.key==='Enter') searchCadet()" class="w-full pl-10 pr-4 py-2 rounded-ios-md glass-input text-sm focus:outline-none" placeholder="Cari nama kadet (Enter)...">
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="flex flex-col gap-2">
+              <label class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Kategori Kegiatan</label>
+              <div class="flex bg-slate-100 dark:bg-zinc-800 p-1 rounded-ios-md border border-slate-200/40 dark:border-zinc-700/60">
+                <button type="button" onclick="setCategory('Batalyon')" id="cat-btn-batalyon" class="flex-1 text-center py-2.5 rounded-ios-sm text-xs font-bold transition-all text-slate-800 bg-white dark:bg-zinc-700 dark:text-white shadow-sm">Batalyon</button>
+                <button type="button" onclick="setCategory('Putra')" id="cat-btn-putra" class="flex-1 text-center py-2.5 rounded-ios-sm text-xs font-bold transition-all text-slate-500 dark:text-zinc-400 hover:text-slate-900">Putra</button>
+                <button type="button" onclick="setCategory('Putri')" id="cat-btn-putri" class="flex-1 text-center py-2.5 rounded-ios-sm text-xs font-bold transition-all text-slate-500 dark:text-zinc-400 hover:text-slate-900">Putri</button>
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <label class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Jenis Kegiatan</label>
+              <select id="presensiActivitySelect" onchange="checkCustomActivity(); renderAttendanceList();" class="w-full px-4 py-2.5 rounded-ios-md glass-input text-sm text-slate-900 dark:text-white focus:outline-none"></select>
+            </div>
+          </div>
+
+          <div id="customActivityWrapper" class="hidden flex flex-col gap-1.5 animate-fadeIn">
+            <label class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Nama Kegiatan Tambahan</label>
+            <input type="text" id="customActivityName" onblur="this.value = standardizeEYD(this.value); renderAttendanceList();" oninput="renderAttendanceList()" class="w-full px-4 py-2.5 rounded-ios-md glass-input text-sm text-slate-900 dark:text-white focus:outline-none" placeholder="Masukkan nama kegiatan baru...">
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Tanggal Presensi</label>
+              <input type="date" id="presensiDate" onchange="renderAttendanceList()" class="w-full px-4 py-2.5 rounded-ios-md glass-input text-sm text-slate-900 dark:text-white focus:outline-none">
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <div class="flex justify-between items-center">
+                <label class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Kapasitas Quota</label>
+                <button onclick="enableQuotaEdit()" class="admin-piket-only hidden text-xs font-bold text-ios-blue hover:underline">Edit Quota</button>
+              </div>
+              <input type="number" id="presensiTotalQuota" readonly class="w-full px-4 py-2.5 rounded-ios-md bg-slate-100 dark:bg-zinc-800 border text-slate-500 dark:text-zinc-400 outline-none">
+            </div>
+          </div>
+        </div>
+
+        <div id="kompiGroupWrapper" class="flex flex-col gap-4">
+          <!-- Rendered by JS -->
+        </div>
+
+        <div id="verificationPanel" class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg shadow-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4 transition-all-300">
+          <div class="flex flex-col gap-1">
+            <h4 class="font-extrabold text-base tracking-tight">Kirim & Rekapitulasi Akhir</h4>
+            <p class="text-xs text-slate-500 dark:text-zinc-400 font-medium">Data prodi tersimpan lokal untuk pantauan bersama. Tekan verifikasi untuk rilis permanen.</p>
+          </div>
+          <button onclick="verifyAndSaveAttendance()" class="w-full md:w-auto bg-gradient-to-r from-ios-green to-emerald-600 text-white px-6 py-3.5 rounded-ios-md font-bold text-sm shadow-md hover:opacity-90 active:scale-95 flex items-center justify-center gap-2">
+            <i data-lucide="check-circle2" class="w-4.5 h-4.5"></i> Verifikasi Semua & Simpan Permanen
+          </button>
+        </div>
+      </section>
+
+      <!-- View: Statistik -->
+      <section id="view-statistik" class="view-screen hidden flex flex-col gap-6 transition-all-300">
+        
+        <div class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg shadow-lg flex flex-col gap-6">
+          <h3 class="font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">Parameter Analisis & Riwayat Kegiatan</h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Filter Kegiatan</label>
+              <select id="statActivitySelect" onchange="renderCharts(); renderHistoryTable();" class="w-full px-4 py-2.5 rounded-ios-md glass-input text-sm text-slate-900 dark:text-white"></select>
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Tingkatan Grafik</label>
+              <select id="statLevelSelect" onchange="toggleStatProdiSelect()" class="w-full px-4 py-2.5 rounded-ios-md glass-input text-sm text-slate-900 dark:text-white">
+                <option value="Batalyon">Batalyon (600 Kadet)</option>
+                <option value="Prodi">Program Studi</option>
+                <option value="Putra">Khusus Putra Saja</option>
+                <option value="Putri">Khusus Putri Saja</option>
+              </select>
+            </div>
+            <div id="statProdiWrapper" class="hidden flex flex-col gap-1.5">
+              <label class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Program Studi</label>
+              <select id="statProdiSelect" onchange="renderCharts(); renderHistoryTable();" class="w-full px-4 py-2.5 rounded-ios-md glass-input text-sm text-slate-900 dark:text-white"></select>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-3 border-t border-slate-100 dark:border-zinc-800">
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Cari Tanggal Kegiatan Tertentu</label>
+              <div class="relative">
+                <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+                <input type="date" id="statSearchDate" onchange="renderHistoryTable()" class="w-full pl-10 pr-4 py-2.5 rounded-ios-md glass-input text-sm text-slate-900 dark:text-white">
+              </div>
+            </div>
+            <div class="flex items-end gap-2">
+              <button onclick="resetSearchFilter()" class="px-4 py-2.5 rounded-ios-md bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-300 hover:bg-slate-200 text-xs font-bold transition-all">Bersihkan Filter</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg shadow-lg flex flex-col gap-4">
+            <h4 id="lineChartTitle" class="font-extrabold text-base tracking-tight">Grafik Kehadiran Mingguan</h4>
+            <div class="relative h-[280px] w-full"><canvas id="lineChart"></canvas></div>
+          </div>
+
+          <div class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg shadow-lg flex flex-col gap-4">
+            <div class="flex justify-between items-center border-b border-slate-100 dark:border-zinc-800 pb-2">
+              <h4 id="pieChartTitle" class="font-extrabold text-base tracking-tight">Distribusi Status</h4>
+              <select id="pieLogSourceSelect" onchange="renderCharts()" class="px-2.5 py-1 text-[11px] rounded bg-slate-100 dark:bg-zinc-800 text-slate-800 dark:text-slate-200 border-none font-bold outline-none">
+                <option value="last">Log Terakhir</option>
+                <option value="all">Kumulatif</option>
+              </select>
+            </div>
+            <div class="relative h-[280px] w-full flex justify-center"><canvas id="pieChart"></canvas></div>
+          </div>
+        </div>
+
+        <div class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg shadow-lg flex flex-col gap-4">
+          <div class="flex justify-between items-center pb-2 border-b border-slate-100 dark:border-zinc-800/60">
+            <h4 class="font-extrabold text-base tracking-tight">Riwayat Kegiatan & Keterangan Roster</h4>
+            <span id="historyRecordsCount" class="text-xs font-bold px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-ios-blue font-mono">0 Log</span>
+          </div>
+
+          <div class="overflow-x-auto no-scrollbar">
+            <table class="min-w-full text-sm text-left">
+              <thead>
+                <tr class="border-b border-slate-100 dark:border-zinc-800 text-[10px] font-black uppercase text-slate-400 tracking-wider">
+                  <th class="py-3 px-4">Tanggal / Waktu</th>
+                  <th class="py-3 px-4">Nama Kegiatan</th>
+                  <th class="py-3 px-4">Kategori</th>
+                  <th class="py-3 px-4">Hadir / Quota</th>
+                  <th class="py-3 px-4">Detail Kekurangan</th>
+                  <th class="py-3 px-4 text-right">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="historyTableBody" class="divide-y divide-slate-100 dark:divide-zinc-800/60 font-medium"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- View: Kepulangan -->
+      <section id="view-kepulangan" class="view-screen hidden flex flex-col gap-6 transition-all-300">
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div class="p-5 bg-white dark:bg-zinc-900 rounded-ios-lg shadow-lg flex items-center gap-4">
+            <div class="p-3.5 rounded-full bg-emerald-100 text-ios-green"><i data-lucide="check-circle" class="w-6 h-6"></i></div>
+            <div>
+              <h4 class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Sudah Kepulangan</h4>
+              <h2 id="depCountSudah" class="text-2xl font-black text-emerald-600 dark:text-ios-green">0 Prodi</h2>
+            </div>
+          </div>
+          <div class="p-5 bg-white dark:bg-zinc-900 rounded-ios-lg shadow-lg flex items-center gap-4">
+            <div class="p-3.5 rounded-full bg-amber-100 text-ios-orange"><i data-lucide="clock" class="w-6 h-6"></i></div>
+            <div>
+              <h4 class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Belum Kepulangan</h4>
+              <h2 id="depCountBelum" class="text-2xl font-black text-ios-orange">0 Prodi</h2>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg shadow-lg flex flex-col gap-4">
+          <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 pb-3 border-b border-slate-100 dark:border-zinc-800">
+            <div>
+              <h3 class="font-extrabold text-lg text-slate-900 dark:text-white tracking-tight">Manajemen Kepulangan Roster</h3>
+              <p class="text-xs text-slate-500 font-medium">Reset kepulangan prodi dilakukan secara otomatis pada 03:00 AM.</p>
+            </div>
+            <div class="flex flex-col gap-1 w-full sm:w-auto min-w-[180px]">
+              <label class="text-[9px] font-black uppercase tracking-widest text-slate-400">Tanggal Kepulangan</label>
+              <input type="date" id="kepulanganFilterDate" onchange="renderKepulanganList()" class="px-3.5 py-2 rounded-ios-md glass-input text-xs text-slate-950 dark:text-white focus:outline-none">
+            </div>
+          </div>
+          
+          <div class="overflow-x-auto no-scrollbar">
+            <div class="min-w-[800px] flex flex-col gap-2">
+              <div class="grid grid-cols-6 gap-4 py-2.5 px-4 bg-slate-100 dark:bg-zinc-800/80 rounded-ios-md text-[10px] font-black uppercase tracking-wider text-slate-400">
+                <div class="col-span-2">Program Studi</div>
+                <div>Tanggal</div>
+                <div>Jam Pulang</div>
+                <div>Status Kehadiran</div>
+                <div>Aksi / Bukti Video</div>
+              </div>
+              <div id="kepulanganListWrapper" class="flex flex-col gap-2"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg shadow-lg flex flex-col gap-4">
+          <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 pb-3 border-b border-slate-100 dark:border-zinc-800">
+            <div>
+              <h3 class="font-extrabold text-base tracking-tight">Riwayat Log Kepulangan (Terbaru di Atas)</h3>
+            </div>
+            <div class="flex items-center gap-2">
+              <input type="date" id="depLogSearchDate" onchange="renderDepartureLogs()" class="px-3.5 py-2 rounded-ios-md glass-input text-xs text-slate-900 dark:text-white outline-none">
+              <!-- Reset button removed per request -->
+            </div>
+          </div>
+
+          <div class="overflow-x-auto no-scrollbar">
+            <table class="min-w-full text-xs text-left">
+              <thead>
+                <tr class="border-b border-slate-100 dark:border-zinc-800 text-[10px] font-black uppercase text-slate-400 tracking-wider">
+                  <th class="py-2.5 px-3">Tanggal</th>
+                  <th class="py-2.5 px-3">Program Studi</th>
+                  <th class="py-2.5 px-3">Jam Pulang</th>
+                  <th class="py-2.5 px-3">Status</th>
+                  <th class="py-2.5 px-3">Video / Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="departureLogsTableBody" class="divide-y divide-slate-100 dark:divide-zinc-800/60 font-medium"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- View: Announce -->
+      <section id="view-announce" class="view-screen hidden flex flex-col gap-6 transition-all-300">
+        
+        <div class="p-6 bg-white/85 dark:bg-zinc-900/85 backdrop-blur-md rounded-ios-lg shadow-xl flex flex-col gap-5">
+          <div class="flex justify-between items-center pb-3 border-b border-slate-100 dark:border-zinc-800">
+            <div class="flex flex-col gap-1">
+              <h3 class="font-black text-xl tracking-tight flex items-center gap-2">
+                <i data-lucide="calendar" class="w-5 h-5 text-ios-blue animate-pulse"></i> Jadwal Penuh Kegiatan Harian
+              </h3>
+              <p class="text-xs text-slate-400 font-medium">Daftar keseluruhan jadwal kegiatan Batalyon dari pagi hingga malam.</p>
+            </div>
+            <button onclick="openAddScheduleModal()" class="admin-piket-only hidden bg-ios-blue hover:opacity-90 text-white px-4 py-2 rounded-ios-sm text-xs font-bold transition-all shadow-md">
+              + Tambah Kegiatan
+            </button>
+          </div>
+          
+          <div class="flex flex-col gap-1.5 max-w-xs">
+            <label class="text-[10px] font-black uppercase tracking-widest text-slate-400">Pilih Tanggal Roster</label>
+            <input type="date" id="announceScheduleDate" onchange="loadAnnounceSchedules()" class="w-full px-4 py-2.5 rounded-ios-md glass-input text-sm text-slate-950 dark:text-white focus:outline-none">
+          </div>
+
+          <div id="announceSchedulesList" class="flex flex-col gap-3 mt-2"></div>
+        </div>
+
+        <div class="p-6 bg-white/85 dark:bg-zinc-900/85 backdrop-blur-md rounded-ios-lg shadow-xl flex flex-col gap-5">
+          <div class="pb-2 border-b border-slate-100 dark:border-zinc-800 flex items-center gap-2">
+            <i data-lucide="shirt" class="w-5 h-5 text-ios-indigo"></i>
+            <div>
+              <h3 class="font-black text-lg tracking-tight">Ketentuan Seragam Dinas</h3>
+            </div>
+          </div>
+          <div class="p-4 bg-slate-50 dark:bg-zinc-800/30 rounded-ios-md border border-slate-100 dark:border-zinc-800/80">
+            <input type="text" id="announcePakaian" class="w-full px-4 py-2.5 rounded-ios-md glass-input text-sm text-slate-900 dark:text-white" placeholder="Contoh: Pakaian Dinas Harian (PDH)">
+          </div>
+        </div>
+
+        <div class="p-6 bg-white/85 dark:bg-zinc-900/85 backdrop-blur-md rounded-ios-lg shadow-xl flex flex-col gap-5">
+          <div class="pb-2 border-b border-slate-100 dark:border-zinc-800 flex items-center gap-2">
+            <i data-lucide="shield-check" class="w-5 h-5 text-ios-green"></i>
+            <div>
+              <h3 class="font-black text-lg tracking-tight">Petugas Piket Batalyon</h3>
+            </div>
+          </div>
+
+          <form id="announceConfigForm" onsubmit="saveAnnounceConfig(event)" class="admin-piket-only hidden flex flex-col gap-5">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div class="p-5 bg-slate-50/50 dark:bg-zinc-800/10 rounded-ios-md border border-slate-100 flex flex-col gap-3.5">
+                <span class="text-xs font-black text-ios-blue uppercase tracking-widest">Piket Putra</span>
+                <input type="text" id="announcePiketBatPaName" onblur="this.value = standardizeEYD(this.value);" class="w-full px-3 py-2.5 rounded-ios-sm glass-input text-xs" placeholder="Nama Petugas">
+                <input type="url" id="announcePiketBatPaTg" class="w-full px-3 py-2.5 rounded-ios-sm glass-input text-xs" placeholder="Link Telegram">
+                <label class="text-[9px] font-bold text-ios-blue cursor-pointer hover:underline">Ganti Foto Profil
+                  <input type="file" id="announcePiketPaAvatar" accept="image/*" onchange="uploadPiketAvatar(event, 'Pa')" class="hidden">
+                </label>
+              </div>
+              <div class="p-5 bg-slate-50/50 dark:bg-zinc-800/10 rounded-ios-md border border-slate-100 flex flex-col gap-3.5">
+                <span class="text-xs font-black text-ios-blue uppercase tracking-widest">Piket Putri</span>
+                <input type="text" id="announcePiketBatPiName" onblur="this.value = standardizeEYD(this.value);" class="w-full px-3 py-2.5 rounded-ios-sm glass-input text-xs" placeholder="Nama Petugas">
+                <input type="url" id="announcePiketBatPiTg" class="w-full px-3 py-2.5 rounded-ios-sm glass-input text-xs" placeholder="Link Telegram">
+                <label class="text-[9px] font-bold text-ios-blue cursor-pointer hover:underline">Ganti Foto Profil
+                  <input type="file" id="announcePiketPiAvatar" accept="image/*" onchange="uploadPiketAvatar(event, 'Pi')" class="hidden">
+                </label>
+              </div>
+            </div>
+            <button type="submit" class="w-fit bg-ios-blue hover:opacity-90 text-white font-extrabold px-6 py-3 rounded-ios-md text-sm shadow-md">
+              Simpan Pengumuman Piket
+            </button>
+          </form>
+
+          <div id="announceConfigViewer" class="hidden flex-col gap-4">
+             <!-- Rendered identical to dashboard layout via JS -->
+          </div>
+        </div>
+
+      </section>
+
+      <!-- View: Profile -->
+      <section id="view-profile" class="view-screen hidden flex flex-col gap-6 transition-all-300">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg shadow-lg flex flex-col items-center justify-center text-center gap-4">
+            <div class="relative w-28 h-28 rounded-full border-4 border-ios-blue overflow-hidden bg-slate-100 flex items-center justify-center">
+              <img id="profilePhotoImg" class="w-full h-full object-cover hidden">
+              <div id="profilePhotoPlaceholder" class="text-slate-400"><i data-lucide="user" class="w-12 h-12"></i></div>
+              <label class="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-ios-blue text-white flex items-center justify-center cursor-pointer hover:scale-105 border border-white">
+                <i data-lucide="camera" class="w-4 h-4"></i>
+                <input type="file" accept="image/*" class="hidden" onchange="handleProfilePhotoUpload(event)">
+              </label>
+            </div>
+            <div>
+              <h3 id="profileUsername" class="text-xl font-bold text-slate-900 dark:text-white">piket</h3>
+              <span id="profileRoleBadge" class="text-xs font-bold text-white bg-ios-blue px-3 py-1 rounded-full uppercase mt-2 inline-block tracking-wider">Piket</span>
+            </div>
+            <div class="w-full border-t border-slate-100 dark:border-zinc-800 pt-4 text-left flex flex-col gap-2 text-sm">
+              <div class="flex justify-between"><strong class="text-slate-500">Kompi:</strong> <span id="profileKompi" class="font-semibold">-</span></div>
+              <div class="flex justify-between"><strong class="text-slate-500">Prodi:</strong> <span id="profileProdi" class="font-semibold">-</span></div>
+            </div>
+          </div>
+
+          <div class="md:col-span-2 p-6 bg-white dark:bg-zinc-900 rounded-ios-lg shadow-lg flex flex-col gap-4">
+            <h3 class="font-extrabold text-lg text-slate-900 dark:text-white">Riwayat Aktivitas Roster</h3>
+            <div id="activityLogsWrapper" class="flex flex-col gap-2 max-h-[300px] overflow-y-auto no-scrollbar"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- View: Panel Admin -->
+      <section id="view-admin-panel" class="view-screen hidden flex flex-col gap-6 transition-all-300">
+        
+        <div class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg shadow-lg flex flex-col gap-4 animate-fadeIn">
+          <div class="pb-3 border-b border-slate-100 dark:border-zinc-800">
+            <h3 class="font-bold text-lg text-slate-900 dark:text-white">Ubah Logo Aplikasi e-Arvy</h3>
+          </div>
+          <div class="flex flex-col sm:flex-row items-center gap-6">
+            <div id="adminLogoPreview" class="w-20 h-20 rounded-ios-md border border-slate-200 flex items-center justify-center bg-slate-50 overflow-hidden shadow-inner p-2"></div>
+            <div class="flex flex-col gap-2 w-full sm:w-auto">
+              <label class="w-fit bg-ios-blue hover:opacity-90 text-white font-bold px-4 py-2.5 rounded-ios-md text-xs shadow-sm cursor-pointer flex items-center gap-1.5">
+                <i data-lucide="image" class="w-4 h-4"></i> Unggah Logo Kustom
+                <input type="file" id="adminLogoUpload" accept="image/*" onchange="uploadCustomAppLogo(event)" class="hidden">
+              </label>
+              <button onclick="resetDefaultAppLogo()" class="w-fit text-xs font-bold text-ios-red hover:underline mt-1">Kembalikan ke Bawaan</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg shadow-lg flex flex-col gap-4 animate-fadeIn">
+          <div class="pb-3 border-b border-slate-100 dark:border-zinc-800">
+            <h3 class="font-bold text-lg text-slate-900 dark:text-white">Kelola Status Presensi (Variabel Statistik)</h3>
+            <p class="text-xs text-slate-500 font-medium">Tambah status ketidakhadiran yang muncul pada dropdown presensi dan grafik Pie Chart.</p>
+          </div>
+          <div class="flex flex-col gap-3">
+            <div class="flex gap-2">
+              <input type="text" id="newAbsenceStatusInput" onblur="this.value = standardizeEYD(this.value);" class="flex-1 px-4 py-2.5 rounded-ios-md glass-input text-sm" placeholder="Contoh: Cuti, Isoman...">
+              <button onclick="addNewAbsenceStatus()" class="px-5 py-2.5 bg-ios-blue text-white rounded-ios-md text-xs font-bold shadow-sm">Tambah</button>
+            </div>
+            <div id="absenceStatusListWrapper" class="flex flex-wrap gap-2 mt-2"></div>
+          </div>
+        </div>
+
+        <div class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg shadow-lg flex flex-col gap-4">
+          <h3 class="font-bold text-lg text-slate-900 dark:text-white">Kelola Program Studi & Akun Kadet</h3>
+          <div id="adminProdiList" class="flex flex-col gap-3"></div>
+        </div>
+
+        <div class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg shadow-lg flex flex-col gap-4">
+          <h3 class="font-bold text-lg text-slate-900 dark:text-white">Ubah & Sesuaikan Anggota Kadet per Prodi</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs font-bold uppercase tracking-wider text-slate-500">Pilih Prodi</label>
+              <select id="adminSelectProdi" onchange="loadAdminCadetList()" class="w-full px-4 py-2.5 rounded-ios-md glass-input text-sm focus:outline-none"></select>
+            </div>
+            <div class="flex items-end">
+              <button onclick="addBlankCadetToSelectedProdi()" class="px-4 py-2.5 bg-ios-green text-white rounded-ios-md text-xs font-bold shadow-sm hover:opacity-90 flex items-center gap-1">
+                <i data-lucide="user-plus" class="w-4 h-4"></i> Tambah Kadet
+              </button>
+            </div>
+          </div>
+          <div id="adminCadetListWrapper" class="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[400px] overflow-y-auto pr-2 no-scrollbar"></div>
+          <button onclick="saveAdminCadetNames()" class="w-fit bg-ios-blue text-white font-bold px-6 py-2.5 rounded-ios-md text-sm mt-2">
+            Simpan Nama & Gender
+          </button>
+        </div>
+
+      </section>
+    </main>
+  </div>
+
+  <button onclick="refreshDataLocally()" class="no-print fixed bottom-6 right-6 z-[1000] p-4 rounded-full bg-white/80 backdrop-blur-xl border border-white/20 shadow-2xl text-ios-blue hover:scale-105 active:scale-95 flex items-center justify-center">
+    <i data-lucide="rotate-cw" id="localRefreshIcon" class="w-6 h-6"></i>
+  </button>
+
+  <!-- Mobile Nav -->
+  <nav class="tabbar no-print fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border-t border-slate-200/40 lg:hidden flex justify-around items-center py-2 pb-6 z-[100] shadow-lg">
+    <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tabbar-item flex flex-col items-center gap-0.5 text-ios-blue font-semibold text-[10px]"><i data-lucide="layout-dashboard" class="w-6 h-6"></i>Dashboard</button>
+    <button onclick="switchTab('kehadiran')" id="tab-kehadiran" class="tabbar-item flex flex-col items-center gap-0.5 text-slate-400 font-semibold text-[10px]"><i data-lucide="clipboard-list" class="w-6 h-6"></i>Kehadiran</button>
+    <button onclick="switchTab('statistik')" id="tab-statistik" class="tabbar-item flex flex-col items-center gap-0.5 text-slate-400 font-semibold text-[10px]"><i data-lucide="trending-up" class="w-6 h-6"></i>Statistik</button>
+    <button onclick="switchTab('kepulangan')" id="tab-kepulangan" class="tabbar-item flex flex-col items-center gap-0.5 text-slate-400 font-semibold text-[10px]"><i data-lucide="plane-takeoff" class="w-6 h-6"></i>Kepulangan</button>
+    <button onclick="switchTab('announce')" id="tab-announce" class="tabbar-item flex flex-col items-center gap-0.5 text-slate-400 font-semibold text-[10px]"><i data-lucide="megaphone" class="w-6 h-6"></i>Announce</button>
+  </nav>
+
+  <!-- Modals -->
+  <div id="recapModal" class="ios-modal fixed inset-0 bg-black/60 z-[3000] hidden items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-md">
+    <div class="ios-modal-content w-full sm:max-w-2xl bg-white dark:bg-zinc-900 rounded-t-ios-xl sm:rounded-ios-lg p-6 shadow-2xl flex flex-col gap-4 transform translate-y-full transition-transform">
+      <div class="flex items-center justify-between border-b pb-3">
+        <h3 class="text-lg font-bold">Rekapitulasi Formulir Kehadiran</h3>
+        <button onclick="closeModal('recapModal')" class="text-slate-400 text-2xl">&times;</button>
+      </div>
+      <textarea id="recapTextarea" readonly class="w-full h-64 p-3 bg-slate-50 dark:bg-zinc-800 text-xs font-mono rounded border focus:outline-none resize-none"></textarea>
+      <div class="grid grid-cols-2 gap-3">
+        <button onclick="closeModal('recapModal')" class="py-2.5 rounded-ios-md bg-slate-100 font-bold text-sm">Selesai</button>
+        <button onclick="copyRecapText()" class="py-2.5 rounded-ios-md bg-ios-blue text-white font-bold text-sm flex items-center justify-center gap-2"><i data-lucide="copy" class="w-4 h-4"></i> Salin Rekap</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="detailAbsentsModal" class="ios-modal fixed inset-0 bg-black/60 z-[3000] hidden items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-md">
+    <div class="ios-modal-content w-full sm:max-w-2xl bg-white dark:bg-zinc-900 rounded-t-ios-xl sm:rounded-ios-lg p-6 shadow-2xl flex flex-col gap-4 transform translate-y-full transition-transform">
+      <div class="flex items-center justify-between border-b pb-3">
+        <h3 id="detailAbsModalTitle" class="text-lg font-bold">Keterangan Tidak Hadir</h3>
+        <button onclick="closeModal('detailAbsentsModal')" class="text-slate-400 text-2xl">&times;</button>
+      </div>
+      <div id="detailAbsModalContent" class="flex flex-col gap-4 max-h-[450px] overflow-y-auto py-2"></div>
+      <div class="flex justify-end"><button onclick="closeModal('detailAbsentsModal')" class="px-6 py-2.5 rounded-ios-md bg-slate-100 font-bold text-sm">Tutup</button></div>
+    </div>
+  </div>
+
+  <div id="generalAnnounceModal" class="ios-modal fixed inset-0 bg-black/60 z-[3000] hidden items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-md">
+    <div class="ios-modal-content w-full sm:max-w-md bg-white dark:bg-zinc-900 rounded-t-ios-xl sm:rounded-ios-lg p-6 shadow-2xl flex flex-col gap-4 transform translate-y-full transition-transform">
+      <div class="flex items-center justify-between border-b pb-3">
+        <h3 class="text-lg font-bold">Edit Pengumuman Umum</h3>
+        <button onclick="closeModal('generalAnnounceModal')" class="text-slate-400 text-2xl">&times;</button>
+      </div>
+      <textarea id="editGeneralAnnounceText" onblur="this.value = standardizeEYD(this.value);" class="w-full h-32 p-3 rounded-ios-md bg-slate-50 border text-sm resize-none focus:outline-none"></textarea>
+      <div class="grid grid-cols-2 gap-3">
+        <button onclick="closeModal('generalAnnounceModal')" class="py-2.5 rounded-ios-md bg-slate-100 font-bold text-sm">Batal</button>
+        <button onclick="saveGeneralAnnounce()" class="py-2.5 rounded-ios-md bg-ios-blue text-white font-bold text-sm">Simpan</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="scheduleModal" class="ios-modal fixed inset-0 bg-black/60 z-[3000] hidden items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-md">
+    <div class="ios-modal-content w-full sm:max-w-md bg-white dark:bg-zinc-900 rounded-t-ios-xl sm:rounded-ios-lg p-6 shadow-2xl flex flex-col gap-4 transform translate-y-full transition-transform">
+      <div class="flex items-center justify-between border-b pb-3">
+        <h3 id="scheduleModalTitle" class="text-lg font-bold">Tambah Kegiatan</h3>
+        <button onclick="closeModal('scheduleModal')" class="text-slate-400 text-2xl">&times;</button>
+      </div>
+      <div class="flex flex-col gap-3">
+        <input type="date" id="schedModalDate" class="w-full px-4 py-2.5 rounded-ios-md glass-input text-sm">
+        <input type="time" id="schedModalTime" class="w-full px-4 py-2.5 rounded-ios-md glass-input text-sm">
+        <input type="text" id="schedModalTitleInput" class="w-full px-4 py-2.5 rounded-ios-md glass-input text-sm" placeholder="Nama Kegiatan">
+        <input type="text" id="schedModalLocation" class="w-full px-4 py-2.5 rounded-ios-md glass-input text-sm" placeholder="Lokasi">
+        <input type="file" id="schedModalPhoto" accept="image/*" class="text-xs">
+      </div>
+      <div class="grid grid-cols-2 gap-3 mt-2">
+        <button onclick="closeModal('scheduleModal')" class="py-2.5 rounded-ios-md bg-slate-100 font-bold text-sm">Batal</button>
+        <button onclick="saveNewSchedule()" class="py-2.5 rounded-ios-md bg-ios-blue text-white font-bold text-sm">Simpan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FIX Modal Preview Documented Photo (z-index & pointer events) -->
+  <div id="photoPreviewModal" class="fixed inset-0 bg-black/80 z-[9999] hidden items-center justify-center p-4 backdrop-blur-md pointer-events-auto">
+    <div class="w-full max-w-xl bg-zinc-950 rounded-ios-lg p-4 shadow-2xl flex flex-col gap-3 text-white pointer-events-auto relative">
+      <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
+        <h4 id="photoPreviewTitle" class="text-sm font-bold">Dokumentasi Kegiatan</h4>
+        <button onclick="closePhotoModal()" class="text-zinc-400 hover:text-white text-3xl font-bold p-2 leading-none">&times;</button>
+      </div>
+      <div class="w-full h-80 rounded overflow-hidden bg-black flex items-center justify-center">
+        <img id="photoPreviewImg" src="" class="max-w-full max-h-full object-contain">
+      </div>
+      <div class="flex justify-end">
+        <button onclick="closePhotoModal()" class="px-5 py-2.5 rounded bg-zinc-800 hover:bg-zinc-700 text-xs font-bold pointer-events-auto">Tutup Pratinjau</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentUser = null;
+    let scheduleModalMode = 'add';
+    let editingOldDate = '';
+    let editingOldTime = '';
+    let editingOldTitle = '';
+
+    const DEFAULT_SVG_LOGO = `<svg class="w-10 h-10 filter drop-shadow-md" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#007aff" /><stop offset="100%" stop-color="#5856d6" /></linearGradient><linearGradient id="sixGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ffffff" /><stop offset="100%" stop-color="#e2e8f0" /></linearGradient></defs><path d="M50 5 L85 15 V45 C85 70 50 92 50 92 C50 92 15 70 15 45 V15 L50 5 Z" fill="url(#shieldGrad)" stroke="rgba(255,255,255,0.2)" stroke-width="2"/><path d="M52 26 C40 26 34 35 34 48 C34 60 41 68 53 68 C63 68 70 60 70 49 C70 39 63 32 52 32 C47 32 42 35 40 39 C40 33 45 28 52 28 Z M52 38 C58 38 62 42 62 49 C62 55 58 59 52 59 C46 59 42 55 42 49 C42 42 46 38 52 38 Z" fill="url(#sixGrad)"/></svg>`;
+    const DEFAULT_SVG_LOGO_LOGIN = `<svg class="w-14 h-14" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="shieldGradLogin" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ffffff" /><stop offset="100%" stop-color="#f8fafc" /></linearGradient><linearGradient id="sixGradLogin" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#007aff" /><stop offset="100%" stop-color="#5856d6" /></linearGradient></defs><path d="M50 5 L85 15 V45 C85 70 50 92 50 92 C50 92 15 70 15 45 V15 L50 5 Z" fill="url(#shieldGradLogin)" stroke="rgba(255,255,255,0.4)" stroke-width="2"/><path d="M52 26 C40 26 34 35 34 48 C34 60 41 68 53 68 C63 68 70 60 70 49 C70 39 63 32 52 32 C47 32 42 35 40 39 C40 33 45 28 52 28 Z M52 38 C58 38 62 42 62 49 C62 55 58 59 52 59 C46 59 42 55 42 49 C42 42 46 38 52 38 Z" fill="url(#sixGradLogin)"/></svg>`;
+
+    let appData = {
+      settings: { total_batalyon: 600, total_putra: 333, total_putri: 267, general_announcement: "Selamat datang di E-Arvy. Silakan laksanakan presensi harian tepat waktu.", custom_logo: "" },
+      prodis: [], cadets: {}, schedules: [], kepulangan: [], announcements: [], latestAttendance: null, historyAttendance: []
+    };
+
+    let activeCategory = 'Batalyon';
+    let lineChartInstance = null;
+    let pieChartInstance = null;
+    let nextEventInterval = null;
+
+    const storage = {
+      _data: {},
+      getItem(key) { try { return window.localStorage.getItem(key); } catch(e) { return this._data[key] || null; } },
+      setItem(key, val) { try { window.localStorage.setItem(key, val); } catch(e) { this._data[key] = String(val); } },
+      removeItem(key) { try { window.localStorage.removeItem(key); } catch(e) { delete this._data[key]; } }
+    };
+    const isLocalMode = true;
+
+    function showToast(title, message, type = 'info') {
+      const container = document.getElementById('iosToastContainer');
+      if (!container) return;
+      const toast = document.createElement('div');
+      toast.className = 'ios-toast';
+      let iconHtml = type === 'success' ? '<i data-lucide="check-circle-2" class="w-5 h-5 text-ios-green"></i>' : (type === 'error' ? '<i data-lucide="x-circle" class="w-5 h-5 text-ios-red"></i>' : '<i data-lucide="info" class="w-5 h-5 text-ios-blue"></i>');
+      toast.innerHTML = `${iconHtml}<div class="flex-1"><h4 class="text-xs font-black text-slate-900 dark:text-white">${title}</h4><p class="text-[10px] text-slate-500 font-semibold mt-0.5">${message}</p></div>`;
+      container.appendChild(toast);
+      lucide.createIcons();
+      setTimeout(() => toast.classList.add('show'), 50);
+      setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 400); }, 4500);
+    }
+
+    function standardizeEYD(text) {
+      if (!text) return "";
+      let formatted = text.trim().replace(/\s+/g, ' ');
+      formatted = formatted.replace(/(^\s*|[.!?]\s+)([a-z])/g, (m, sep, char) => sep + char.toUpperCase());
+      const acronyms = {"pdh":"PDH", "pdl":"PDL", "fk":"FK", "if":"IF", "rsda":"RSDA", "bio":"BIO", "te":"TE", "fm":"FM", "ked":"KED"};
+      let words = formatted.split(' ').map(w => {
+        let clean = w.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"").toLowerCase();
+        return acronyms[clean] ? w.replace(new RegExp(clean, 'i'), acronyms[clean]) : w;
+      });
+      return words.join(' ');
+    }
+
+    function initMockDatabase() {
+      if (!storage.getItem('e_arvy_initialized_new_v5')) {
+        const defaultProdiList = [
+          { prodiId: 1, originalName: "IF 1", currentName: "IF 1", kompiNumber: 1 },
+          { prodiId: 2, originalName: "IF 2", currentName: "IF 2", kompiNumber: 2 },
+          { prodiId: 3, originalName: "IF 3", currentName: "IF 3", kompiNumber: 3 },
+        ];
+        storage.setItem('e_arvy_prodis', JSON.stringify(defaultProdiList));
+
+        const users = [
+          { username: 'admin', password: 'admin123', role: 'Admin', prodiName: '', kompiName: '', profilePhoto: '' },
+          { username: 'piket', password: 'piket123', role: 'Piket', prodiName: '', kompiName: '', profilePhoto: '' }
+        ];
+        defaultProdiList.forEach(p => users.push({ username: p.currentName.replace(/\s+/g, '').toLowerCase(), password: 'kadet123', role: 'Kopral Kadet', prodiName: p.currentName, kompiName: 'Kompi ' + p.kompiNumber, profilePhoto: '' }));
+        storage.setItem('e_arvy_users', JSON.stringify(users));
+
+        const cadets = {};
+        defaultProdiList.forEach(p => {
+          cadets[p.currentName] = [];
+          for (let i = 1; i <= 25; i++) cadets[p.currentName].push({ no: i, name: `Kadet ${p.currentName} No ${i}`, gender: (i % 2 === 1) ? "Laki-Laki" : "Perempuan" });
+        });
+        storage.setItem('e_arvy_cadets', JSON.stringify(cadets));
+        storage.setItem('e_arvy_settings', JSON.stringify(appData.settings));
+
+        const todayStr = new Date().toISOString().split('T')[0];
+        const defaultSchedules = [
+          { date: todayStr, time: "05:00", title: "Apel Pagi", location: "Lapangan Utama", photoUrl: "" },
+          { date: todayStr, time: "12:00", title: "Makan Siang", location: "Ruang Makan", photoUrl: "" },
+          { date: todayStr, time: "20:00", title: "Apel Malam", location: "Lapangan Utama", photoUrl: "" }
+        ];
+        storage.setItem('e_arvy_schedules', JSON.stringify(defaultSchedules));
+        storage.setItem('e_arvy_kepulangan', JSON.stringify([]));
+        storage.setItem('e_arvy_absence_statuses', JSON.stringify(['Sakit', 'Izin', 'Alpa', 'Dinas', 'Bajaga', 'Gasuh', 'Kontrol RSPPN', 'Rawat Jalan', 'Tanpa Keterangan']));
+        storage.setItem('e_arvy_initialized_new_v5', 'true');
+      }
+    }
+
+    function callServer(methodName, params, successCallback, errorCallback) {
+      setTimeout(() => {
+        try { const result = simulateServerCall(methodName, params); if (successCallback) successCallback(result); } 
+        catch (e) { if (errorCallback) errorCallback(e); }
+      }, 150);
+    }
+
+    function simulateServerCall(methodName, params) {
+      if (methodName === 'login') {
+        const users = JSON.parse(storage.getItem('e_arvy_users'));
+        const user = users.find(u => u.username.toLowerCase() === params.username.toLowerCase() && u.password === params.password);
+        if (user) { logLocalActivity(user.username, "Login ke sistem e-Arvy"); return user; }
+        return null;
+      }
+      if (methodName === 'getInitialData') {
+        const data = {};
+        data.settings = JSON.parse(storage.getItem('e_arvy_settings'));
+        data.prodis = JSON.parse(storage.getItem('e_arvy_prodis'));
+        data.cadets = JSON.parse(storage.getItem('e_arvy_cadets'));
+        data.schedules = JSON.parse(storage.getItem('e_arvy_schedules'));
+        data.kepulangan = JSON.parse(storage.getItem('e_arvy_kepulangan'));
+        data.announcements = JSON.parse(storage.getItem('e_arvy_announcements') || '[]');
+        data.historyAttendance = JSON.parse(storage.getItem('e_arvy_history_attendance') || '[]');
+        data.historyAttendance.sort((a, b) => new Date(b.verifiedAt) - new Date(a.verifiedAt));
+        data.latestAttendance = data.historyAttendance.length > 0 ? data.historyAttendance[0] : null;
+        return data;
+      }
+      if (methodName === 'saveAttendance') {
+        const histories = JSON.parse(storage.getItem('e_arvy_history_attendance') || '[]');
+        const logId = "L_" + new Date().getTime();
+        const absentCount = params.absents.length;
+        const presentCount = params.totalCadets - absentCount;
+        let textRecap = `DATA ${params.activityName.toUpperCase()} KOPRAL KADET (${params.date})\n\nHADIR : ${presentCount}\nKURANG : ${absentCount}\n`;
+        const logEntry = { logId, date: params.date, activityName: params.activityName, category: params.category, totalCadets: params.totalCadets, absentCount, presentCount, verifier: params.verifier, verifiedAt: new Date().toISOString(), absents: params.absents, recapText: textRecap };
+        histories.push(logEntry);
+        storage.setItem('e_arvy_history_attendance', JSON.stringify(histories));
+        logLocalActivity(params.verifier, `Verifikasi presensi permanen: ${params.activityName}`);
+        return { logId, recapText: textRecap };
+      }
+      if (methodName === 'saveDeparture') {
+        const list = JSON.parse(storage.getItem('e_arvy_kepulangan'));
+        const idx = list.findIndex(k => k.prodiName === params.prodiName && k.date === params.date);
+        const entry = { prodiName: params.prodiName, date: params.date, time: params.time, status: params.attendanceInfo, videoUrl: params.videoBase64 ? "https://placehold.co/640x360?text=Video" : params.existingVideoUrl };
+        if (idx !== -1) list[idx] = entry; else list.push(entry);
+        storage.setItem('e_arvy_kepulangan', JSON.stringify(list));
+        
+        const logs = JSON.parse(storage.getItem('e_arvy_departure_logs') || '[]');
+        const logIdx = logs.findIndex(l => l.prodiName === params.prodiName && l.date === params.date);
+        if (logIdx !== -1) logs[logIdx] = entry; else logs.push(entry);
+        storage.setItem('e_arvy_departure_logs', JSON.stringify(logs));
+        
+        logLocalActivity(params.username, `Update kepulangan prodi ${params.prodiName}`);
+        return { success: true, videoUrl: entry.videoUrl };
+      }
+      if (methodName === 'saveAnnouncement') {
+        const list = JSON.parse(storage.getItem('e_arvy_announcements') || '[]');
+        const idx = list.findIndex(a => a.date === params.date);
+        const entry = { date: params.date, pakaianInfo: params.pakaianInfo, piketBatalyonPutraName: params.piketBatalyonPutraName, piketBatalyonPutraTelegram: params.piketBatalyonPutraTelegram, piketBatalyonPutraAvatar: params.piketBatalyonPutraAvatar, piketBatalyonPutriName: params.piketBatalyonPutriName, piketBatalyonPutriTelegram: params.piketBatalyonPutriTelegram, piketBatalyonPutriAvatar: params.piketBatalyonPutriAvatar };
+        if (idx !== -1) list[idx] = entry; else list.push(entry);
+        storage.setItem('e_arvy_announcements', JSON.stringify(list));
+        logLocalActivity(params.username, `Update pengumuman`);
+        return { success: true };
+      }
+      if (methodName === 'saveSchedule') {
+        const list = JSON.parse(storage.getItem('e_arvy_schedules'));
+        if (params.action === 'add') list.push({ date: params.date, time: params.time, title: params.title, location: params.location, photoUrl: params.photoUrl });
+        else if (params.action === 'edit') {
+          const idx = list.findIndex(s => s.date === params.oldDate && s.time === params.oldTime && s.title === params.oldTitle);
+          if (idx !== -1) list[idx] = { date: params.date, time: params.time, title: params.title, location: params.location, photoUrl: params.photoUrl };
+        } else if (params.action === 'delete') {
+          const idx = list.findIndex(s => s.date === params.date && s.time === params.time && s.title === params.title);
+          if (idx !== -1) list.splice(idx, 1);
+        }
+        list.sort((a,b) => a.time.localeCompare(b.time));
+        storage.setItem('e_arvy_schedules', JSON.stringify(list));
+        logLocalActivity(params.username, `Update jadwal: ${params.title}`);
+        return { success: true };
+      }
+      if (methodName === 'updateTotalCadets') {
+        const settings = JSON.parse(storage.getItem('e_arvy_settings'));
+        settings.total_batalyon = params.batalyon; settings.total_putra = params.putra; settings.total_putri = params.putri;
+        if(params.generalAnnouncement) settings.general_announcement = params.generalAnnouncement;
+        if(params.customLogo !== undefined) settings.custom_logo = params.customLogo;
+        storage.setItem('e_arvy_settings', JSON.stringify(settings));
+        return { success: true };
+      }
+      if (methodName === 'getActivityLogs') return JSON.parse(storage.getItem('e_arvy_logs') || '[]').reverse();
+      if (methodName === 'updateProdiNames') {
+        const prodis = JSON.parse(storage.getItem('e_arvy_prodis'));
+        const pIdx = prodis.findIndex(p => p.currentName === params.oldName);
+        if (pIdx !== -1) prodis[pIdx].currentName = params.newName;
+        storage.setItem('e_arvy_prodis', JSON.stringify(prodis));
+        logLocalActivity(params.username, `Ganti nama prodi: ${params.oldName} -> ${params.newName}`);
+        return { success: true };
+      }
+      if (methodName === 'updateCadetNames') {
+        const cadets = JSON.parse(storage.getItem('e_arvy_cadets'));
+        cadets[params.prodiName] = params.cadetsList;
+        storage.setItem('e_arvy_cadets', JSON.stringify(cadets));
+        logLocalActivity(params.username, `Ubah roster prodi ${params.prodiName}`);
+        return { success: true };
+      }
+      if (methodName === 'updateAccounts') {
+        const users = JSON.parse(storage.getItem('e_arvy_users'));
+        const idx = users.findIndex(u => u.username === params.targetUsername);
+        if (idx !== -1) { users[idx].password = params.newPassword; storage.setItem('e_arvy_users', JSON.stringify(users)); }
+        logLocalActivity(params.username, `Ubah password: ${params.targetUsername}`);
+        return { success: true };
+      }
+      if (methodName === 'updateProfilePhoto') {
+        const users = JSON.parse(storage.getItem('e_arvy_users'));
+        const idx = users.findIndex(u => u.username === params.username);
+        if (idx !== -1) { users[idx].profilePhoto = params.photoBase64; storage.setItem('e_arvy_users', JSON.stringify(users)); }
+        return { success: true };
+      }
+      return null;
+    }
+
+    function logLocalActivity(username, action) {
+      const logs = JSON.parse(storage.getItem('e_arvy_logs') || '[]');
+      logs.push({ timestamp: new Date().toISOString(), username, action });
+      storage.setItem('e_arvy_logs', JSON.stringify(logs));
+    }
+
+    window.onload = function() {
+      initMockDatabase();
+      const todayStr = new Date().toISOString().split('T')[0];
+      document.getElementById('presensiDate').value = todayStr;
+      document.getElementById('kepulanganFilterDate').value = todayStr;
+      document.getElementById('announceScheduleDate').value = todayStr;
+      checkLoginSession();
+      startRealTimeClock();
+    };
+
+    function checkLoginSession() {
+      const storedUser = storage.getItem('e_arvy_session');
+      if (storedUser) { currentUser = JSON.parse(storedUser); setupUserInterface(); } 
+      else { renderApplicationLogos(); document.getElementById('loginWrapper').classList.remove('hidden'); }
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const user = document.getElementById('loginUsername').value;
+      const pass = document.getElementById('loginPassword').value;
+      callServer('login', { username: user, password: pass }, (res) => {
+        if (res) {
+          currentUser = res; storage.setItem('e_arvy_session', JSON.stringify(res));
+          document.getElementById('loginWrapper').classList.add('hidden');
+          document.getElementById('loginErrorMsg').classList.add('hidden');
+          document.getElementById('loginForm').reset();
+          setupUserInterface(); showToast('Selamat Datang', `Berhasil masuk @${currentUser.username}`, 'success');
+        } else {
+          document.getElementById('loginErrorMsg').classList.remove('hidden'); showToast('Gagal Masuk', 'Kredensial salah.', 'error');
+        }
+      });
+    }
+
+    function logout() {
+      if(confirm('Keluar sistem?')) {
+        storage.removeItem('e_arvy_session'); currentUser = null;
+        renderApplicationLogos(); document.getElementById('loginWrapper').classList.remove('hidden');
+        document.getElementById('userInfoHeader').classList.add('hidden');
+      }
+    }
+
+    function setupUserInterface() {
+      document.getElementById('userHeaderName').innerText = currentUser.username;
+      document.getElementById('userHeaderRole').innerText = currentUser.role;
+      document.getElementById('userInfoHeader').classList.remove('hidden');
+
+      const adminOnly = document.querySelectorAll('.admin-only');
+      if (currentUser.role === 'Admin') adminOnly.forEach(el => { el.classList.remove('hidden'); el.classList.add('flex'); renderAbsenceStatusManager(); });
+      else adminOnly.forEach(el => el.classList.add('hidden'));
+
+      const adminPiket = document.querySelectorAll('.admin-piket-only');
+      if (['Admin', 'Piket', 'Pokdo', 'Pengasuh'].includes(currentUser.role)) {
+        adminPiket.forEach(el => { el.classList.remove('hidden'); el.classList.add('inline-flex'); });
+        document.getElementById('verificationPanel').classList.remove('hidden');
+        document.getElementById('announceConfigForm').classList.remove('hidden'); document.getElementById('announceConfigForm').classList.add('flex');
+        document.getElementById('announceConfigViewer').classList.add('hidden');
+      } else {
+        adminPiket.forEach(el => el.classList.add('hidden'));
+        document.getElementById('verificationPanel').classList.add('hidden');
+        document.getElementById('announceConfigForm').classList.add('hidden'); document.getElementById('announceConfigForm').classList.remove('flex');
+        document.getElementById('announceConfigViewer').classList.remove('hidden');
+      }
+
+      loadDashboardAndAppData();
+      switchTab('dashboard');
+    }
+
+    function renderApplicationLogos() {
+      const customLogo = appData.settings.custom_logo || "";
+      const hContainer = document.getElementById('headerLogoContainer');
+      const lContainer = document.getElementById('loginLogoContainer');
+      const aContainer = document.getElementById('adminLogoPreview');
+
+      if (hContainer) hContainer.innerHTML = customLogo ? `<img src="${customLogo}" class="w-10 h-10 object-contain rounded filter drop-shadow-md">` : DEFAULT_SVG_LOGO;
+      if (lContainer) lContainer.innerHTML = customLogo ? `<img src="${customLogo}" class="w-14 h-14 object-contain rounded">` : DEFAULT_SVG_LOGO_LOGIN;
+      if (aContainer) aContainer.innerHTML = customLogo ? `<img src="${customLogo}" class="w-full h-full object-contain rounded">` : DEFAULT_SVG_LOGO;
+    }
+
+    function uploadCustomAppLogo(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          appData.settings.custom_logo = evt.target.result;
+          callServer('updateTotalCadets', { ...appData.settings, username: currentUser.username }, () => {
+            renderApplicationLogos(); showToast('Logo Kustom', 'Logo diperbarui.', 'success');
+          });
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function resetDefaultAppLogo() {
+      if (confirm('Gunakan logo bawaan?')) {
+        appData.settings.custom_logo = "";
+        callServer('updateTotalCadets', { ...appData.settings, username: currentUser.username }, () => {
+          renderApplicationLogos(); showToast('Logo Dipulihkan', 'Logo bawaan.', 'info');
+        });
+      }
+    }
+
+    function loadDashboardAndAppData() {
+      callServer('getInitialData', null, (data) => {
+        appData = data;
+        renderApplicationLogos(); updateDashboardDetails(); populatePresensiActivities();
+        renderAttendanceList(); populateStatProdiOptions(); renderCharts(); renderHistoryTable();
+        renderKepulanganList(); renderDepartureLogs(); updateProfilePage();
+        if(currentUser.role === 'Admin') { renderAdminProdiList(); populateAdminProdiOptions(); renderAbsenceStatusManager(); }
+      });
+    }
+
+    let isKepulanganResetToday = false;
+    function startRealTimeClock() {
+      setInterval(() => {
+        const now = new Date();
+        const hrs = String(now.getHours()).padStart(2, '0');
+        const mins = String(now.getMinutes()).padStart(2, '0');
+        const secs = String(now.getSeconds()).padStart(2, '0');
+        document.getElementById('realTimeClock').innerText = `${hrs}:${mins}:${secs}`;
+        
+        // Auto reset kepulangan at 03:00:00
+        if (hrs === "03" && mins === "00" && secs === "00" && !isKepulanganResetToday) {
+          appData.kepulangan = [];
+          storage.setItem('e_arvy_kepulangan', JSON.stringify([]));
+          renderKepulanganList();
+          isKepulanganResetToday = true;
+          showToast('Reset Otomatis', 'Data kepulangan telah di-reset pada 03:00 AM.', 'info');
+        }
+        if (hrs === "04") isKepulanganResetToday = false;
+
+        renderDashboardSchedules(now);
+      }, 1000);
+
+      const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+      const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+      const now = new Date();
+      document.getElementById('realTimeDate').innerText = `${days[now.getDay()]} , ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+    }
+
+    // Dashboard Schedule - Active & Next Event Logic
+    function renderDashboardSchedules(now = new Date()) {
+      const flowWrapper = document.getElementById('dashScheduleFlowWrapper');
+      if (!flowWrapper) return;
+      
+      const todayStr = now.toISOString().split('T')[0];
+      const todaySchedules = appData.schedules.filter(s => s.date === todayStr || s.date);
+      
+      if (todaySchedules.length === 0) {
+        flowWrapper.innerHTML = `<p class="text-slate-400 text-xs italic py-4">Belum ada kegiatan.</p>`;
+        return;
+      }
+
+      const sorted = [...todaySchedules].sort((a,b) => a.time.localeCompare(b.time));
+      const currentTimeStr = String(now.getHours()).padStart(2, '0') + ":" + String(now.getMinutes()).padStart(2, '0');
+      
+      let activeIdx = -1;
+      for (let i = 0; i < sorted.length; i++) {
+        if (currentTimeStr >= sorted[i].time) activeIdx = i;
+      }
+      
+      let activeEvent = activeIdx !== -1 ? sorted[activeIdx] : sorted[sorted.length - 1];
+      let nextEvent = activeIdx + 1 < sorted.length ? sorted[activeIdx + 1] : null;
+
+      let html = '';
+      
+      // Card 1: Active Event
+      if (activeEvent) {
+        const photoBtn = activeEvent.photoUrl ? `<button onclick="viewDocumentedPhoto('${activeEvent.title}', '${activeEvent.photoUrl}')" class="px-2.5 py-1 bg-emerald-100 text-ios-green rounded text-xs font-bold"><i data-lucide="image" class="w-3.5 h-3.5 inline"></i> Foto</button>` : '';
+        html += `
+          <div class="flex justify-between items-center p-4 bg-blue-50/50 dark:bg-blue-900/20 rounded-ios-md border border-ios-blue/30 shadow-sm relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-1 h-full bg-ios-blue active-pulse"></div>
+            <div class="flex items-center gap-4 pl-2">
+              <div class="text-center min-w-[70px]">
+                <span class="text-lg font-black text-ios-blue">${activeEvent.time}</span>
+                <span class="text-[9px] font-black uppercase text-slate-400 block -mt-1">Berlangsung</span>
+              </div>
+              <div>
+                <h4 class="text-sm font-extrabold text-slate-800 dark:text-white">${activeEvent.title}</h4>
+                <p class="text-[10px] text-slate-500 font-bold"><i data-lucide="map-pin" class="w-3 h-3 inline text-ios-blue"></i> ${activeEvent.location || "-"}</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              ${photoBtn}
+              <button onclick="triggerQuickAttendance('${activeEvent.title}')" class="px-3 py-1.5 bg-ios-blue text-white rounded text-xs font-bold shadow-sm hover:opacity-90 transition-all">Presensi</button>
+            </div>
+          </div>
+        `;
+      }
+
+      // Card 2: Next Event Countdown
+      if (nextEvent) {
+        const nextTimeParts = nextEvent.time.split(':');
+        let target = new Date(now);
+        target.setHours(parseInt(nextTimeParts[0]), parseInt(nextTimeParts[1]), 0, 0);
+        const diffMs = target - now;
+        const diffHrs = Math.floor(diffMs / 3600000);
+        const diffMins = Math.floor((diffMs % 3600000) / 60000);
+        const diffStr = diffHrs > 0 ? `${diffHrs}j ${diffMins}m` : `${diffMins} menit`;
+
+        html += `
+          <div class="flex justify-between items-center p-4 bg-slate-50 dark:bg-zinc-800/40 rounded-ios-md border border-slate-200/50 dark:border-zinc-700">
+            <div class="flex items-center gap-4">
+              <div class="text-center min-w-[70px]">
+                <span class="text-lg font-black text-slate-700 dark:text-zinc-300">${nextEvent.time}</span>
+                <span class="text-[9px] font-black uppercase text-ios-orange block -mt-1">Berikutnya</span>
+              </div>
+              <div>
+                <h4 class="text-sm font-extrabold text-slate-600 dark:text-zinc-300">${nextEvent.title}</h4>
+              </div>
+            </div>
+            <div class="text-right">
+              <span class="px-2.5 py-1 bg-orange-100 text-ios-orange rounded text-[10px] font-black"><i data-lucide="timer" class="w-3 h-3 inline"></i> ${diffStr} lagi</span>
+            </div>
+          </div>
+        `;
+      }
+      flowWrapper.innerHTML = html;
+      lucide.createIcons();
+    }
+
+    function updateDashboardDetails() {
+      setCategory(activeCategory);
+      document.getElementById('dashGeneralAnnouncement').innerText = appData.settings.general_announcement || "Belum ada pengumuman.";
+      
+      const today = new Date().toISOString().split('T')[0];
+      const ann = appData.announcements.find(a => a.date === today) || appData.announcements[appData.announcements.length - 1];
+      
+      if (ann) {
+        document.getElementById('dashPakaianText').innerText = ann.pakaianInfo || "-";
+        document.getElementById('dashPiketBatPaName').innerText = ann.piketBatalyonPutraName || "-";
+        document.getElementById('dashPiketBatPaTg').href = ann.piketBatalyonPutraTelegram || "#";
+        document.getElementById('dashPiketBatPiName').innerText = ann.piketBatalyonPutriName || "-";
+        document.getElementById('dashPiketBatPiTg').href = ann.piketBatalyonPutriTelegram || "#";
+        if (ann.piketBatalyonPutraAvatar) document.getElementById('dashPiketPaAvatar').src = ann.piketBatalyonPutraAvatar;
+        if (ann.piketBatalyonPutriAvatar) document.getElementById('dashPiketPiAvatar').src = ann.piketBatalyonPutriAvatar;
+
+        document.getElementById('announcePakaian').value = ann.pakaianInfo || "";
+        document.getElementById('announcePiketBatPaName').value = ann.piketBatalyonPutraName || "";
+        document.getElementById('announcePiketBatPaTg').value = ann.piketBatalyonPutraTelegram || "";
+        document.getElementById('announcePiketBatPiName').value = ann.piketBatalyonPutriName || "";
+        document.getElementById('announcePiketBatPiTg').value = ann.piketBatalyonPutriTelegram || "";
+
+        // Tampilan viewer piket di Laman Announce agar sama persis dengan Dashboard
+        document.getElementById('announceConfigViewer').innerHTML = `
+          <div class="flex flex-col gap-3">
+            <div class="p-3.5 bg-slate-50 dark:bg-zinc-800/40 rounded-ios-md border border-slate-100 dark:border-zinc-800/60 flex justify-between items-center">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full border border-ios-blue/30 overflow-hidden bg-slate-200 flex items-center justify-center">
+                  <img src="${ann.piketBatalyonPutraAvatar || ''}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100?text=Pa'">
+                </div>
+                <div>
+                  <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">Piket Batalyon Putra</span>
+                  <h4 class="text-xs font-extrabold text-slate-900 dark:text-white">${ann.piketBatalyonPutraName || '-'}</h4>
+                </div>
+              </div>
+              <a target="_blank" href="${ann.piketBatalyonPutraTelegram || '#'}" class="p-2 rounded-full bg-blue-50 text-ios-blue"><i data-lucide="send" class="w-4 h-4"></i></a>
+            </div>
+            <div class="p-3.5 bg-slate-50 dark:bg-zinc-800/40 rounded-ios-md border border-slate-100 dark:border-zinc-800/60 flex justify-between items-center">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full border border-ios-blue/30 overflow-hidden bg-slate-200 flex items-center justify-center">
+                  <img src="${ann.piketBatalyonPutriAvatar || ''}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100?text=Pi'">
+                </div>
+                <div>
+                  <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">Piket Batalyon Putri</span>
+                  <h4 class="text-xs font-extrabold text-slate-900 dark:text-white">${ann.piketBatalyonPutriName || '-'}</h4>
+                </div>
+              </div>
+              <a target="_blank" href="${ann.piketBatalyonPutriTelegram || '#'}" class="p-2 rounded-full bg-blue-50 text-ios-blue"><i data-lucide="send" class="w-4 h-4"></i></a>
+            </div>
+          </div>
+        `;
+      }
+
+      if (appData.historyAttendance && appData.historyAttendance.length > 0) {
+        const last = appData.historyAttendance[0];
+        document.getElementById('dashLastActName').innerText = last.activityName;
+        document.getElementById('dashLastActDate').innerText = last.date;
+        document.getElementById('dashLastActTotal').innerText = last.totalCadets;
+        document.getElementById('dashLastActPresent').innerText = last.presentCount;
+        document.getElementById('dashLastActAbsent').innerText = last.absentCount;
+        
+        if (last.absentCount > 0) {
+          document.getElementById('dashLastActCat').innerText = "Ada Kekurangan";
+          document.getElementById('dashLastActCat').className = "text-xs font-extrabold px-2.5 py-1 rounded-full bg-rose-50 text-ios-red border border-rose-100";
+        } else {
+          document.getElementById('dashLastActCat').innerText = "Lengkap Hadir";
+          document.getElementById('dashLastActCat').className = "text-xs font-extrabold px-2.5 py-1 rounded-full bg-emerald-50 text-ios-green border border-emerald-100";
+        }
+      }
+      lucide.createIcons();
+    }
+
+    function viewDocumentedPhoto(title, base64) {
+      document.getElementById('photoPreviewTitle').innerText = "Dokumentasi: " + title;
+      document.getElementById('photoPreviewImg').src = base64;
+      document.getElementById('photoPreviewModal').classList.remove('hidden');
+      document.getElementById('photoPreviewModal').classList.add('flex');
+    }
+
+    function closePhotoModal() {
+      document.getElementById('photoPreviewModal').classList.remove('flex');
+      document.getElementById('photoPreviewModal').classList.add('hidden');
+    }
+
+    function triggerQuickAttendance(activityTitle) {
+      switchTab('kehadiran');
+      const select = document.getElementById('presensiActivitySelect');
+      select.value = activityTitle;
+      if (!select.value) { select.value = 'kustom'; document.getElementById('customActivityWrapper').classList.remove('hidden'); document.getElementById('customActivityName').value = activityTitle; } 
+      else { document.getElementById('customActivityWrapper').classList.add('hidden'); }
+      renderAttendanceList();
+    }
+
+    function refreshDataLocally() {
+      const icon = document.getElementById('localRefreshIcon');
+      if (icon) icon.classList.add('animate-spin');
+      loadDashboardAndAppData();
+      setTimeout(() => { if (icon) icon.classList.remove('animate-spin'); showToast('Data Diperbarui', 'Sinkronisasi berhasil.', 'success'); }, 750);
+    }
+
+    function populatePresensiActivities() {
+      const select = document.getElementById('presensiActivitySelect');
+      const statSelect = document.getElementById('statActivitySelect');
+      if (!select) return;
+      select.innerHTML = ''; statSelect.innerHTML = '';
+      const activities = [...new Set(appData.schedules.map(s => s.title))];
+      activities.forEach(act => select.innerHTML += `<option value="${act}">${act}</option>`);
+      select.innerHTML += `<option value="kustom">Tambahan Kegiatan Lainnya...</option>`;
+      statSelect.innerHTML += `<option value="semua" selected>Semua Kegiatan</option>`;
+      activities.forEach(act => statSelect.innerHTML += `<option value="${act}">${act}</option>`);
+      checkCustomActivity();
+    }
+
+    function uploadPiketAvatar(event, type) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          const today = new Date().toISOString().split('T')[0];
+          let ann = appData.announcements.find(a => a.date === today);
+          if (!ann) ann = { date: today, pakaianInfo: "", piketBatalyonPutraName: "", piketBatalyonPutriName: "" };
+          if (type === 'Pa') ann.piketBatalyonPutraAvatar = evt.target.result;
+          else ann.piketBatalyonPutriAvatar = evt.target.result;
+          showToast('Avatar Siap', `Foto profil piket tersimpan sementara. Klik Simpan.`, 'success');
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function viewLastRecapDetail() {
+      if (appData.latestAttendance) { document.getElementById('recapTextarea').value = appData.latestAttendance.recapText; openModal('recapModal'); } 
+      else showToast('Log Kosong', 'Belum ada log presensi.', 'warning');
+    }
+
+    function setCategory(cat) {
+      activeCategory = cat;
+      ['batalyon', 'putra', 'putri'].forEach(b => {
+        const btn = document.getElementById(`cat-btn-${b}`);
+        if (btn) btn.className = b === cat.toLowerCase() ? "flex-1 text-center py-2.5 rounded-ios-sm text-xs font-bold bg-white dark:bg-zinc-700 shadow-sm" : "flex-1 text-center py-2.5 rounded-ios-sm text-xs font-bold text-slate-500 hover:text-slate-800";
+      });
+      const key = `total_${cat.toLowerCase()}`;
+      document.getElementById('presensiTotalQuota').value = appData.settings[key] || 600;
+      renderAttendanceList();
+    }
+
+    function enableQuotaEdit() {
+      const input = document.getElementById('presensiTotalQuota');
+      input.removeAttribute('readonly'); input.className = "w-full px-4 py-2.5 rounded-ios-md bg-white border-2 border-ios-blue text-sm outline-none"; input.focus();
+      input.onblur = function() {
+        const newVal = parseInt(input.value);
+        if (!isNaN(newVal)) {
+          input.setAttribute('readonly', 'true'); input.className = "w-full px-4 py-2.5 rounded-ios-md bg-slate-100 border text-sm text-slate-500 outline-none";
+          appData.settings[activeCategory === 'Batalyon' ? 'total_batalyon' : (activeCategory === 'Putra' ? 'total_putra' : 'total_putri')] = newVal;
+          callServer('updateTotalCadets', { ...appData.settings, username: currentUser.username }, () => showToast('Kuota Diperbarui', 'Tersimpan.', 'success'));
+        }
+      }
+    }
+
+    function checkCustomActivity() {
+      const select = document.getElementById('presensiActivitySelect');
+      const customWrapper = document.getElementById('customActivityWrapper');
+      if (select && select.value === 'kustom') customWrapper.classList.remove('hidden');
+      else customWrapper.classList.add('hidden');
+    }
+
+    // Interactive Search Logic
+    function searchCadet() {
+      const query = document.getElementById('searchCadetInput').value.toLowerCase().trim();
+      if (!query) return;
+
+      let found = false;
+      for (const prodi of appData.prodis) {
+        const cadets = appData.cadets[prodi.currentName] || [];
+        for (const c of cadets) {
+          if (c.name.toLowerCase().includes(query)) {
+            // Found it. 
+            activeCategory = 'Batalyon';
+            setCategory('Batalyon'); // ensure Batalyon view to see all
+            
+            setTimeout(() => {
+              // Open kompi
+              const kompiBody = document.getElementById(`company-body-${prodi.kompiNumber}`);
+              if (kompiBody && kompiBody.classList.contains('hidden')) toggleCompanySection(prodi.kompiNumber);
+              
+              // Open prodi
+              const prodiBody = document.getElementById(`prodi-body-${prodi.prodiId}`);
+              if (prodiBody && prodiBody.classList.contains('hidden')) toggleProdiSection(prodi.prodiId);
+              
+              // Scroll and Highlight
+              const row = document.getElementById(`cadet-row-${prodi.prodiId}-${c.no}`);
+              if (row) {
+                row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                row.classList.add('highlight-search');
+                setTimeout(() => row.classList.remove('highlight-search'), 3000);
+              }
+            }, 100);
+            found = true;
+            break;
+          }
+        }
+        if(found) break;
+      }
+      if (!found) showToast('Tidak Ditemukan', `Kadet dengan nama "${query}" tidak ditemukan.`, 'error');
+    }
+
+    // Bulk Select Actions Array
+    let bulkSelection = {};
+
+    function toggleBulkCheck(prodiId, cadetNo, checked) {
+      if (!bulkSelection[prodiId]) bulkSelection[prodiId] = new Set();
+      if (checked) bulkSelection[prodiId].add(cadetNo);
+      else bulkSelection[prodiId].delete(cadetNo);
+      
+      const toolbar = document.getElementById(`bulk-toolbar-${prodiId}`);
+      if (bulkSelection[prodiId].size > 0) {
+        toolbar.classList.remove('hidden');
+        document.getElementById(`bulk-count-${prodiId}`).innerText = `${bulkSelection[prodiId].size} Terpilih`;
+      } else {
+        toolbar.classList.add('hidden');
+      }
+    }
+
+    function applyBulkAction(prodiId) {
+      if (!bulkSelection[prodiId] || bulkSelection[prodiId].size === 0) return;
+      
+      const status = document.getElementById(`bulk-status-${prodiId}`).value;
+      const fileInput = document.getElementById(`bulk-file-${prodiId}`);
+      
+      const dateStr = document.getElementById('presensiDate').value;
+      let activityName = document.getElementById('presensiActivitySelect').value;
+      if (activityName === 'kustom') activityName = document.getElementById('customActivityName').value || 'Kegiatan Kustom';
+
+      const processBulk = (base64) => {
+        bulkSelection[prodiId].forEach(no => {
+          document.getElementById(`cadet-status-${prodiId}-${no}`).value = status;
+          storage.setItem(`draft_status_${dateStr}_${activityName}_${prodiId}_${no}`, status);
+          
+          if (status !== 'Hadir') {
+            document.getElementById(`absence-detail-${prodiId}-${no}`).classList.remove('hidden');
+            document.getElementById(`absence-detail-${prodiId}-${no}`).classList.add('flex');
+            if (base64) {
+              storage.setItem(`draft_proof_${dateStr}_${activityName}_${prodiId}_${no}`, base64);
+              const img = document.getElementById(`proof-preview-${prodiId}-${no}`);
+              img.src = base64; img.classList.remove('hidden');
+              document.getElementById(`proof-base64-${prodiId}-${no}`).value = base64;
+            }
+          } else {
+            document.getElementById(`absence-detail-${prodiId}-${no}`).classList.add('hidden');
+            storage.removeItem(`draft_proof_${dateStr}_${activityName}_${prodiId}_${no}`);
+            storage.removeItem(`draft_reason_${dateStr}_${activityName}_${prodiId}_${no}`);
+          }
+        });
+
+        // Uncheck all
+        document.querySelectorAll(`.bulk-cb-${prodiId}`).forEach(cb => cb.checked = false);
+        bulkSelection[prodiId].clear();
+        document.getElementById(`bulk-toolbar-${prodiId}`).classList.add('hidden');
+        
+        updateProdiSummary(prodiId);
+        updateAllKompisCumulativeAbsents();
+        showToast('Terapkan Masal', `Berhasil menerapkan status ke kadet yang dipilih.`, 'success');
+      };
+
+      if (fileInput.files && fileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = e => processBulk(e.target.result);
+        reader.readAsDataURL(fileInput.files[0]);
+      } else {
+        processBulk("");
+      }
+    }
+
+
+    function renderAttendanceList() {
+      const container = document.getElementById('kompiGroupWrapper');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const dateStr = document.getElementById('presensiDate').value;
+      let activityName = document.getElementById('presensiActivitySelect').value;
+      if (activityName === 'kustom') activityName = document.getElementById('customActivityName').value || 'Kegiatan Kustom';
+
+      const absenceStatuses = JSON.parse(storage.getItem('e_arvy_absence_statuses') || '["Sakit", "Izin", "Alpa", "Dinas"]');
+      let statusOptionsHtml = `<option value="Hadir">Hadir</option>`;
+      absenceStatuses.forEach(st => statusOptionsHtml += `<option value="${st}">${st}</option>`);
+
+      const kompis = {};
+      appData.prodis.forEach(p => { if (!kompis[p.kompiNumber]) kompis[p.kompiNumber] = []; kompis[p.kompiNumber].push(p); });
+
+      for (let k = 1; k <= 6; k++) {
+        if (!kompis[k]) continue;
+
+        const compCard = document.createElement('div');
+        compCard.className = 'p-5 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-md rounded-ios-lg border border-slate-200/60 shadow-lg flex flex-col gap-3.5';
+        
+        compCard.innerHTML = `
+          <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 py-3 px-4 bg-slate-100/80 rounded-ios-md cursor-pointer hover:opacity-95 transition-all" onclick="toggleCompanySection(${k})">
+            <div class="flex items-center gap-2.5"><i data-lucide="users" class="w-4.5 h-4.5 text-ios-blue"></i><span class="font-extrabold text-sm">Kompi ${k}</span></div>
+            <div class="flex items-center gap-3">
+              <div class="flex items-center gap-1.5 shrink-0">
+                <span id="kompi-hdr-present-${k}" class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-ios-green border border-emerald-500/20">Hadir: 0</span>
+                <span id="kompi-hdr-absent-${k}" class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-rose-500/10 text-ios-red border border-rose-500/20 font-mono">Kurang: 0</span>
+                <span id="kompi-hdr-total-${k}" class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-500 font-mono">Total: 0</span>
+              </div>
+              <i data-lucide="chevron-down" class="w-4.5 h-4.5 text-slate-400"></i>
+            </div>
+          </div>
+          <div class="flex flex-col gap-4 mt-1" id="company-body-${k}"></div>
+        `;
+
+        const compBody = compCard.querySelector(`#company-body-${k}`);
+
+        kompis[k].forEach(prodi => {
+          const prodiBox = document.createElement('div');
+          prodiBox.className = 'border border-slate-200/60 rounded-ios-md overflow-hidden bg-white dark:bg-zinc-900';
+          prodiBox.id = `prodi-box-${prodi.prodiId}`;
+
+          const isEditable = isProdiEditableForCurrentUser(prodi);
+          const isSaved = storage.getItem(`saved_${dateStr}_${activityName}_${prodi.currentName}`) === 'true';
+          const badgeClass = !isEditable ? 'bg-slate-100 text-slate-400' : (isSaved ? 'bg-emerald-50 text-ios-green border-emerald-500/30' : 'bg-slate-100 text-slate-400');
+          const badgeText = !isEditable ? 'Read Only' : (isSaved ? 'Sudah Disimpan' : 'Belum Disimpan');
+
+          const cadetsList = (appData.cadets[prodi.currentName] || []).filter(c => activeCategory === 'Batalyon' || (activeCategory === 'Putra' && c.gender === 'Laki-Laki') || (activeCategory === 'Putri' && c.gender === 'Perempuan'));
+          const draftPresentCount = storage.getItem(`saved_present_cnt_${dateStr}_${activityName}_${prodi.prodiId}`) || cadetsList.length;
+
+          let cadetRowsHtml = '';
+          if (cadetsList.length === 0) {
+            cadetRowsHtml = `<p class="text-xs italic text-slate-400 text-center py-4">Tidak ada anggota.</p>`;
+          } else {
+            // BULK TOOLBAR
+            if (isEditable) {
+              cadetRowsHtml += `
+                <div id="bulk-toolbar-${prodi.prodiId}" class="hidden bg-blue-50 dark:bg-blue-900/30 p-2.5 rounded flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3 border border-blue-200 dark:border-blue-800 gap-2">
+                   <span class="text-xs font-bold text-ios-blue" id="bulk-count-${prodi.prodiId}">0 Terpilih</span>
+                   <div class="flex items-center gap-2 w-full sm:w-auto">
+                      <select id="bulk-status-${prodi.prodiId}" class="text-xs px-2 py-1.5 rounded border outline-none">
+                        ${statusOptionsHtml}
+                      </select>
+                      <input type="file" id="bulk-file-${prodi.prodiId}" accept="image/*" class="text-[10px] w-48 text-slate-500">
+                      <button onclick="applyBulkAction(${prodi.prodiId})" class="px-3 py-1.5 bg-ios-blue text-white rounded text-xs font-bold shrink-0">Terapkan Serempak</button>
+                   </div>
+                </div>
+              `;
+            }
+
+            cadetsList.forEach(c => {
+              const draftStatus = storage.getItem(`draft_status_${dateStr}_${activityName}_${prodi.prodiId}_${c.no}`) || 'Hadir';
+              const draftReason = storage.getItem(`draft_reason_${dateStr}_${activityName}_${prodi.prodiId}_${c.no}`) || '';
+              const draftProof = storage.getItem(`draft_proof_${dateStr}_${activityName}_${prodi.prodiId}_${c.no}`) || '';
+              
+              let selectOptionsSpecific = `<option value="Hadir" ${draftStatus === 'Hadir' ? 'selected' : ''}>Hadir</option>`;
+              absenceStatuses.forEach(st => selectOptionsSpecific += `<option value="${st}" ${draftStatus === st ? 'selected' : ''}>${st}</option>`);
+
+              const checkboxHtml = isEditable ? `<input type="checkbox" class="bulk-cb-${prodi.prodiId} w-3.5 h-3.5 rounded border-gray-300 text-ios-blue focus:ring-ios-blue" onchange="toggleBulkCheck(${prodi.prodiId}, ${c.no}, this.checked)">` : '';
+
+              cadetRowsHtml += `
+                <div id="cadet-row-${prodi.prodiId}-${c.no}" class="grid grid-cols-1 md:grid-cols-4 gap-3 items-center py-2.5 border-b border-slate-100 last:border-0 rounded p-1 transition-colors">
+                  <div class="flex items-center gap-2">
+                    ${checkboxHtml}
+                    <span class="text-xs font-extrabold text-slate-400">No. ${c.no}</span>
+                    <span class="text-[9px] font-black px-1.5 py-0.5 rounded ${c.gender === 'Laki-Laki' ? 'bg-blue-100 text-blue-700' : 'bg-pink-100 text-pink-700'}">${c.gender === 'Laki-Laki' ? 'PA' : 'PI'}</span>
+                  </div>
+                  <div class="md:col-span-2">
+                    <input type="text" class="w-full px-2 py-1 rounded border-0 bg-transparent text-sm font-bold focus:bg-slate-100 focus:outline-none" value="${c.name}" id="cadet-name-${prodi.prodiId}-${c.no}" readonly>
+                  </div>
+                  <div>
+                    <select class="w-full px-2 py-1.5 rounded-ios-sm border bg-slate-50 text-xs font-semibold focus:outline-none" id="cadet-status-${prodi.prodiId}-${c.no}" onchange="handleCadetStatusChange(${prodi.prodiId}, ${c.no})" ${isEditable ? '' : 'disabled'}>
+                      ${selectOptionsSpecific}
+                    </select>
+                  </div>
+                  <div id="absence-detail-${prodi.prodiId}-${c.no}" class="${draftStatus !== 'Hadir' ? 'flex' : 'hidden'} col-span-1 md:col-span-4 flex-col gap-3 p-3 bg-rose-50/50 rounded-ios-md border border-dashed border-rose-200 mt-1">
+                    <input type="text" class="w-full px-3 py-1.5 rounded bg-white border text-xs" placeholder="Sebutkan alasan..." id="absence-reason-${prodi.prodiId}-${c.no}" value="${draftReason}" onblur="this.value = standardizeEYD(this.value); syncDraftReason(${prodi.prodiId}, ${c.no});" ${isEditable ? '' : 'readonly'}>
+                    <div class="flex items-center gap-3">
+                      ${isEditable ? `<label class="px-3 py-1.5 rounded bg-slate-100 border text-xs font-bold cursor-pointer hover:bg-slate-200"><i data-lucide="upload" class="w-3.5 h-3.5 inline"></i> Unggah <input type="file" accept="image/*" class="hidden" onchange="handleProofPhotoUpload(event, ${prodi.prodiId}, ${c.no})"></label>` : ''}
+                      <img id="proof-preview-${prodi.prodiId}-${c.no}" src="${draftProof}" class="h-10 w-16 object-cover rounded border ${draftProof ? '' : 'hidden'}">
+                    </div>
+                    <input type="hidden" id="proof-base64-${prodi.prodiId}-${c.no}" value="${draftProof}">
+                  </div>
+                </div>
+              `;
+            });
+          }
+
+          prodiBox.innerHTML = `
+            <div class="flex justify-between items-center px-4 py-3 bg-slate-50/50 border-b cursor-pointer hover:bg-slate-50" onclick="toggleProdiSection(${prodi.prodiId})">
+              <div class="flex items-center gap-2"><span class="font-extrabold text-sm">${prodi.currentName}</span><span class="text-[9px] font-black uppercase px-2.5 py-0.5 rounded-full border ${badgeClass}">${badgeText}</span></div>
+              <div class="flex items-center gap-2"><span id="prodi-lbl-stat-${prodi.prodiId}" class="text-xs font-extrabold text-slate-400">Hadir: ${draftPresentCount}/${cadetsList.length}</span><i data-lucide="chevron-down" id="prodi-chevron-${prodi.prodiId}" class="w-4.5 h-4.5 text-slate-400 transition-transform"></i></div>
+            </div>
+            <div class="p-4 hidden flex-col gap-4 border-t" id="prodi-body-${prodi.prodiId}">
+              ${cadetRowsHtml}
+              <div class="p-4 bg-slate-50 rounded-ios-md border flex flex-col gap-3 mt-3">
+                <div class="grid grid-cols-3 gap-2 text-center">
+                  <div><h4 class="text-base font-extrabold">${cadetsList.length}</h4><p class="text-[9px] text-slate-400 uppercase font-bold">Total</p></div>
+                  <div><h4 id="prodi-sum-present-${prodi.prodiId}" class="text-base font-extrabold text-ios-green">${draftPresentCount}</h4><p class="text-[9px] text-slate-400 uppercase font-bold">Hadir</p></div>
+                  <div><h4 id="prodi-sum-absent-${prodi.prodiId}" class="text-base font-extrabold text-slate-500">${cadetsList.length - draftPresentCount}</h4><p class="text-[9px] text-slate-400 uppercase font-bold">Kurang</p></div>
+                </div>
+                <div class="text-xs pt-2 border-t" id="prodi-sum-detail-${prodi.prodiId}"></div>
+                ${isEditable ? `<div class="pt-3 flex justify-end gap-2"><button type="button" onclick="saveSingleProdiAttendance(${prodi.prodiId}, '${prodi.currentName}')" class="px-4 py-2 bg-ios-blue text-white rounded text-xs font-black shadow-sm">Simpan Sementara</button></div>` : ''}
+              </div>
+            </div>
+          `;
+          compBody.appendChild(prodiBox);
+          updateProdiSummary(prodi.prodiId);
+        });
+
+        container.appendChild(compCard);
+        updateSingleKompiCumulativeHdr(k);
+      }
+      lucide.createIcons();
+    }
+
+    function isProdiEditableForCurrentUser(prodi) {
+      if (['Admin', 'Piket', 'Pokdo', 'Pengasuh'].includes(currentUser.role)) return true;
+      if (currentUser.role === 'Kopral Kadet') return currentUser.kompiName === 'Kompi ' + prodi.kompiNumber;
+      return false;
+    }
+
+    function toggleCompanySection(kompiId) { document.getElementById(`company-body-${kompiId}`).classList.toggle('hidden'); }
+    function toggleProdiSection(prodiId) { document.getElementById(`prodi-body-${prodiId}`).classList.toggle('hidden'); document.getElementById(`prodi-body-${prodiId}`).classList.toggle('flex'); const chev = document.getElementById(`prodi-chevron-${prodiId}`); if(chev) chev.classList.toggle('rotate-180'); }
+
+    function handleCadetStatusChange(prodiId, cadetNo) {
+      const dateStr = document.getElementById('presensiDate').value;
+      let activityName = document.getElementById('presensiActivitySelect').value;
+      if (activityName === 'kustom') activityName = document.getElementById('customActivityName').value || 'Kegiatan Kustom';
+      const status = document.getElementById(`cadet-status-${prodiId}-${cadetNo}`).value;
+      const detailRow = document.getElementById(`absence-detail-${prodiId}-${cadetNo}`);
+      
+      storage.setItem(`draft_status_${dateStr}_${activityName}_${prodiId}_${cadetNo}`, status);
+      if (status !== 'Hadir') { detailRow.classList.remove('hidden'); detailRow.classList.add('flex'); } 
+      else {
+        detailRow.classList.add('hidden'); document.getElementById(`absence-reason-${prodiId}-${cadetNo}`).value = '';
+        storage.removeItem(`draft_reason_${dateStr}_${activityName}_${prodiId}_${cadetNo}`);
+        storage.removeItem(`draft_proof_${dateStr}_${activityName}_${prodiId}_${cadetNo}`);
+        document.getElementById(`proof-preview-${prodiId}-${cadetNo}`).classList.add('hidden');
+        document.getElementById(`proof-base64-${prodiId}-${cadetNo}`).value = '';
+      }
+      updateProdiSummary(prodiId); updateAllKompisCumulativeAbsents();
+    }
+
+    function syncDraftReason(prodiId, cadetNo) {
+      const dateStr = document.getElementById('presensiDate').value;
+      let activityName = document.getElementById('presensiActivitySelect').value;
+      if (activityName === 'kustom') activityName = document.getElementById('customActivityName').value || 'Kegiatan Kustom';
+      const reasonInput = document.getElementById(`absence-reason-${prodiId}-${cadetNo}`);
+      reasonInput.value = standardizeEYD(reasonInput.value);
+      storage.setItem(`draft_reason_${dateStr}_${activityName}_${prodiId}_${cadetNo}`, reasonInput.value);
+      updateProdiSummary(prodiId);
+    }
+
+    function handleProofPhotoUpload(event, prodiId, cadetNo) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const dateStr = document.getElementById('presensiDate').value;
+          let activityName = document.getElementById('presensiActivitySelect').value;
+          if (activityName === 'kustom') activityName = document.getElementById('customActivityName').value || 'Kegiatan Kustom';
+          const img = document.getElementById(`proof-preview-${prodiId}-${cadetNo}`);
+          img.src = e.target.result; img.classList.remove('hidden');
+          document.getElementById(`proof-base64-${prodiId}-${cadetNo}`).value = e.target.result;
+          storage.setItem(`draft_proof_${dateStr}_${activityName}_${prodiId}_${cadetNo}`, e.target.result);
+          showToast('Gambar Terunggah', 'Bukti fisik berhasil dilampirkan.', 'info');
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function updateProdiSummary(prodiId) {
+      const prodi = appData.prodis.find(p => p.prodiId === prodiId);
+      if (!prodi) return;
+      const dateStr = document.getElementById('presensiDate').value;
+      let act = document.getElementById('presensiActivitySelect').value;
+      if (act === 'kustom') act = document.getElementById('customActivityName').value || 'Kegiatan Kustom';
+
+      const cadets = (appData.cadets[prodi.currentName] || []).filter(c => activeCategory === 'Batalyon' || (activeCategory === 'Putra' && c.gender === 'Laki-Laki') || (activeCategory === 'Putri' && c.gender === 'Perempuan'));
+      let present = 0, absent = 0; const details = [];
+
+      cadets.forEach(c => {
+        const status = storage.getItem(`draft_status_${dateStr}_${act}_${prodiId}_${c.no}`) || 'Hadir';
+        if (status === 'Hadir') present++;
+        else { absent++; const reason = storage.getItem(`draft_reason_${dateStr}_${act}_${prodiId}_${c.no}`) || ''; details.push(`• No ${c.no} (${status}) ${reason}`); }
+      });
+
+      const lblStat = document.getElementById(`prodi-lbl-stat-${prodiId}`);
+      if (lblStat) lblStat.innerText = `Hadir: ${present}/${cadets.length}`;
+      const sumP = document.getElementById(`prodi-sum-present-${prodiId}`); if(sumP) sumP.innerText = present;
+      const sumA = document.getElementById(`prodi-sum-absent-${prodiId}`); if(sumA) sumA.innerText = absent;
+      const det = document.getElementById(`prodi-sum-detail-${prodiId}`);
+      if (det) det.innerHTML = `<strong>Keterangan Tidak Hadir:</strong><p class="${absent > 0 ? 'text-ios-red' : 'text-slate-400 italic'} mt-1 text-xs">${absent > 0 ? details.join('<br>') : 'Nihil'}</p>`;
+    }
+
+    function updateSingleKompiCumulativeHdr(k) {
+      const prodis = appData.prodis.filter(p => p.kompiNumber === k);
+      let total = 0, present = 0, absent = 0;
+      const dateStr = document.getElementById('presensiDate').value;
+      let act = document.getElementById('presensiActivitySelect').value;
+      if (act === 'kustom') act = document.getElementById('customActivityName').value || 'Kegiatan Kustom';
+
+      prodis.forEach(p => {
+        const cadets = (appData.cadets[p.currentName] || []).filter(c => activeCategory === 'Batalyon' || (activeCategory === 'Putra' && c.gender === 'Laki-Laki') || (activeCategory === 'Putri' && c.gender === 'Perempuan'));
+        total += cadets.length;
+        cadets.forEach(c => {
+          const status = storage.getItem(`draft_status_${dateStr}_${act}_${p.prodiId}_${c.no}`) || 'Hadir';
+          if (status === 'Hadir') present++; else absent++;
+        });
+      });
+
+      const hp = document.getElementById(`kompi-hdr-present-${k}`); if(hp) hp.innerText = `Hadir: ${present}`;
+      const ha = document.getElementById(`kompi-hdr-absent-${k}`); if(ha) ha.innerText = `Kurang: ${absent}`;
+      const ht = document.getElementById(`kompi-hdr-total-${k}`); if(ht) ht.innerText = `Total: ${total}`;
+    }
+
+    function updateAllKompisCumulativeAbsents() { for (let k = 1; k <= 6; k++) updateSingleKompiCumulativeHdr(k); }
+
+    function saveSingleProdiAttendance(prodiId, prodiName) {
+      const dateStr = document.getElementById('presensiDate').value;
+      let act = document.getElementById('presensiActivitySelect').value;
+      if (act === 'kustom') act = document.getElementById('customActivityName').value;
+      if (!act) { showToast('Validasi', 'Tentukan kegiatan!', 'warning'); return; }
+
+      const cadets = (appData.cadets[prodiName] || []).filter(c => activeCategory === 'Batalyon' || (activeCategory === 'Putra' && c.gender === 'Laki-Laki') || (activeCategory === 'Putri' && c.gender === 'Perempuan'));
+      let presentCnt = 0, absentCnt = 0;
+      cadets.forEach(c => { const st = storage.getItem(`draft_status_${dateStr}_${act}_${prodiId}_${c.no}`) || 'Hadir'; if (st === 'Hadir') presentCnt++; else absentCnt++; });
+
+      storage.setItem(`saved_present_cnt_${dateStr}_${act}_${prodiId}`, presentCnt);
+      storage.setItem(`saved_absent_cnt_${dateStr}_${act}_${prodiId}`, absentCnt);
+      storage.setItem(`saved_total_cnt_${dateStr}_${act}_${prodiId}`, cadets.length);
+      storage.setItem(`saved_${dateStr}_${act}_${prodiName}`, 'true');
+      showToast('Tersimpan Sementara', `Prodi ${prodiName} diperbarui.`, 'success');
+      loadDashboardAndAppData();
+    }
+
+    function verifyAndSaveAttendance() {
+      const dateStr = document.getElementById('presensiDate').value;
+      let act = document.getElementById('presensiActivitySelect').value;
+      if (act === 'kustom') act = document.getElementById('customActivityName').value;
+      if (!act) { showToast('Validasi', 'Nama kegiatan kosong!', 'warning'); return; }
+
+      const totalQuota = parseInt(document.getElementById('presensiTotalQuota').value);
+      const absents = [];
+      appData.prodis.forEach(prodi => {
+        const cadets = (appData.cadets[prodi.currentName] || []).filter(c => activeCategory === 'Batalyon' || (activeCategory === 'Putra' && c.gender === 'Laki-Laki') || (activeCategory === 'Putri' && c.gender === 'Perempuan'));
+        cadets.forEach(c => {
+          const status = storage.getItem(`draft_status_${dateStr}_${act}_${prodi.prodiId}_${c.no}`) || 'Hadir';
+          if (status !== 'Hadir') {
+            const reason = storage.getItem(`draft_reason_${dateStr}_${act}_${prodi.prodiId}_${c.no}`) || '';
+            const att = storage.getItem(`draft_proof_${dateStr}_${act}_${prodi.prodiId}_${c.no}`) || '';
+            absents.push({ prodiName: prodi.currentName, cadetNo: c.no, cadetName: c.name, status, reason, attachmentBase64: att });
+          }
+        });
+      });
+
+      const btn = document.querySelector('#verificationPanel button');
+      btn.innerHTML = '<i data-lucide="loader" class="animate-spin w-4.5 h-4.5"></i> Memproses...';
+      callServer('saveAttendance', { date: dateStr, activityName: act, category: activeCategory, totalCadets: totalQuota, absents, verifier: currentUser.username }, (res) => {
+        btn.innerHTML = '<i data-lucide="check-circle2" class="w-4.5 h-4.5"></i> Verifikasi & Simpan';
+        appData.prodis.forEach(p => storage.setItem(`saved_${dateStr}_${act}_${p.currentName}`, 'true'));
+        document.getElementById('recapTextarea').value = res.recapText; openModal('recapModal');
+        loadDashboardAndAppData(); showToast('Verifikasi Permanen', 'Selesai.', 'success');
+      }, () => { btn.innerHTML = '<i data-lucide="check-circle2" class="w-4.5 h-4.5"></i> Verifikasi'; showToast('Gagal', 'Terjadi kesalahan.', 'error'); });
+    }
+
+    function copyRecapText() {
+      const t = document.getElementById('recapTextarea'); t.select(); t.setSelectionRange(0, 99999);
+      try { document.execCommand('copy'); showToast('Berhasil', 'Teks disalin!', 'success'); } catch(e) { navigator.clipboard.writeText(t.value); }
+    }
+
+    function populateStatProdiOptions() {
+      const s = document.getElementById('statProdiSelect');
+      if (s) { s.innerHTML = ''; appData.prodis.forEach(p => s.innerHTML += `<option value="${p.currentName}">${p.currentName}</option>`); }
+    }
+    function toggleStatProdiSelect() { document.getElementById('statProdiWrapper').classList[document.getElementById('statLevelSelect').value === 'Prodi' ? 'remove' : 'add']('hidden'); renderCharts(); }
+    function resetSearchFilter() { document.getElementById('statSearchDate').value = ''; renderHistoryTable(); }
+
+    function renderCharts() {
+      const act = document.getElementById('statActivitySelect').value;
+      const lvl = document.getElementById('statLevelSelect').value;
+      const pd = document.getElementById('statProdiSelect').value;
+      const src = document.getElementById('pieLogSourceSelect').value;
+      
+      const absenceStatuses = JSON.parse(storage.getItem('e_arvy_absence_statuses') || '["Sakit", "Izin", "Alpa", "Dinas"]');
+      const bgColors = ['#34c759', '#ff9500', '#007aff', '#ff3b30', '#8e8e93', '#af52de', '#ff2d55', '#5ac8fa', '#32ade6', '#a2845e'];
+
+      const days = Array.from({length: 30}, (_, i) => i + 1);
+      const dataHadir = new Array(30).fill(100);
+
+      days.forEach(day => {
+        const dateStr = `2026-06-${day < 10 ? '0'+day : day}`;
+        const log = appData.historyAttendance.find(l => l.date === dateStr && (act === 'semua' || l.activityName === act));
+        if (log) {
+          if (lvl === 'Batalyon') dataHadir[day - 1] = (log.presentCount / log.totalCadets) * 100;
+          else if (lvl === 'Prodi') dataHadir[day - 1] = ((25 - log.absents.filter(a => a.prodiName === pd).length) / 25) * 100;
+          else if (lvl === 'Putra' || lvl === 'Putri') {
+            const isPa = lvl === 'Putra';
+            const total = isPa ? appData.settings.total_putra : appData.settings.total_putri;
+            const absentCnt = log.absents.filter(a => {
+              const c = (appData.cadets[a.prodiName] || []).find(x => x.no === a.cadetNo);
+              return c && c.gender === (isPa ? 'Laki-Laki' : 'Perempuan');
+            }).length;
+            dataHadir[day - 1] = ((total - absentCnt) / total) * 100;
+          }
+        }
+      });
+
+      const lineEl = document.getElementById('lineChart');
+      if (lineChartInstance && lineEl) lineChartInstance.destroy();
+      if (lineEl) {
+        lineChartInstance = new Chart(lineEl.getContext('2d'), {
+          type: 'line', data: { labels: days.map(d => `${d} Jun`), datasets: [{ label: 'Kehadiran (%)', data: dataHadir, borderColor: '#007aff', backgroundColor: 'rgba(0,122,255,0.06)', borderWidth: 2.5, fill: true }] },
+          options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 80, max: 100 } } }
+        });
+      }
+
+      // Dynamic Pie Chart based on all statuses
+      let statusCounts = { 'Hadir': 0 };
+      absenceStatuses.forEach(st => statusCounts[st] = 0);
+
+      let logPool = src === 'last' && appData.historyAttendance.length > 0 ? [appData.historyAttendance[0]] : appData.historyAttendance;
+      logPool.forEach(log => {
+        if (act === 'semua' || log.activityName === act) {
+          let items = log.absents || [];
+          if (lvl === 'Prodi') items = items.filter(a => a.prodiName === pd);
+          else if (lvl === 'Putra' || lvl === 'Putri') items = items.filter(a => { const c = (appData.cadets[a.prodiName] || []).find(x => x.no === a.cadetNo); return c && c.gender === (lvl === 'Putra' ? 'Laki-Laki' : 'Perempuan'); });
+          
+          // count presents (rough estimate for pie context relative to absents)
+          statusCounts['Hadir'] += (log.totalCadets - items.length);
+
+          items.forEach(a => {
+             if(statusCounts[a.status] !== undefined) statusCounts[a.status]++;
+             else statusCounts[a.status] = 1; // fallback
+          });
+        }
+      });
+
+      const pieLabels = ['Hadir', ...absenceStatuses];
+      const pieData = [statusCounts['Hadir'], ...absenceStatuses.map(st => statusCounts[st])];
+      const actualColors = pieLabels.map((_, i) => bgColors[i % bgColors.length]);
+
+      const pieEl = document.getElementById('pieChart');
+      if (pieChartInstance && pieEl) pieChartInstance.destroy();
+      if (pieEl) {
+        pieChartInstance = new Chart(pieEl.getContext('2d'), {
+          type: 'doughnut', data: { labels: pieLabels, datasets: [{ data: pieData, backgroundColor: actualColors, borderWidth: 1.5 }] },
+          options: { responsive: true, maintainAspectRatio: false }
+        });
+      }
+    }
+
+    function renderHistoryTable() {
+      const tbody = document.getElementById('historyTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+      const sDate = document.getElementById('statSearchDate').value;
+      const sAct = document.getElementById('statActivitySelect').value;
+      let list = appData.historyAttendance || [];
+      if (sDate) list = list.filter(h => h.date === sDate);
+      if (sAct && sAct !== 'semua') list = list.filter(h => h.activityName === sAct);
+      
+      document.getElementById('historyRecordsCount').innerText = `${list.length} Log`;
+      if (list.length === 0) { tbody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-400 italic">Tidak ada data.</td></tr>`; return; }
+
+      list.forEach(h => {
+        let absentsSummary = "Nihil (Lengkap)";
+        if (h.absents && h.absents.length > 0) {
+          const grouped = {}; h.absents.forEach(a => { grouped[a.status] = (grouped[a.status] || 0) + 1; });
+          absentsSummary = Object.keys(grouped).map(k => `${k}: ${grouped[k]}`).join(', ');
+        }
+        
+        const delBtn = ['Admin', 'Piket', 'Pokdo', 'Pengasuh'].includes(currentUser.role) ? `<button onclick="deleteHistoryLog('${h.logId}')" class="px-2.5 py-1 bg-rose-50 text-ios-red rounded text-xs font-black">Hapus</button>` : '';
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-50 border-b text-xs cursor-pointer" onclick="if(event.target.tagName !== 'BUTTON') openDetailAbsentsModal('${h.logId}')">
+            <td class="py-3 px-4"><span class="font-bold block">${h.date}</span></td>
+            <td class="py-3 px-4 font-extrabold flex flex-col"><span>${h.activityName}</span><span class="text-[10px] text-ios-blue font-medium mt-0.5">Klik untuk detail foto</span></td>
+            <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full bg-slate-100 font-bold">${h.category}</span></td>
+            <td class="py-3 px-4"><span class="font-extrabold text-ios-green">${h.presentCount}</span> / <span class="font-bold text-slate-400">${h.totalCadets}</span></td>
+            <td class="py-3 px-4 font-bold ${h.absentCount > 0 ? 'text-ios-red' : 'text-ios-green'}">${absentsSummary}</td>
+            <td class="py-3 px-4 text-right"><div class="flex items-center justify-end gap-1.5"><button onclick="viewHistoryRecap('${h.logId}')" class="px-3 py-1 bg-slate-100 rounded font-black text-ios-blue text-xs">Rekap</button>${delBtn}</div></td>
+          </tr>
+        `;
+      });
+    }
+
+    function deleteHistoryLog(logId) {
+      if (confirm('Hapus permanen log ini?')) {
+        appData.historyAttendance = appData.historyAttendance.filter(h => h.logId !== logId);
+        storage.setItem('e_arvy_history_attendance', JSON.stringify(appData.historyAttendance));
+        logLocalActivity(currentUser.username, `Hapus log presensi: ${logId}`);
+        showToast('Terhapus', 'Log presensi dihapus.', 'success'); loadDashboardAndAppData();
+      }
+    }
+
+    function openDetailAbsentsModal(logId) {
+      const item = appData.historyAttendance.find(h => h.logId === logId);
+      if (!item) return;
+      document.getElementById('detailAbsModalTitle').innerText = `Ketidakhadiran: ${item.activityName}`;
+      const content = document.getElementById('detailAbsModalContent'); content.innerHTML = '';
+      if (!item.absents || item.absents.length === 0) { content.innerHTML = `<div class="text-center py-8 text-slate-400 italic">Hadir Lengkap.</div>`; openModal('detailAbsentsModal'); return; }
+
+      const grouped = {}; item.absents.forEach(a => { if(!grouped[a.status]) grouped[a.status] = []; grouped[a.status].push(a); });
+      for (const status in grouped) {
+        let listHtml = '';
+        grouped[status].forEach(cad => {
+          const imgHtml = cad.attachmentBase64 ? `<div class="mt-2 w-36 h-20 border rounded cursor-zoom-in" onclick="viewDocumentedPhoto('${cad.cadetName}', '${cad.attachmentBase64}')"><img src="${cad.attachmentBase64}" class="w-full h-full object-cover"></div>` : '';
+          listHtml += `<div class="text-xs leading-relaxed pl-1 border-l-2 border-ios-blue/40 mt-2"><div><span class="font-extrabold">KK [${cad.prodiName}] ${cad.cadetName}</span> <span class="text-[10px] text-slate-500 block">Absen: ${cad.cadetNo} ${cad.reason ? `"${cad.reason}"` : ''}</span></div>${imgHtml}</div>`;
+        });
+        content.innerHTML += `<div class="flex flex-col gap-2 p-3 bg-slate-50 rounded-ios-md border"><div class="border-b pb-1.5 font-black text-ios-blue text-xs uppercase">${status} (${grouped[status].length})</div>${listHtml}</div>`;
+      }
+      openModal('detailAbsentsModal');
+    }
+
+    function viewHistoryRecap(logId) {
+      const item = appData.historyAttendance.find(h => h.logId === logId);
+      if (item) { document.getElementById('recapTextarea').value = item.recapText; openModal('recapModal'); }
+    }
+
+    function renderKepulanganList() {
+      const wrapper = document.getElementById('kepulanganListWrapper');
+      if (!wrapper) return; wrapper.innerHTML = '';
+      const selectedDate = document.getElementById('kepulanganFilterDate').value || new Date().toISOString().split('T')[0];
+      let sudahCount = 0, belumCount = 0;
+
+      appData.prodis.forEach((prodi) => {
+        let record = appData.kepulangan.find(k => k.prodiName === prodi.currentName && k.date === selectedDate);
+        if (!record) { record = { prodiName: prodi.currentName, date: selectedDate, time: "17:00", status: "Belum Pulang", videoUrl: "" }; appData.kepulangan.push(record); }
+      });
+
+      const filtered = appData.kepulangan.filter(k => k.date === selectedDate);
+      filtered.forEach((k) => {
+        if (k.videoUrl) sudahCount++; else belumCount++;
+        const canEdit = ['Admin', 'Piket', 'Pokdo', 'Pengasuh'].includes(currentUser.role) || (currentUser.role === 'Kopral Kadet' && currentUser.prodiName === k.prodiName);
+        const disabledAttr = canEdit ? '' : 'disabled';
+        const trueIdx = appData.kepulangan.findIndex(item => item.prodiName === k.prodiName && item.date === selectedDate);
+
+        wrapper.innerHTML += `
+          <div class="grid grid-cols-6 gap-4 items-center py-3 px-4 border-b text-sm">
+            <div class="col-span-2 font-bold">${k.prodiName}</div>
+            <div><input type="date" value="${k.date}" id="dep-date-${trueIdx}" ${disabledAttr} class="w-full px-2 py-1.5 rounded bg-slate-50 border text-xs outline-none"></div>
+            <div><input type="time" value="${k.time}" id="dep-time-${trueIdx}" ${disabledAttr} class="w-full px-2 py-1.5 rounded bg-slate-50 border text-xs outline-none"></div>
+            <div><input type="text" value="${k.status}" id="dep-status-${trueIdx}" ${disabledAttr} class="w-full px-2 py-1.5 rounded bg-slate-50 border text-xs outline-none"></div>
+            <div>
+              <div class="flex flex-col gap-1.5">
+                ${canEdit ? `<label class="w-fit px-2.5 py-1 rounded bg-slate-100 border text-[10px] font-bold cursor-pointer"><i data-lucide="video" class="w-3.5 h-3.5 inline"></i> Unggah <input type="file" accept="video/*" class="hidden" onchange="handleDepVideoUpload(event, ${trueIdx})"></label>` : ''}
+                <div id="dep-video-preview-box-${trueIdx}" class="text-[10px]">${k.videoUrl ? `<a href="${k.videoUrl}" target="_blank" class="text-ios-blue font-semibold">Lihat Bukti</a>` : ''}</div>
+                <input type="hidden" id="dep-video-base64-${trueIdx}">
+              </div>
+            </div>
+            <div class="text-right">${canEdit ? `<button id="dep-save-btn-${trueIdx}" onclick="saveDepartureRow(${trueIdx}, '${k.prodiName}')" class="px-4 py-1.5 bg-ios-blue text-white rounded text-xs font-bold">Simpan</button>` : 'Read Only'}</div>
+          </div>
+        `;
+      });
+      document.getElementById('depCountSudah').innerText = `${sudahCount} Prodi`;
+      document.getElementById('depCountBelum').innerText = `${belumCount} Prodi`;
+      lucide.createIcons();
+    }
+
+    function renderDepartureLogs() {
+      const tbody = document.getElementById('departureLogsTableBody');
+      if (!tbody) return; tbody.innerHTML = '';
+      const searchDate = document.getElementById('depLogSearchDate').value;
+      const logs = JSON.parse(storage.getItem('e_arvy_departure_logs') || '[]');
+      let filtered = searchDate ? logs.filter(l => l.date === searchDate) : logs;
+      filtered.sort((a, b) => new Date(b.date + ' ' + b.time) - new Date(a.date + ' ' + a.time));
+
+      if (filtered.length === 0) { tbody.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-slate-400 italic">Tidak ada log.</td></tr>`; return; }
+      filtered.forEach(l => {
+        tbody.innerHTML += `
+          <tr class="border-b text-xs">
+            <td class="py-2.5 px-3">${l.date}</td><td class="py-2.5 px-3 font-extrabold">${l.prodiName}</td><td class="py-2.5 px-3 font-bold text-ios-blue">${l.time}</td>
+            <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${l.videoUrl ? 'bg-emerald-100 text-ios-green' : 'bg-slate-100'}">${l.status}</span></td>
+            <td class="py-2.5 px-3 flex items-center gap-2">
+              ${l.videoUrl ? `<a href="${l.videoUrl}" target="_blank" class="text-ios-blue font-bold">Lihat</a>` : `Nihil`}
+              ${['Admin', 'Piket'].includes(currentUser.role) ? `<button onclick="deleteDepartureLog('${l.date}', '${l.prodiName}')" class="px-2 py-1 bg-red-100 text-red-600 rounded text-[10px] font-bold"><i data-lucide="trash" class="w-3 h-3"></i></button>` : ''}
+            </td>
+          </tr>
+        `;
+      });
+      lucide.createIcons();
+    }
+
+    function deleteDepartureLog(date, prodiName) {
+      if(confirm(`Hapus log kepulangan ${prodiName} tanggal ${date}?`)) {
+        let logs = JSON.parse(storage.getItem('e_arvy_departure_logs') || '[]');
+        logs = logs.filter(l => !(l.date === date && l.prodiName === prodiName));
+        storage.setItem('e_arvy_departure_logs', JSON.stringify(logs));
+        
+        // Also remove from appData.kepulangan if it exists
+        const idx = appData.kepulangan.findIndex(k => k.date === date && k.prodiName === prodiName);
+        if (idx !== -1) { appData.kepulangan[idx].videoUrl = ""; appData.kepulangan[idx].status = "Belum Pulang"; }
+        storage.setItem('e_arvy_kepulangan', JSON.stringify(appData.kepulangan));
+
+        renderKepulanganList(); renderDepartureLogs(); showToast('Terhapus', 'Log kepulangan dibersihkan.', 'success');
+      }
+    }
+
+    function handleDepVideoUpload(e, idx) {
+      if (e.target.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          document.getElementById(`dep-video-base64-${idx}`).value = event.target.result;
+          document.getElementById(`dep-video-preview-box-${idx}`).innerHTML = `<span class="text-ios-green font-bold">Video Terpilih</span>`;
+        };
+        reader.readAsDataURL(e.target.files[0]);
+      }
+    }
+
+    function saveDepartureRow(idx, prodiName) {
+      const date = document.getElementById(`dep-date-${idx}`).value;
+      const time = document.getElementById(`dep-time-${idx}`).value;
+      const status = standardizeEYD(document.getElementById(`dep-status-${idx}`).value);
+      const videoBase64 = document.getElementById(`dep-video-base64-${idx}`).value;
+      
+      callServer('saveDeparture', { prodiName, date, time, attendanceInfo: status, videoBase64, username: currentUser.username, existingVideoUrl: appData.kepulangan[idx] ? appData.kepulangan[idx].videoUrl : "" }, (res) => {
+        if (appData.kepulangan[idx]) { appData.kepulangan[idx].date = date; appData.kepulangan[idx].time = time; appData.kepulangan[idx].status = status; if(res.videoUrl) appData.kepulangan[idx].videoUrl = res.videoUrl; }
+        showToast('Disimpan', 'Kepulangan diperbarui.', 'success'); renderKepulanganList(); renderDepartureLogs();
+      });
+    }
+
+    function renderAbsenceStatusManager() {
+      const wrapper = document.getElementById('absenceStatusListWrapper');
+      if (!wrapper) return; wrapper.innerHTML = '';
+      const statuses = JSON.parse(storage.getItem('e_arvy_absence_statuses') || '["Sakit", "Izin", "Alpa", "Dinas"]');
+      statuses.forEach(st => wrapper.innerHTML += `<div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 text-xs font-bold border"><span>${st}</span><button onclick="deleteAbsenceStatus('${st}')" class="text-ios-red font-black text-xs">&times;</button></div>`);
+    }
+
+    function addNewAbsenceStatus() {
+      const val = standardizeEYD(document.getElementById('newAbsenceStatusInput').value);
+      if (!val) return;
+      let statuses = JSON.parse(storage.getItem('e_arvy_absence_statuses') || '["Sakit", "Izin", "Alpa", "Dinas"]');
+      if (!statuses.includes(val) && val !== 'Hadir') {
+        statuses.push(val); storage.setItem('e_arvy_absence_statuses', JSON.stringify(statuses));
+        document.getElementById('newAbsenceStatusInput').value = ''; renderAbsenceStatusManager(); populatePresensiActivities(); renderAttendanceList(); showToast('Ditambahkan', 'Status presensi ditambahkan.', 'success');
+      }
+    }
+    function deleteAbsenceStatus(st) {
+      if(confirm(`Hapus status "${st}"?`)) {
+        let statuses = JSON.parse(storage.getItem('e_arvy_absence_statuses'));
+        storage.setItem('e_arvy_absence_statuses', JSON.stringify(statuses.filter(s => s !== st)));
+        renderAbsenceStatusManager(); populatePresensiActivities(); renderAttendanceList();
+      }
+    }
+
+    function loadAnnounceSchedules() {
+      const date = document.getElementById('announceScheduleDate').value;
+      const container = document.getElementById('announceSchedulesList');
+      if (!container) return; container.innerHTML = '';
+      const list = appData.schedules.filter(s => s.date === date || s.date);
+      if (list.length === 0) { container.innerHTML = '<p class="text-slate-400 text-xs italic text-center py-4">Tidak ada jadwal.</p>'; return; }
+
+      list.forEach(s => {
+        const pBtn = s.photoUrl ? `<button onclick="viewDocumentedPhoto('${s.title}', '${s.photoUrl}')" class="px-2.5 py-1 bg-emerald-100 text-ios-green rounded text-xs font-bold">Foto</button>` : '';
+        container.innerHTML += `
+          <div class="flex flex-col sm:flex-row justify-between items-center gap-3 p-3.5 bg-slate-50 rounded-ios-md border">
+            <div class="flex flex-col gap-1 w-full sm:w-auto text-center sm:text-left">
+              <div class="flex items-center justify-center sm:justify-start gap-3"><h4 class="text-sm font-black text-ios-blue">${s.time}</h4><span class="text-sm font-bold">${s.title}</span></div>
+              <div class="text-[10px] text-slate-400 font-bold"><i data-lucide="map-pin" class="w-3.5 h-3.5 inline"></i> ${s.location || "-"}</div>
+            </div>
+            <div class="admin-piket-only hidden gap-2">
+              ${pBtn}
+              <button onclick="triggerEditScheduleWholeModal('${s.date}', '${s.time}', '${s.title}', '${s.location || ''}')" class="px-3 py-1 bg-slate-200 rounded text-xs font-bold">Ubah</button>
+              <button onclick="deleteSchedule('${s.date}', '${s.time}', '${s.title}')" class="px-3 py-1 bg-red-100 text-red-600 rounded text-xs font-bold">Hapus</button>
+            </div>
+          </div>
+        `;
+      });
+      const adminPiket = document.querySelectorAll('.admin-piket-only');
+      if (['Admin', 'Piket', 'Pokdo', 'Pengasuh'].includes(currentUser.role)) adminPiket.forEach(el => { el.classList.remove('hidden'); el.classList.add('inline-flex'); });
+      lucide.createIcons();
+    }
+
+    function openAddScheduleModal() {
+      scheduleModalMode = 'add'; document.getElementById('scheduleModalTitle').innerText = 'Tambah Kegiatan Baru';
+      document.getElementById('schedModalDate').value = document.getElementById('announceScheduleDate').value;
+      document.getElementById('schedModalTime').value = '08:00'; document.getElementById('schedModalTitleInput').value = '';
+      document.getElementById('schedModalLocation').value = ''; document.getElementById('schedModalPhoto').value = '';
+      openModal('scheduleModal');
+    }
+
+    function triggerEditScheduleWholeModal(date, time, title, location) {
+      scheduleModalMode = 'edit'; editingOldDate = date; editingOldTime = time; editingOldTitle = title;
+      document.getElementById('schedModalDate').value = date; document.getElementById('schedModalTime').value = time;
+      document.getElementById('schedModalTitleInput').value = title; document.getElementById('schedModalLocation').value = location || '';
+      document.getElementById('schedModalPhoto').value = ''; openModal('scheduleModal');
+    }
+
+    function saveNewSchedule() {
+      const date = document.getElementById('schedModalDate').value; const time = document.getElementById('schedModalTime').value;
+      const title = standardizeEYD(document.getElementById('schedModalTitleInput').value); const location = standardizeEYD(document.getElementById('schedModalLocation').value);
+      if(!date || !time || !title) return;
+
+      const fileInput = document.getElementById('schedModalPhoto');
+      const processSave = (base64) => {
+        callServer('saveSchedule', { action: scheduleModalMode, oldDate: editingOldDate, oldTime: editingOldTime, oldTitle: editingOldTitle, date, time, title, location, photoUrl: base64, username: currentUser.username }, () => {
+          if (scheduleModalMode === 'add') appData.schedules.push({ date, time, title, location, photoUrl: base64 });
+          else { const idx = appData.schedules.findIndex(s => s.date === editingOldDate && s.time === editingOldTime && s.title === editingOldTitle); if(idx !== -1) appData.schedules[idx] = { date, time, title, location, photoUrl: base64 }; }
+          appData.schedules.sort((a,b) => a.time.localeCompare(b.time)); closeModal('scheduleModal'); loadDashboardAndAppData(); loadAnnounceSchedules(); showToast('Tersimpan', `Kegiatan disimpan.`, 'success');
+        });
+      };
+      if (fileInput.files && fileInput.files[0]) { const r = new FileReader(); r.onload = e => processSave(e.target.result); r.readAsDataURL(fileInput.files[0]); } else processSave("");
+    }
+
+    function deleteSchedule(date, time, title) {
+      if (confirm(`Hapus kegiatan "${title}"?`)) {
+        callServer('saveSchedule', { action: 'delete', date, time, title, username: currentUser.username }, () => {
+          appData.schedules = appData.schedules.filter(s => !(s.date === date && s.time === time && s.title === title));
+          loadDashboardAndAppData(); loadAnnounceSchedules(); showToast('Dihapus', 'Kegiatan dihapus.', 'info');
+        });
+      }
+    }
+
+    function saveAnnounceConfig(e) {
+      e.preventDefault(); const today = new Date().toISOString().split('T')[0];
+      const ann = appData.announcements.find(a => a.date === today) || {};
+      callServer('saveAnnouncement', { date: today, pakaianInfo: standardizeEYD(document.getElementById('announcePakaian').value), piketBatalyonPutraName: standardizeEYD(document.getElementById('announcePiketBatPaName').value), piketBatalyonPutraTelegram: document.getElementById('announcePiketBatPaTg').value, piketBatalyonPutraAvatar: ann.piketBatalyonPutraAvatar, piketBatalyonPutriName: standardizeEYD(document.getElementById('announcePiketBatPiName').value), piketBatalyonPutriTelegram: document.getElementById('announcePiketBatPiTg').value, piketBatalyonPutriAvatar: ann.piketBatalyonPutriAvatar, username: currentUser.username }, () => {
+        showToast('Disimpan', 'Pengumuman diperbarui.', 'success'); loadDashboardAndAppData();
+      });
+    }
+
+    function openEditGeneralAnnounceModal() { document.getElementById('editGeneralAnnounceText').value = appData.settings.general_announcement || ''; openModal('generalAnnounceModal'); }
+    function saveGeneralAnnounce() {
+      const text = standardizeEYD(document.getElementById('editGeneralAnnounceText').value);
+      callServer('updateTotalCadets', { ...appData.settings, generalAnnouncement: text, username: currentUser.username }, () => {
+        appData.settings.general_announcement = text; document.getElementById('dashGeneralAnnouncement').innerText = text; closeModal('generalAnnounceModal'); showToast('Tersimpan', 'Pesan diubah.', 'success');
+      });
+    }
+
+    function updateProfilePage() {
+      document.getElementById('profileUsername').innerText = currentUser.username; document.getElementById('profileRoleBadge').innerText = currentUser.role;
+      document.getElementById('profileKompi').innerText = currentUser.kompiName || "Batalyon"; document.getElementById('profileProdi').innerText = currentUser.prodiName || "Tidak ada (Akses Penuh)";
+      if (currentUser.profilePhoto) { document.getElementById('profilePhotoImg').src = currentUser.profilePhoto; document.getElementById('profilePhotoImg').classList.remove('hidden'); document.getElementById('profilePhotoPlaceholder').classList.add('hidden'); }
+      
+      callServer('getActivityLogs', null, (logs) => {
+        const container = document.getElementById('activityLogsWrapper'); if (!container) return; container.innerHTML = '';
+        
+        // Log Filtering Logic
+        let filteredLogs = logs;
+        if (currentUser.role !== 'Admin') {
+          filteredLogs = logs.filter(l => l.username === currentUser.username);
+        }
+
+        if (filteredLogs.length === 0) { container.innerHTML = '<p class="text-slate-400 text-xs italic py-4">Belum ada aktivitas tercatat.</p>'; return; }
+        filteredLogs.forEach(l => {
+          const t = new Date(l.timestamp);
+          container.innerHTML += `<div class="flex justify-between items-center p-2.5 bg-slate-50 rounded border text-xs"><span><strong>${l.username}</strong>: ${l.action}</span><span class="text-[10px] text-slate-400 font-bold">${t.toLocaleTimeString()} ${t.toLocaleDateString()}</span></div>`;
+        });
+      });
+    }
+
+    function handleProfilePhotoUpload(event) {
+      if (event.target.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          callServer('updateProfilePhoto', { username: currentUser.username, photoBase64: e.target.result }, () => {
+            currentUser.profilePhoto = e.target.result; storage.setItem('e_arvy_session', JSON.stringify(currentUser)); updateProfilePage(); showToast('Diperbarui', 'Foto profil diganti.', 'success');
+          });
+        };
+        reader.readAsDataURL(event.target.files[0]);
+      }
+    }
+
+    function renderAdminProdiList() {
+      const wrapper = document.getElementById('adminProdiList'); if (!wrapper) return; wrapper.innerHTML = '';
+      appData.prodis.forEach(p => {
+        const uName = p.currentName.replace(/\s+/g, '').toLowerCase();
+        wrapper.innerHTML += `
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3 p-4 bg-slate-50 rounded-ios-md border text-sm">
+            <div><div class="font-bold">${p.currentName}</div><div class="text-xs text-slate-400">Kompi: ${p.kompiNumber} | User: ${uName}</div></div>
+            <div class="flex flex-col gap-2"><input type="text" value="${p.currentName}" id="adm-prodi-name-${p.prodiId}" class="px-3 py-1.5 rounded border text-xs"><input type="password" value="kadet123" id="adm-prodi-pass-${p.prodiId}" class="px-3 py-1.5 rounded border text-xs"></div>
+            <div class="flex items-center gap-2 md:justify-end"><button onclick="saveAdminProdiRow(${p.prodiId}, '${p.currentName}')" class="px-3 py-1.5 bg-ios-blue text-white rounded text-xs font-bold">Simpan Nama</button><button onclick="saveAdminProdiPass('${uName}', ${p.prodiId})" class="px-3 py-1.5 bg-slate-200 rounded text-xs font-bold">Ubah Sandi</button></div>
+          </div>`;
+      });
+    }
+
+    function saveAdminProdiRow(pId, oName) {
+      const nName = standardizeEYD(document.getElementById(`adm-prodi-name-${pId}`).value);
+      if (nName && nName !== oName) callServer('updateProdiNames', { oldName: oName, newName: nName, username: currentUser.username }, () => { showToast('Diubah', `Prodi menjadi ${nName}`, 'success'); loadDashboardAndAppData(); });
+    }
+    function saveAdminProdiPass(uName, pId) {
+      const pass = document.getElementById(`adm-prodi-pass-${pId}`).value;
+      if (pass) callServer('updateAccounts', { targetUsername: uName, newPassword: pass, username: currentUser.username }, () => showToast('Diubah', 'Sandi diperbarui!', 'success'));
+    }
+
+    function populateAdminProdiOptions() {
+      const s = document.getElementById('adminSelectProdi'); if(s) { s.innerHTML = ''; appData.prodis.forEach(p => s.innerHTML += `<option value="${p.currentName}">${p.currentName}</option>`); loadAdminCadetList(); }
+    }
+
+    function loadAdminCadetList() {
+      const sel = document.getElementById('adminSelectProdi').value; const list = appData.cadets[sel] || [];
+      const w = document.getElementById('adminCadetListWrapper'); if(!w) return; w.innerHTML = '';
+      list.forEach(c => {
+        w.innerHTML += `
+          <div class="flex flex-col gap-2 p-3 bg-slate-50 rounded border text-xs">
+            <div class="flex justify-between"><span class="font-extrabold">No: ${c.no}</span><button onclick="removeCadetFromSelectedProdi(${c.no})" class="text-ios-red font-bold">&times; Hapus</button></div>
+            <div class="grid grid-cols-2 gap-2">
+              <input type="text" value="${c.name}" id="adm-cadet-name-${c.no}" class="px-2 py-1.5 border rounded">
+              <select id="adm-cadet-gender-${c.no}" class="px-2 py-1.5 border rounded"><option value="Laki-Laki" ${c.gender==='Laki-Laki'?'selected':''}>Putra</option><option value="Perempuan" ${c.gender==='Perempuan'?'selected':''}>Putri</option></select>
+            </div>
+          </div>`;
+      });
+    }
+
+    function addBlankCadetToSelectedProdi() {
+      const p = document.getElementById('adminSelectProdi').value; if(!appData.cadets[p]) appData.cadets[p] = [];
+      appData.cadets[p].push({ no: appData.cadets[p].length + 1, name: `Kadet Baru`, gender: "Laki-Laki" }); loadAdminCadetList();
+    }
+    function removeCadetFromSelectedProdi(no) {
+      const p = document.getElementById('adminSelectProdi').value;
+      if(confirm(`Hapus absen ${no}?`)) { appData.cadets[p] = appData.cadets[p].filter(c => c.no !== no).map((c,i) => ({...c, no: i+1})); loadAdminCadetList(); }
+    }
+    function saveAdminCadetNames() {
+      const p = document.getElementById('adminSelectProdi').value; const list = [];
+      (appData.cadets[p] || []).forEach(c => list.push({ no: c.no, name: standardizeEYD(document.getElementById(`adm-cadet-name-${c.no}`).value), gender: document.getElementById(`adm-cadet-gender-${c.no}`).value }));
+      callServer('updateCadetNames', { prodiName: p, cadetsList: list, username: currentUser.username }, () => { showToast('Tersimpan', `Roster ${p} disimpan.`, 'success'); loadDashboardAndAppData(); });
+    }
+
+    function switchTab(viewId) {
+      if (viewId === 'admin-panel' && currentUser.role !== 'Admin') return switchTab('dashboard');
+      document.querySelectorAll('.view-screen').forEach(s => { s.classList.add('hidden'); s.classList.remove('active'); });
+      const target = document.getElementById(`view-${viewId}`); if (target) { target.classList.remove('hidden'); target.classList.add('active'); }
+      document.querySelectorAll('.sidebar-item').forEach(i => i.className = i.id === `side-${viewId}` ? "sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-ios-md text-sm font-bold text-ios-blue bg-blue-100/50" : "sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-ios-md text-sm font-semibold text-slate-600 hover:bg-slate-100/50");
+      document.querySelectorAll('.tabbar-item').forEach(i => i.className = i.id === `tab-${viewId}` ? "tabbar-item flex flex-col items-center gap-0.5 text-ios-blue font-bold text-[10px]" : "tabbar-item flex flex-col items-center gap-0.5 text-slate-400 font-semibold text-[10px]");
+      if (viewId === 'statistik') { renderCharts(); renderHistoryTable(); } else if (viewId === 'announce') loadAnnounceSchedules(); else if (viewId === 'profile') updateProfilePage(); else if (viewId === 'kepulangan') { renderKepulanganList(); renderDepartureLogs(); } else if (viewId === 'admin-panel') renderAbsenceStatusManager();
+    }
+
+    function toggleTheme() {
+      const html = document.documentElement; html.classList.toggle('dark');
+      if (html.classList.contains('dark')) document.body.setAttribute('data-theme', 'dark'); else document.body.removeAttribute('data-theme');
+      if (document.getElementById('view-statistik').classList.contains('active')) renderCharts();
+    }
+
+    function openModal(modalId) { const m = document.getElementById(modalId); m.classList.remove('hidden'); m.classList.add('flex'); setTimeout(() => m.querySelector('.ios-modal-content').classList.remove('translate-y-full'), 50); }
+    function closeModal(modalId) { const m = document.getElementById(modalId); m.querySelector('.ios-modal-content').classList.add('translate-y-full'); setTimeout(() => { m.classList.remove('flex'); m.classList.add('hidden'); }, 300); }
+  </script>
+<!-- MASUKKAN SDK BACK4APP VIA CDN -->
+<script type="text/javascript" src="https://npmcdn.com/parse/dist/parse.min.js"></script>
+
+<script>
+  // 1. INISIALISASI KUNCI BACK4APP ANDA
+  Parse.initialize(
+    yrivktjbMxh6WkhSfNZHvNypSplAnlNVe1Za6NRT, 
+    ZMb4e7MYUQH8TlMeO85Ym4I797Zpyw9InkY91jkJ
+  );
+  Parse.serverURL = 'https://parseapi.back4app.com/';
+
+  // 2. SINKRONISASI DATA TEKS KE CLOUD
+  window.syncLocalStorageToCloud = async function(key) {
+    const data = localStorage.getItem(key);
+    if (!data) return;
+    try {
+      const CloudStorage = Parse.Object.extend("DataArvy");
+      const query = new Parse.Query(CloudStorage);
+      query.equalTo("kunci", key);
+      let record = await query.first();
+
+      if (!record) {
+        record = new CloudStorage();
+        record.set("kunci", key);
+      }
+      
+      record.set("jsonString", data);
+      await record.save();
+    } catch (e) {
+      console.error("Gagal sinkronisasi ke Back4App:", e);
+    }
+  };
+
+  // 3. TARIK DATA SAAT APLIKASI PERTAMA KALI DIBUKA
+  window.fetchDatabaseFromCloud = async function() {
+    try {
+      const CloudStorage = Parse.Object.extend("DataArvy");
+      const query = new Parse.Query(CloudStorage);
+      query.limit(100);
+      const results = await query.find();
+      
+      for (let i = 0; i < results.length; i++) {
+        localStorage.setItem(results[i].get("kunci"), results[i].get("jsonString"));
+      }
+    } catch (e) {
+      console.error("Gagal menarik data dari cloud:", e);
+    }
+  };
+
+  // 4. UPLOAD FOTO BUKTI ABSENSI KE STORAGE CLOUD
+  window.uploadFileToCloudStorage = async function(base64Data, folderPath, fileName) {
+    if (!base64Data || !base64Data.startsWith("data:")) return base64Data;
+    try {
+      const bersihFileName = fileName.replace(/[^a-zA-Z0-9]/g, "_") + ".jpg";
+      const parseFile = new Parse.File(bersihFileName, { base64: base64Data });
+      await parseFile.save();
+      return parseFile.url(); // Mengembalikan link gambar HTTPS publik
+    } catch(err) {
+      console.error("Gagal unggah foto ke cloud:", err);
+      return base64Data;
+    }
+  };
+</script>
+
+<script>
+  // OVERRIDE LOGIKA BAWAAN APLIKASI AGAR TERHUBUNG KE CLOUD AUTOMATIS
+  const originalOnload = window.onload;
+  window.onload = function() {
+    const icon = document.getElementById('localRefreshIcon');
+    if (icon) icon.classList.add('animate-spin');
+
+    if (window.fetchDatabaseFromCloud) {
+      window.fetchDatabaseFromCloud().then(() => {
+        if (icon) icon.classList.remove('animate-spin');
+        initMockDatabase();
+        const todayStr = new Date().toISOString().split('T')[0];
+        document.getElementById('presensiDate').value = todayStr;
+        document.getElementById('kepulanganFilterDate').value = todayStr;
+        document.getElementById('announceScheduleDate').value = todayStr;
+        checkLoginSession();
+        startRealTimeClock();
+      });
+    } else {
+      if (originalOnload) originalOnload();
+    }
+  };
+
+  const originalSimulateServerCall = simulateServerCall;
+  simulateServerCall = function(methodName, params) {
+    const result = originalSimulateServerCall(methodName, params);
+    
+    setTimeout(async () => {
+      if (methodName === 'saveAttendance') { await syncLocalStorageToCloud('e_arvy_history_attendance'); } 
+      else if (methodName === 'saveSchedule') { await syncLocalStorageToCloud('e_arvy_schedules'); } 
+      else if (methodName === 'saveDeparture') { await syncLocalStorageToCloud('e_arvy_kepulangan'); await syncLocalStorageToCloud('e_arvy_departure_logs'); } 
+      else if (methodName === 'updateTotalCadets') { await syncLocalStorageToCloud('e_arvy_settings'); } 
+      else if (methodName === 'updateCadetNames') { await syncLocalStorageToCloud('e_arvy_cadets'); } 
+      else if (methodName === 'updateProdiNames' || methodName === 'updateAccounts') { await syncLocalStorageToCloud('e_arvy_prodis'); await syncLocalStorageToCloud('e_arvy_users'); }
+    }, 100);
+
+    return result;
+  };
+
+  const originalHandleProofPhotoUpload = handleProofPhotoUpload;
+  handleProofPhotoUpload = function(event, prodiId, cadetNo) {
+    const file = event.target.files[0];
+    if (file && window.uploadFileToCloudStorage) {
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        showToast('Mengunggah...', 'Mengirim dokumen fisik ke Cloud...', 'info');
+        const cloudUrl = await window.uploadFileToCloudStorage(e.target.result, 'absensi_bukti', `cadet_${prodiId}_${cadetNo}`);
+        
+        const dateStr = document.getElementById('presensiDate').value;
+        let activityName = document.getElementById('presensiActivitySelect').value;
+        if (activityName === 'kustom') activityName = document.getElementById('customActivityName').value || 'Kustom';
+        
+        const img = document.getElementById(`proof-preview-${prodiId}-${cadetNo}`);
+        img.src = cloudUrl; img.classList.remove('hidden');
+        document.getElementById(`proof-base64-${prodiId}-${cadetNo}`).value = cloudUrl;
+        storage.setItem(`draft_proof_${dateStr}_${activityName}_${prodiId}_${cadetNo}`, cloudUrl);
+        
+        updateProdiSummary(prodiId);
+        showToast('Selesai', 'Bukti berhasil disimpan di cloud.', 'success');
+      };
+      reader.readAsDataURL(file);
+    } else {
+      originalHandleProofPhotoUpload(event, prodiId, cadetNo);
+    }
+  };
+</script>
+</body>
+</html>
