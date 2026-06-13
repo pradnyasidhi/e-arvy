@@ -1157,11 +1157,11 @@
         textRecap += `KURANG   : ${absentCount}\n`;
         textRecap += `HADIR    : ${presentCount}\n\n`;
         
-        textRecap += `KETERANGAN:\n\n`;
+        textRecap += `KETERANGAN:\n`;
         
         // Daftar Absen Keseluruhan per Status
         if (absentCount === 0) {
-            textRecap += `LENGKAP\n\n`;
+            textRecap += `LENGKAP\n\n\n`;
         } else {
             const groupedStatus = {};
             params.absents.forEach(a => {
@@ -1202,7 +1202,7 @@
                 textRecap += `KETERANGAN:\n`;
                 
                 if (pKurang === 0) {
-                    textRecap += `LENGKAP\n\n`;
+                    textRecap += `LENGKAP\n\n\n`;
                 } else {
                     pAbsents.forEach(a => {
                         textRecap += `- ${a.cadetName} (${a.status}${a.reason ? ', ' + a.reason : ''})\n`;
