@@ -240,7 +240,7 @@
         </div>
 
         <button type="submit" id="loginSubmitBtn" class="w-full bg-gradient-to-r from-ios-blue via-blue-600 to-indigo-600 text-white font-bold py-3.5 rounded-ios-md hover:opacity-90 active:scale-95 transition-all shadow-md shadow-blue-500/20 flex items-center justify-center gap-2">
-          <i data-lucide="log-in" class="w-4 h-4"></i> Masuk
+          <i data-lucide="log-in" class= "w-4 h-4"></i> Masuk
         </button>
       </form>
 
@@ -1805,6 +1805,38 @@
       const dateStr = document.getElementById('presensiDate').value;
       let activityName = document.getElementById('presensiActivitySelect').value;
       if (activityName === 'kustom') activityName = document.getElementById('customActivityName').value || 'Kegiatan Kustom';
+      const isLocked = storage.getItem(`locked_presensi_${dateStr}_${activityName}`) === 'true';
+      const isAdmin = ['Admin', 'Piket', 'Pokdo', 'Pengasuh'].includes(currentUser.role);
+      
+      let lockBannerHtml = '';
+      if (isLocked) {
+         lockBannerHtml = `
+           <div class="flex justify-between items-center p-4 mb-2 bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900 rounded-ios-md transition-all">
+             <div class="flex items-center gap-3 text-ios-red">
+               <i data-lucide="lock" class="w-5 h-5"></i>
+               <div class="flex flex-col">
+                 <span class="text-sm font-bold text-slate-900 dark:text-white">Akses Kadet Terkunci</span>
+                 <span class="text-[10px] text-slate-500 font-medium">Data presensi telah diverifikasi permanen.</span>
+               </div>
+             </div>
+             ${isAdmin ? `<button onclick="toggleAttendanceLock()" class="px-3 py-1.5 bg-white dark:bg-zinc-800 border border-rose-200 dark:border-rose-900 text-ios-red rounded-ios-sm text-xs font-bold hover:bg-rose-100 transition-all shadow-sm">Buka Akses</button>` : ''}
+           </div>
+         `;
+      } else if (isAdmin) {
+         lockBannerHtml = `
+           <div class="flex justify-between items-center p-4 mb-2 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900 rounded-ios-md transition-all">
+             <div class="flex items-center gap-3 text-ios-green">
+               <i data-lucide="unlock" class="w-5 h-5"></i>
+               <div class="flex flex-col">
+                 <span class="text-sm font-bold text-slate-900 dark:text-white">Akses Kadet Terbuka</span>
+                 <span class="text-[10px] text-slate-500 font-medium">Kadet masih dapat mengisi data presensi prodi mereka.</span>
+               </div>
+             </div>
+             <button onclick="toggleAttendanceLock()" class="px-3 py-1.5 bg-white dark:bg-zinc-800 border border-emerald-200 dark:border-emerald-900 text-ios-green rounded-ios-sm text-xs font-bold hover:bg-emerald-100 transition-all shadow-sm">Kunci Manual</button>
+           </div>
+         `;
+      }
+      container.innerHTML += lockBannerHtml;
 
       const absenceStatuses = JSON.parse(storage.getItem('e_arvy_absence_statuses') || '["Sakit", "Izin", "Alpa", "Dinas"]');
       let statusOptionsHtml = `<option value="Hadir">Hadir</option>`;
@@ -1947,9 +1979,44 @@
     }
 
     function isProdiEditableForCurrentUser(prodi) {
+      const dateStr = document.getElementById('presensiDate').value;
+      let act = document.getElementById('presensiActivitySelect').value;
+      if (act === 'kustom') act = document.getElementById('customActivityName').value;
+      
+      // Cek apakah presensi ini sudah dikunci
+      const isLocked = storage.getItem(`locked_presensi_${dateStr}_${act}`) === 'true';
+
+      // Admin, Piket, Pokdo selalu bisa edit meskipun terkunci
       if (['Admin', 'Piket', 'Pokdo', 'Pengasuh'].includes(currentUser.role)) return true;
-      if (currentUser.role === 'Kopral Kadet') return currentUser.kompiName === 'Kompi ' + prodi.kompiNumber;
+      
+      // Untuk Kadet, akses ditutup jika sudah terkunci
+      if (currentUser.role === 'Kopral Kadet') {
+        if (isLocked) return false; 
+        return currentUser.kompiName === 'Kompi ' + prodi.kompiNumber;
+      }
+      
       return false;
+    }
+    
+    function toggleAttendanceLock() {
+      const dateStr = document.getElementById('presensiDate').value;
+      let act = document.getElementById('presensiActivitySelect').value;
+      if (act === 'kustom') act = document.getElementById('customActivityName').value;
+      if (!act) return;
+
+      const key = `locked_presensi_${dateStr}_${act}`;
+      const isLocked = storage.getItem(key) === 'true';
+      
+      if (isLocked) {
+         storage.setItem(key, 'false');
+         showToast('Akses Dibuka', `Kadet dapat kembali mengubah data presensi.`, 'info');
+      } else {
+         storage.setItem(key, 'true');
+         showToast('Akses Dikunci', `Data presensi dikunci dari Kadet.`, 'warning');
+      }
+      
+      if (window.syncLocalStorageToCloud) window.syncLocalStorageToCloud(key);
+      renderAttendanceList();
     }
 
     function toggleCompanySection(kompiId) { document.getElementById(`company-body-${kompiId}`).classList.toggle('hidden'); }
@@ -2128,8 +2195,14 @@
       callServer('saveAttendance', { date: dateStr, activityName: act, category: activeCategory, totalCadets: totalQuota, absents, verifier: currentUser.username }, (res) => {
         btn.innerHTML = '<i data-lucide="check-circle2" class="w-4.5 h-4.5"></i> Verifikasi & Simpan';
         appData.prodis.forEach(p => storage.setItem(`saved_${dateStr}_${act}_${p.currentName}`, 'true'));
+        
+        // --- TAMBAHAN: Kunci akses kadet secara otomatis ---
+        storage.setItem(`locked_presensi_${dateStr}_${act}`, 'true');
+        if (window.syncLocalStorageToCloud) window.syncLocalStorageToCloud(`locked_presensi_${dateStr}_${act}`);
+        // ---------------------------------------------------
+
         document.getElementById('recapTextarea').value = res.recapText; openModal('recapModal');
-        loadDashboardAndAppData(); showToast('Verifikasi Permanen', 'Selesai.', 'success');
+        loadDashboardAndAppData(); showToast('Verifikasi Permanen', 'Selesai dan Akses Dikunci.', 'success');
       }, () => { btn.innerHTML = '<i data-lucide="check-circle2" class="w-4.5 h-4.5"></i> Verifikasi'; showToast('Gagal', 'Terjadi kesalahan.', 'error'); });
     }
 
