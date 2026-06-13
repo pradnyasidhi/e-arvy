@@ -2366,8 +2366,8 @@
     function openModal(modalId) { const m = document.getElementById(modalId); m.classList.remove('hidden'); m.classList.add('flex'); setTimeout(() => m.querySelector('.ios-modal-content').classList.remove('translate-y-full'), 50); }
     function closeModal(modalId) { const m = document.getElementById(modalId); m.querySelector('.ios-modal-content').classList.add('translate-y-full'); setTimeout(() => { m.classList.remove('flex'); m.classList.add('hidden'); }, 300); }
   </script>
-<!-- MASUKKAN SDK BACK4APP VIA CDN -->
-<script type="text/javascript" src="https://npmcdn.com/parse/dist/parse.min.js"></script>
+
+<script type="text/javascript" src="https://unpkg.com/parse/dist/parse.min.js"></script>
 
 <script>
   // 1. INISIALISASI KUNCI BACK4APP ANDA
