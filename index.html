@@ -2036,11 +2036,17 @@ markAsUnsaved(prodiId);
                       ${selectOptionsSpecific}
                     </select>
                   </div>
-                  <div id="absence-detail-${prodi.prodiId}-${c.no}" class="${draftStatus !== 'Hadir' ? 'flex' : 'hidden'} col-span-1 md:col-span-4 flex-col gap-3 p-3 bg-rose-50/50 rounded-ios-md border border-dashed border-rose-200 mt-1">
-                    <input type="text" class="w-full px-3 py-2 rounded bg-white border text-xs" placeholder="Sebutkan alasan..." id="absence-reason-${prodi.prodiId}-${c.no}" value="${draftReason}" onblur="this.value = standardizeEYD(this.value); syncDraftReason(${prodi.prodiId}, ${c.no});" ${isEditable ? '' : 'readonly'}>
+                  <div id="absence-detail-${prodi.prodiId}-${c.no}" class="${(draftStatus !== 'Hadir' && (isEditable || draftReason || draftProof)) ? 'flex' : 'hidden'} col-span-1 md:col-span-4 flex-col gap-3 p-3 bg-rose-50/50 rounded-ios-md border border-dashed border-rose-200 mt-1 transition-all">
+                    
+                    ${isEditable ? 
+                      `<input type="text" class="w-full px-3 py-2 rounded bg-white border text-xs focus:ring-1 focus:ring-ios-blue outline-none" placeholder="Sebutkan alasan (opsional)..." id="absence-reason-${prodi.prodiId}-${c.no}" value="${draftReason}" onblur="this.value = standardizeEYD(this.value); syncDraftReason(${prodi.prodiId}, ${c.no});">` 
+                    : 
+                      (draftReason ? `<div class="text-xs font-bold text-rose-700 bg-rose-100/60 px-3 py-2 rounded border border-rose-200 shadow-sm">Keterangan: ${draftReason}</div><input type="hidden" id="absence-reason-${prodi.prodiId}-${c.no}" value="${draftReason}">` : `<input type="hidden" id="absence-reason-${prodi.prodiId}-${c.no}" value="">`)
+                    }
+
                     <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
                       ${isEditable ? `<label class="w-full sm:w-auto text-center px-4 py-2 rounded bg-white border border-slate-200 text-xs font-bold cursor-pointer hover:bg-slate-50 block"><i data-lucide="upload" class="w-3.5 h-3.5 inline"></i> Unggah Bukti <input type="file" accept="image/*" class="hidden" onchange="handleProofPhotoUpload(event, ${prodi.prodiId}, ${c.no})"></label>` : ''}
-                      <img id="proof-preview-${prodi.prodiId}-${c.no}" src="${draftProof}" class="h-12 w-20 object-cover rounded border shadow-sm ${draftProof ? '' : 'hidden'}">
+                      <img id="proof-preview-${prodi.prodiId}-${c.no}" src="${draftProof}" class="h-12 w-20 object-cover rounded border shadow-sm ${draftProof ? '' : 'hidden'} cursor-zoom-in" onclick="if('${draftProof}') viewDocumentedPhoto('${c.name}', '${draftProof}')">
                     </div>
                     <input type="hidden" id="proof-base64-${prodi.prodiId}-${c.no}" value="${draftProof}">
                   </div>
