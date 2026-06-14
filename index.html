@@ -2333,7 +2333,7 @@ function markAsUnsaved(prodiId) {
       if (window.syncLocalStorageToCloud) {
         showToast('Sinkronisasi', 'Mengirim data simpan sementara ke Cloud...', 'info');
         window.syncLocalStorageToCloud(bundleKey).then(() => {
-          showToast('Tersimpan Sementara', `Prodi ${prodiName} berhasil sinkron ke Cloud Cloud.`, 'success');
+          showToast('Tersimpan Sementara', `Prodi ${prodiName} berhasil sinkron ke Cloud.`, 'success');
         });
       } else {
         showToast('Tersimpan Sementara', `Prodi ${prodiName} disimpan lokal.`, 'success');
