@@ -1242,7 +1242,7 @@
         const formattedDate = `${days[dateObj.getDay()]}, ${dateObj.getDate()} ${months[dateObj.getMonth()]} ${dateObj.getFullYear()}`;
 
         // Menyusun Teks Rekap
-        let textRecap = `/DATA ${params.activityName.toUpperCase()} KOPRAL KADET (${formattedDate.toUpperCase()})\n\n`;
+        let textRecap = `DATA ${params.activityName.toUpperCase()} KOPRAL KADET (${formattedDate.toUpperCase()})\n\n`;
         textRecap += `JUMLAH   : ${params.totalCadets}\n`;
         textRecap += `KURANG   : ${absentCount}\n`;
         textRecap += `HADIR    : ${presentCount}\n\n`;
@@ -1261,9 +1261,9 @@
             for (let st in groupedStatus) {
                 textRecap += `${st.toUpperCase()} (${groupedStatus[st].length})\n`;
                 groupedStatus[st].forEach(a => {
-                    textRecap += `- ${a.cadetName} (${a.prodiName})\n`;
-                });
-                textRecap += `\n`;
+                    textRecap += `- ${a.cadetName} (${a.status}${a.reason ? ', ' + a.reason : ''})\n`;
+                    });
+                    textRecap += `\n`;
             }
         }
         
