@@ -159,6 +159,18 @@
         color: black !important;
       }
     }
+/* Mencegah Flash Dashboard sebelum Login */
+    body:not(.is-logged-in) header,
+    body:not(.is-logged-in) .app-container,
+    body:not(.is-logged-in) .tabbar,
+    body:not(.is-logged-in) button[onclick="refreshDataLocally()"] {
+      display: none !important;
+    }
+
+    /* Sembunyikan Layar Login jika sudah login */
+    body.is-logged-in #loginWrapper {
+      display: none !important;
+    }
   </style>
 </head>
 <body class="bg-zinc-100 dark:bg-black text-slate-900 dark:text-zinc-100 min-h-screen flex flex-col font-sans transition-all-300 pb-16 lg:pb-4">
@@ -212,7 +224,7 @@
   </header>
 
   <!-- Login Screen -->
-  <div id="loginWrapper" class="fixed inset-0 bg-slate-100/90 dark:bg-black/95 backdrop-blur-2xl z-[2000] flex items-center justify-center p-4 hidden">
+  <div id="loginWrapper" class="fixed inset-0 bg-slate-100/90 dark:bg-black/95 backdrop-blur-2xl z-[2000] flex items-center justify-center p-4">
     <div class="w-full max-w-md bg-white/70 dark:bg-zinc-900/70 backdrop-blur-md rounded-ios-xl shadow-2xl border border-white/20 dark:border-zinc-800/40 p-8 flex flex-col gap-6 transition-all-300">
       <div class="text-center flex flex-col gap-2">
         <div id="loginLogoContainer" class="mx-auto flex items-center justify-center bg-gradient-to-tr from-ios-blue to-indigo-600 text-white p-4.5 rounded-ios-xl shadow-xl shadow-blue-500/20 w-fit mb-2">
@@ -256,7 +268,6 @@
       </div>
     </div>
  </div>
-</div>
 
   <div class="app-container flex-1 max-w-[1400px] w-full mx-auto p-4 sm:p-6 flex flex-col lg:flex-row gap-6">
     <!-- Sidebar Navigation (Desktop) -->
@@ -840,7 +851,7 @@
     </main>
   </div>
 
-  <button onclick="refreshDataLocally()" class="no-print fixed bottom-6 right-6 z-[1000] p-4 rounded-full bg-white/80 backdrop-blur-xl border border-white/20 shadow-2xl text-ios-blue hover:scale-105 active:scale-95 flex items-center justify-center">
+  <button onclick="refreshDataLocally()" class="no-print fixed bottom-24 lg:bottom-8 right-6 z-[1000] p-4 rounded-full bg-white/80 dark:bg-zinc-800/80 backdrop-blur-xl border border-slate-200/50 dark:border-zinc-700/50 shadow-2xl text-ios-blue hover:scale-105 active:scale-95 flex items-center justify-center transition-all">
     <i data-lucide="rotate-cw" id="localRefreshIcon" class="w-6 h-6"></i>
   </button>
 
@@ -1343,35 +1354,48 @@
     };
 
     function checkLoginSession() {
-      const storedUser = storage.getItem('e_arvy_session');
-      if (storedUser) { currentUser = JSON.parse(storedUser); setupUserInterface(); } 
-      else { renderApplicationLogos(); document.getElementById('loginWrapper').classList.remove('hidden'); }
-    }
+  const storedUser = storage.getItem('e_arvy_session');
+  if (storedUser) { 
+    currentUser = JSON.parse(storedUser); 
+    document.body.classList.add('is-logged-in'); // Tambahkan baris ini
+    setupUserInterface(); 
+  } else { 
+    renderApplicationLogos(); 
+    // Hapus kode: document.getElementById('loginWrapper').classList.remove('hidden');
+  }
+}
 
     function handleLogin(e) {
-      e.preventDefault();
-      const user = document.getElementById('loginUsername').value;
-      const pass = document.getElementById('loginPassword').value;
-      callServer('login', { username: user, password: pass }, (res) => {
-        if (res) {
-          currentUser = res; storage.setItem('e_arvy_session', JSON.stringify(res));
-          document.getElementById('loginWrapper').classList.add('hidden');
-          document.getElementById('loginErrorMsg').classList.add('hidden');
-          document.getElementById('loginForm').reset();
-          setupUserInterface(); showToast('Selamat Datang', `Berhasil masuk @${currentUser.username}`, 'success');
-        } else {
-          document.getElementById('loginErrorMsg').classList.remove('hidden'); showToast('Gagal Masuk', 'Kredensial salah.', 'error');
-        }
-      });
+  e.preventDefault();
+  const user = document.getElementById('loginUsername').value;
+  const pass = document.getElementById('loginPassword').value;
+  callServer('login', { username: user, password: pass }, (res) => {
+    if (res) {
+      currentUser = res; storage.setItem('e_arvy_session', JSON.stringify(res));
+      
+      document.body.classList.add('is-logged-in'); // Tambahkan baris ini
+      document.getElementById('loginErrorMsg').classList.add('hidden');
+      document.getElementById('loginForm').reset();
+      
+      setupUserInterface(); 
+      showToast('Selamat Datang', `Berhasil masuk @${currentUser.username}`, 'success');
+    } else {
+      document.getElementById('loginErrorMsg').classList.remove('hidden'); 
+      showToast('Gagal Masuk', 'Kredensial salah.', 'error');
     }
+  });
+}
 
     function logout() {
-      if(confirm('Keluar sistem?')) {
-        storage.removeItem('e_arvy_session'); currentUser = null;
-        renderApplicationLogos(); document.getElementById('loginWrapper').classList.remove('hidden');
-        document.getElementById('userInfoHeader').classList.add('hidden');
-      }
-    }
+  if(confirm('Keluar sistem?')) {
+    storage.removeItem('e_arvy_session'); currentUser = null;
+    
+    document.body.classList.remove('is-logged-in'); // Tambahkan baris ini
+    document.getElementById('userInfoHeader').classList.add('hidden');
+    renderApplicationLogos(); 
+    // Hapus kode: document.getElementById('loginWrapper').classList.remove('hidden');
+  }
+}
 
     function setupUserInterface() {
       document.getElementById('userHeaderName').innerText = currentUser.username;
@@ -2948,16 +2972,32 @@ function updateDashboardPendataan() {
     }
 
     function switchTab(viewId) {
-      if (viewId === 'admin-panel' && currentUser.role !== 'Admin') return switchTab('dashboard');
-      document.querySelectorAll('.view-screen').forEach(s => { s.classList.add('hidden'); s.classList.remove('active'); });
-      const target = document.getElementById(`view-${viewId}`); if (target) { target.classList.remove('hidden'); target.classList.add('active'); }
-      document.querySelectorAll('.sidebar-item').forEach(i => i.className = i.id === `side-${viewId}` ? "sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-ios-md text-sm font-bold text-ios-blue bg-blue-100/50" : "sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-ios-md text-sm font-semibold text-slate-600 hover:bg-slate-100/50");
-      document.querySelectorAll('.tabbar-item').forEach(i => i.className = i.id === `tab-${viewId}` ? "tabbar-item flex flex-col items-center gap-0.5 text-ios-blue font-bold text-[10px]" : "tabbar-item flex flex-col items-center gap-0.5 text-slate-400 font-semibold text-[10px]");
-      if (viewId === 'statistik') { renderCharts(); renderHistoryTable(); } else if (viewId === 'announce') loadAnnounceSchedules(); 
-renderPendataanList();
+  if (viewId === 'admin-panel' && currentUser.role !== 'Admin') return switchTab('dashboard');
+  
+  document.querySelectorAll('.view-screen').forEach(s => { s.classList.add('hidden'); s.classList.remove('active'); });
+  const target = document.getElementById(`view-${viewId}`); 
+  if (target) { target.classList.remove('hidden'); target.classList.add('active'); }
+  
+  document.querySelectorAll('.sidebar-item').forEach(i => i.className = i.id === `side-${viewId}` ? "sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-ios-md text-sm font-bold text-ios-blue bg-blue-100/50" : "sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-ios-md text-sm font-semibold text-slate-600 hover:bg-slate-100/50");
+  
+  document.querySelectorAll('.tabbar-item').forEach(i => i.className = i.id === `tab-${viewId}` ? "tabbar-item flex flex-col items-center gap-0.5 text-ios-blue font-bold text-[10px]" : "tabbar-item flex flex-col items-center gap-0.5 text-slate-400 font-semibold text-[10px]");
+  
+  // Perbaikan logika IF/ELSE
+  if (viewId === 'statistik') { 
+    renderCharts(); 
+    renderHistoryTable(); 
+  } else if (viewId === 'announce') { 
+    loadAnnounceSchedules();
+    renderPendataanList();
+  } else if (viewId === 'profile') { 
+    updateProfilePage(); 
+  } else if (viewId === 'kepulangan') { 
+    renderKepulanganList(); 
+    renderDepartureLogs(); 
+  } else if (viewId === 'admin-panel') { 
+    renderAbsenceStatusManager();
+  }
 }
-  else if (viewId === 'profile') updateProfilePage(); else if (viewId === 'kepulangan') { renderKepulanganList(); renderDepartureLogs(); } else if (viewId === 'admin-panel') renderAbsenceStatusManager();
-    }
 
     function toggleTheme() {
       const html = document.documentElement; html.classList.toggle('dark');
