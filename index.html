@@ -1840,6 +1840,7 @@ updateDashboardPendataan();
         
         updateProdiSummary(prodiId);
         updateAllKompisCumulativeAbsents();
+markAsUnsaved(prodiId);
         showToast('Terapkan Masal', `Berhasil menerapkan status ke kadet yang dipilih.`, 'success');
       };
 
@@ -1998,7 +1999,11 @@ updateDashboardPendataan();
 
           prodiBox.innerHTML = `
             <div class="flex flex-wrap sm:flex-nowrap justify-between items-center px-4 py-3 bg-slate-50/50 border-b cursor-pointer hover:bg-slate-50 gap-2" onclick="toggleProdiSection(${prodi.prodiId})">
-              <div class="flex items-center flex-wrap gap-2"><span class="font-extrabold text-sm">${prodi.currentName}</span><span class="text-[9px] font-black uppercase px-2.5 py-0.5 rounded-full border ${badgeClass} whitespace-nowrap">${badgeText}</span></div>
+              <div class="flex items-center flex-wrap gap-2">
+                <span class="font-extrabold text-sm">${prodi.currentName}</span>
+                <!-- BAGIAN YANG DIUBAH 1: Menambahkan id="prodi-badge-..." -->
+                <span id="prodi-badge-${prodi.prodiId}" class="text-[9px] font-black uppercase px-2.5 py-0.5 rounded-full border ${badgeClass} whitespace-nowrap">${badgeText}</span>
+              </div>
               <div class="flex items-center gap-2 ml-auto"><span id="prodi-lbl-stat-${prodi.prodiId}" class="text-xs font-extrabold text-slate-400 whitespace-nowrap">Hadir: ${draftPresentCount}/${cadetsList.length}</span><i data-lucide="chevron-down" id="prodi-chevron-${prodi.prodiId}" class="w-4.5 h-4.5 text-slate-400 transition-transform shrink-0"></i></div>
             </div>
             <div class="p-4 hidden flex-col gap-4 border-t" id="prodi-body-${prodi.prodiId}">
@@ -2011,7 +2016,8 @@ updateDashboardPendataan();
                 </div>
                 <div class="text-xs pt-2 border-t" id="prodi-sum-detail-${prodi.prodiId}"></div>
                 ${isEditable ? `
-  <div class="pt-3 flex flex-col sm:flex-row justify-end gap-2.5">
+  <!-- BAGIAN YANG DIUBAH 2: Menambahkan id="prodi-action-btns-..." -->
+  <div id="prodi-action-btns-${prodi.prodiId}" class="pt-3 flex flex-col sm:flex-row justify-end gap-2.5">
     ${isSaved ? `
       <button type="button" onclick="resetSingleProdiAttendance(${prodi.prodiId}, '${prodi.currentName}')" class="w-full sm:w-auto px-4 py-2.5 bg-ios-red text-white rounded text-xs font-black shadow-sm hover:opacity-90 active:scale-95 transition-all">
         Reset Kehadiran
@@ -2096,6 +2102,7 @@ updateDashboardPendataan();
         document.getElementById(`proof-base64-${prodiId}-${cadetNo}`).value = '';
       }
       updateProdiSummary(prodiId); updateAllKompisCumulativeAbsents();
+markAsUnsaved(prodiId);
     }
 
     function syncDraftReason(prodiId, cadetNo) {
@@ -2106,6 +2113,7 @@ updateDashboardPendataan();
       reasonInput.value = standardizeEYD(reasonInput.value);
       storage.setItem(`draft_reason_${dateStr}_${activityName}_${prodiId}_${cadetNo}`, reasonInput.value);
       updateProdiSummary(prodiId);
+markAsUnsaved(prodiId);
     }
 
     function handleProofPhotoUpload(event, prodiId, cadetNo) {
@@ -2148,6 +2156,41 @@ updateDashboardPendataan();
       const sumA = document.getElementById(`prodi-sum-absent-${prodiId}`); if(sumA) sumA.innerText = absent;
       const det = document.getElementById(`prodi-sum-detail-${prodiId}`);
       if (det) det.innerHTML = `<strong>Keterangan Tidak Hadir:</strong><p class="${absent > 0 ? 'text-ios-red' : 'text-slate-400 italic'} mt-1 text-xs">${absent > 0 ? details.join('<br>') : 'Nihil'}</p>`;
+    }
+
+function markAsUnsaved(prodiId) {
+      const prodi = appData.prodis.find(p => p.prodiId === prodiId);
+      if (!prodi) return;
+
+      const dateStr = document.getElementById('presensiDate').value;
+      let act = document.getElementById('presensiActivitySelect').value;
+      if (act === 'kustom') act = document.getElementById('customActivityName').value;
+      if (!act) return;
+
+      const savedKey = `saved_${dateStr}_${act}_${prodi.currentName}`;
+      const isSaved = storage.getItem(savedKey) === 'true';
+
+      if (isSaved) {
+        // Hapus status tersimpan
+        storage.removeItem(savedKey);
+
+        // Ubah badge menjadi oranye
+        const badge = document.getElementById(`prodi-badge-${prodiId}`);
+        if (badge) {
+          badge.className = "text-[9px] font-black uppercase px-2.5 py-0.5 rounded-full border bg-amber-50 text-ios-orange border-amber-500/30 whitespace-nowrap";
+          badge.innerText = "Perlu Disimpan (Diedit)";
+        }
+
+        // Sisakan hanya tombol simpan
+        const btnContainer = document.getElementById(`prodi-action-btns-${prodiId}`);
+        if (btnContainer) {
+          btnContainer.innerHTML = `
+            <button type="button" onclick="saveSingleProdiAttendance(${prodiId}, '${prodi.currentName}')" class="w-full sm:w-auto px-4 py-2.5 bg-ios-blue text-white rounded text-xs font-black shadow-sm hover:opacity-90 active:scale-95 transition-all">
+              Simpan Perubahan
+            </button>
+          `;
+        }
+      }
     }
 
     function updateSingleKompiCumulativeHdr(k) {
@@ -3159,11 +3202,13 @@ await syncLocalStorageToCloud('e_arvy_pendataan'); }
         storage.setItem(`draft_proof_${dateStr}_${activityName}_${prodiId}_${cadetNo}`, cloudUrl);
         
         updateProdiSummary(prodiId);
+markAsUnsaved(prodiId);
         showToast('Selesai', 'Bukti berhasil disimpan di cloud.', 'success');
       };
       reader.readAsDataURL(file);
     } else {
       originalHandleProofPhotoUpload(event, prodiId, cadetNo);
+markAsUnsaved(prodiId);
     }
   };
 </script>
