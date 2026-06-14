@@ -1724,12 +1724,24 @@ updateDashboardPendataan();
       const select = document.getElementById('presensiActivitySelect');
       const statSelect = document.getElementById('statActivitySelect');
       if (!select) return;
+
+      // 1. Simpan pilihan user saat ini sebelum daftar di-refresh
+      const currentAct = select.value;
+      const currentStatAct = statSelect.value;
+
       select.innerHTML = ''; statSelect.innerHTML = '';
       const activities = [...new Set(appData.schedules.map(s => s.title))];
+      
       activities.forEach(act => select.innerHTML += `<option value="${act}">${act}</option>`);
       select.innerHTML += `<option value="kustom">Tambahan Kegiatan Lainnya...</option>`;
+      
       statSelect.innerHTML += `<option value="semua" selected>Semua Kegiatan</option>`;
       activities.forEach(act => statSelect.innerHTML += `<option value="${act}">${act}</option>`);
+      
+      // 2. Kembalikan sistem ke pilihan semula
+      if (currentAct) select.value = currentAct;
+      if (currentStatAct) statSelect.value = currentStatAct;
+
       checkCustomActivity();
     }
 
@@ -2411,7 +2423,16 @@ function markAsUnsaved(prodiId) {
 
     function populateStatProdiOptions() {
       const s = document.getElementById('statProdiSelect');
-      if (s) { s.innerHTML = ''; appData.prodis.forEach(p => s.innerHTML += `<option value="${p.currentName}">${p.currentName}</option>`); }
+      if (s) { 
+        // Simpan memori pilihan
+        const currentVal = s.value;
+        
+        s.innerHTML = ''; 
+        appData.prodis.forEach(p => s.innerHTML += `<option value="${p.currentName}">${p.currentName}</option>`); 
+        
+        // Kembalikan memori pilihan
+        if (currentVal) s.value = currentVal;
+      }
     }
     function toggleStatProdiSelect() { document.getElementById('statProdiWrapper').classList[document.getElementById('statLevelSelect').value === 'Prodi' ? 'remove' : 'add']('hidden'); renderCharts(); }
     function resetSearchFilter() { document.getElementById('statSearchDate').value = ''; renderHistoryTable(); }
