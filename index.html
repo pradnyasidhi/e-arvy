@@ -1638,6 +1638,15 @@
         document.getElementById('dashLastActTotal').innerText = last.totalCadets;
         document.getElementById('dashLastActPresent').innerText = last.presentCount;
         document.getElementById('dashLastActAbsent').innerText = last.absentCount;
+
+if (last.verifier && last.verifiedAt) {
+          const vDate = new Date(last.verifiedAt);
+          const tStr = String(vDate.getHours()).padStart(2, '0') + ':' + String(vDate.getMinutes()).padStart(2, '0');
+          const dStr = String(vDate.getDate()).padStart(2, '0') + '/' + String(vDate.getMonth() + 1).padStart(2, '0') + '/' + vDate.getFullYear();
+          document.getElementById('dashLastActVer').innerHTML = `<i data-lucide="shield-check" class="w-3.5 h-3.5 text-ios-blue"></i> Diverifikasi oleh <strong>${last.verifier}</strong> (${dStr} ${tStr})`;
+        } else {
+          document.getElementById('dashLastActVer').innerHTML = `<i data-lucide="shield-check" class="w-3.5 h-3.5 text-ios-blue"></i> Riwayat terdahulu`;
+        }
         
         if (last.absentCount > 0) {
           document.getElementById('dashLastActCat').innerText = "Ada Kekurangan";
