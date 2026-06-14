@@ -175,7 +175,16 @@
 </head>
 <body class="bg-zinc-100 dark:bg-black text-slate-900 dark:text-zinc-100 min-h-screen flex flex-col font-sans transition-all-300 pb-16 lg:pb-4">
 
-  <!-- iOS Floating Toast Container -->
+  <script>
+    (function() {
+      try {
+        if (window.localStorage.getItem('e_arvy_session')) {
+          document.body.classList.add('is-logged-in');
+        }
+      } catch (e) {}
+    })();
+  </script>
+
   <div id="iosToastContainer"></div>
 
   <!-- Top Navigation Bar -->
@@ -1492,6 +1501,16 @@ function togglePassword() {
         document.getElementById('announceConfigViewer').classList.remove('hidden');
       }
 
+      // --- KODE TAMBAHAN UNTUK MENGUNCI INPUT SERAGAM UNTUK KADET ---
+      const announcePakaianInput = document.getElementById('announcePakaian');
+      if (announcePakaianInput) {
+        if (['Admin', 'Piket', 'Pokdo', 'Pengasuh'].includes(currentUser.role)) {
+          announcePakaianInput.removeAttribute('disabled'); // Bisa diketik oleh Admin/Piket
+        } else {
+          announcePakaianInput.setAttribute('disabled', 'true'); // Dikunci (Read-Only) untuk Kadet
+        }
+      }
+
       loadDashboardAndAppData();
       switchTab('dashboard');
     }
@@ -2720,6 +2739,13 @@ function markAsUnsaved(prodiId) {
       if (confirm('Hapus permanen log ini?')) {
         appData.historyAttendance = appData.historyAttendance.filter(h => h.logId !== logId);
         storage.setItem('e_arvy_history_attendance', JSON.stringify(appData.historyAttendance));
+        
+        // --- TAMBAHAN: SINKRONISASI KE CLOUD AGAR TERHAPUS PERMANEN ---
+        if (window.syncLocalStorageToCloud) {
+          window.syncLocalStorageToCloud('e_arvy_history_attendance');
+        }
+        // --------------------------------------------------------------
+
         logLocalActivity(currentUser.username, `Hapus log presensi: ${logId}`);
         showToast('Terhapus', 'Log presensi dihapus.', 'success'); loadDashboardAndAppData();
       }
@@ -2780,7 +2806,7 @@ function markAsUnsaved(prodiId) {
                 <input type="hidden" id="dep-video-base64-${trueIdx}">
               </div>
             </div>
-            <div class="text-right">${canEdit ? `<button id="dep-save-btn-${trueIdx}" onclick="saveDepartureRow(${trueIdx}, '${k.prodiName}')" class="px-4 py-1.5 bg-ios-blue text-white rounded text-xs font-bold">Simpan</button>` : 'Read Only'}</div>
+            <div class="text-right">${canEdit ? `<button id="dep-save-btn-${trueIdx}" onclick="saveDepartureRow(${trueIdx}, '${k.prodiName}')" class="px-4 py-1.5 bg-ios-blue text-white rounded text-xs font-bold">Simpan</button>` : '<span class="inline-block px-3 py-1 bg-slate-100 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-400 text-[10px] font-black uppercase tracking-wider rounded-full shadow-sm">READ ONLY</span>'}</div>
           </div>
         `;
       });
@@ -3390,6 +3416,7 @@ function updateDashboardPendataan() {
 </script>
 
 <script>
+  // OVERRIDE LOGIKA BAWAAN APLIKASI AGAR TERHUBUNG KE CLOUD AUTOMATIS
   // OVERRIDE LOGIKA BAWAAN APLIKASI AGAR TERHUBUNG KE CLOUD AUTOMATIS
   const originalOnload = window.onload;
   window.onload = function() {
