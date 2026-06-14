@@ -1298,10 +1298,25 @@
         return { success: true };
       }
       if (methodName === 'updateTotalCadets') {
-        const settings = JSON.parse(storage.getItem('e_arvy_settings'));
-        settings.total_batalyon = params.batalyon; settings.total_putra = params.putra; settings.total_putri = params.putri;
-        if(params.generalAnnouncement) settings.general_announcement = params.generalAnnouncement;
-        if(params.customLogo !== undefined) settings.custom_logo = params.customLogo;
+        const settings = JSON.parse(storage.getItem('e_arvy_settings') || '{}');
+        
+        // Memperbaiki pembacaan parameter yang tidak sinkron (mengatasi bug Quota & Logo)
+        if (params.total_batalyon !== undefined) settings.total_batalyon = params.total_batalyon;
+        else if (params.batalyon !== undefined) settings.total_batalyon = params.batalyon;
+
+        if (params.total_putra !== undefined) settings.total_putra = params.total_putra;
+        else if (params.putra !== undefined) settings.total_putra = params.putra;
+
+        if (params.total_putri !== undefined) settings.total_putri = params.total_putri;
+        else if (params.putri !== undefined) settings.total_putri = params.putri;
+        
+        if (params.generalAnnouncement !== undefined) settings.general_announcement = params.generalAnnouncement;
+        else if (params.general_announcement !== undefined) settings.general_announcement = params.general_announcement;
+        
+        // Perbaikan BUG Custom Logo
+        if (params.customLogo !== undefined) settings.custom_logo = params.customLogo;
+        else if (params.custom_logo !== undefined) settings.custom_logo = params.custom_logo;
+        
         storage.setItem('e_arvy_settings', JSON.stringify(settings));
         return { success: true };
       }
