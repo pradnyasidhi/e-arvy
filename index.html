@@ -379,6 +379,19 @@
                 Selamat datang di E-Arvy. Silakan laksanakan presensi harian tepat waktu.
               </p>
             </div>
+<!-- Kartu Pendataan Dashboard -->
+            <div id="dashPendataanWrapper" class="hidden p-6 bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/10 dark:to-indigo-900/10 rounded-ios-lg border border-purple-100 dark:border-purple-900/30 shadow-lg flex flex-col gap-4">
+              <div class="flex items-center justify-between border-b border-purple-200 dark:border-purple-800/50 pb-2">
+                <div class="flex items-center gap-2">
+                  <i data-lucide="clipboard-list" class="w-5 h-5 text-purple-600 dark:text-purple-400"></i>
+                  <h3 class="font-extrabold text-base tracking-tight text-slate-900 dark:text-white">Pendataan Terbaru</h3>
+                </div>
+                <button onclick="switchTab('announce')" class="text-[10px] font-black uppercase tracking-wider text-purple-600 hover:underline">Lihat Semua</button>
+              </div>
+              <div id="dashPendataanContent" class="flex flex-col gap-3">
+                 <!-- Rendered by JS -->
+              </div>
+            </div>
 
             <div class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg border border-slate-200/60 dark:border-zinc-800/60 shadow-lg shadow-black/5 flex flex-col gap-4">
               <div class="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-3">
@@ -718,6 +731,21 @@
           <div id="announceConfigViewer" class="hidden flex-col gap-4">
              <!-- Rendered identical to dashboard layout via JS -->
           </div>
+        </div>
+
+<div class="p-6 bg-white/85 dark:bg-zinc-900/85 backdrop-blur-md rounded-ios-lg shadow-xl flex flex-col gap-5">
+          <div class="pb-2 border-b border-slate-100 dark:border-zinc-800 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <i data-lucide="clipboard-text" class="w-5 h-5 text-purple-600"></i>
+              <h3 class="font-black text-lg tracking-tight">Pendataan & Google Form</h3>
+            </div>
+            <button onclick="addNewPendataanItem()" class="admin-piket-only hidden bg-ios-blue hover:opacity-90 text-white px-3.5 py-2 rounded-ios-sm text-xs font-bold transition-all shadow-md">
+              + Tambah Formulir
+            </button>
+          </div>
+
+          <div id="pendataanListContainer" class="flex flex-col gap-4">
+             </div>
         </div>
 
       </section>
@@ -1416,6 +1444,7 @@
     }
 
     let isKepulanganResetToday = false;
+
     function startRealTimeClock() {
       setInterval(() => {
         const now = new Date();
@@ -1435,6 +1464,7 @@
         if (hrs === "04") isKepulanganResetToday = false;
 
         renderDashboardSchedules(now);
+	updatePendataanCountdowns();
       }, 1000);
 
       const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
@@ -1593,6 +1623,8 @@
           document.getElementById('dashLastActCat').className = "text-xs font-extrabold px-2.5 py-1 rounded-full bg-emerald-50 text-ios-green border border-emerald-100";
         }
       }
+updateDashboardPendataan();
+
       lucide.createIcons();
     }
 
@@ -1884,18 +1916,19 @@
           let cadetRowsHtml = '';
           if (cadetsList.length === 0) {
             cadetRowsHtml = `<p class="text-xs italic text-slate-400 text-center py-4">Tidak ada anggota.</p>`;
-          } else {
+         
+ } else {
             // BULK TOOLBAR
             if (isEditable) {
               cadetRowsHtml += `
-                <div id="bulk-toolbar-${prodi.prodiId}" class="hidden bg-blue-50 dark:bg-blue-900/30 p-2.5 rounded flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3 border border-blue-200 dark:border-blue-800 gap-2">
+                <div id="bulk-toolbar-${prodi.prodiId}" class="hidden bg-blue-50 dark:bg-blue-900/30 p-3 rounded flex flex-col items-start justify-between mb-3 border border-blue-200 dark:border-blue-800 gap-3">
                    <span class="text-xs font-bold text-ios-blue" id="bulk-count-${prodi.prodiId}">0 Terpilih</span>
-                   <div class="flex items-center gap-2 w-full sm:w-auto">
-                      <select id="bulk-status-${prodi.prodiId}" class="text-xs px-2 py-1.5 rounded border outline-none">
+                   <div class="flex flex-col md:flex-row items-stretch md:items-center gap-2 w-full">
+                      <select id="bulk-status-${prodi.prodiId}" class="w-full md:w-auto text-xs px-3 py-2 rounded border outline-none">
                         ${statusOptionsHtml}
                       </select>
-                      <input type="file" id="bulk-file-${prodi.prodiId}" accept="image/*" class="text-[10px] w-48 text-slate-500">
-                      <button onclick="applyBulkAction(${prodi.prodiId})" class="px-3 py-1.5 bg-ios-blue text-white rounded text-xs font-bold shrink-0">Terapkan Serempak</button>
+                      <input type="file" id="bulk-file-${prodi.prodiId}" accept="image/*" class="w-full md:w-auto text-[10px] bg-white border rounded p-1.5 text-slate-500">
+                      <button onclick="applyBulkAction(${prodi.prodiId})" class="w-full md:w-auto px-4 py-2 bg-ios-blue text-white rounded text-xs font-bold">Terapkan Masal</button>
                    </div>
                 </div>
               `;
@@ -1927,10 +1960,10 @@
                     </select>
                   </div>
                   <div id="absence-detail-${prodi.prodiId}-${c.no}" class="${draftStatus !== 'Hadir' ? 'flex' : 'hidden'} col-span-1 md:col-span-4 flex-col gap-3 p-3 bg-rose-50/50 rounded-ios-md border border-dashed border-rose-200 mt-1">
-                    <input type="text" class="w-full px-3 py-1.5 rounded bg-white border text-xs" placeholder="Sebutkan alasan..." id="absence-reason-${prodi.prodiId}-${c.no}" value="${draftReason}" onblur="this.value = standardizeEYD(this.value); syncDraftReason(${prodi.prodiId}, ${c.no});" ${isEditable ? '' : 'readonly'}>
-                    <div class="flex items-center gap-3">
-                      ${isEditable ? `<label class="px-3 py-1.5 rounded bg-slate-100 border text-xs font-bold cursor-pointer hover:bg-slate-200"><i data-lucide="upload" class="w-3.5 h-3.5 inline"></i> Unggah <input type="file" accept="image/*" class="hidden" onchange="handleProofPhotoUpload(event, ${prodi.prodiId}, ${c.no})"></label>` : ''}
-                      <img id="proof-preview-${prodi.prodiId}-${c.no}" src="${draftProof}" class="h-10 w-16 object-cover rounded border ${draftProof ? '' : 'hidden'}">
+                    <input type="text" class="w-full px-3 py-2 rounded bg-white border text-xs" placeholder="Sebutkan alasan..." id="absence-reason-${prodi.prodiId}-${c.no}" value="${draftReason}" onblur="this.value = standardizeEYD(this.value); syncDraftReason(${prodi.prodiId}, ${c.no});" ${isEditable ? '' : 'readonly'}>
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                      ${isEditable ? `<label class="w-full sm:w-auto text-center px-4 py-2 rounded bg-white border border-slate-200 text-xs font-bold cursor-pointer hover:bg-slate-50 block"><i data-lucide="upload" class="w-3.5 h-3.5 inline"></i> Unggah Bukti <input type="file" accept="image/*" class="hidden" onchange="handleProofPhotoUpload(event, ${prodi.prodiId}, ${c.no})"></label>` : ''}
+                      <img id="proof-preview-${prodi.prodiId}-${c.no}" src="${draftProof}" class="h-12 w-20 object-cover rounded border shadow-sm ${draftProof ? '' : 'hidden'}">
                     </div>
                     <input type="hidden" id="proof-base64-${prodi.prodiId}-${c.no}" value="${draftProof}">
                   </div>
@@ -1940,9 +1973,9 @@
           }
 
           prodiBox.innerHTML = `
-            <div class="flex justify-between items-center px-4 py-3 bg-slate-50/50 border-b cursor-pointer hover:bg-slate-50" onclick="toggleProdiSection(${prodi.prodiId})">
-              <div class="flex items-center gap-2"><span class="font-extrabold text-sm">${prodi.currentName}</span><span class="text-[9px] font-black uppercase px-2.5 py-0.5 rounded-full border ${badgeClass}">${badgeText}</span></div>
-              <div class="flex items-center gap-2"><span id="prodi-lbl-stat-${prodi.prodiId}" class="text-xs font-extrabold text-slate-400">Hadir: ${draftPresentCount}/${cadetsList.length}</span><i data-lucide="chevron-down" id="prodi-chevron-${prodi.prodiId}" class="w-4.5 h-4.5 text-slate-400 transition-transform"></i></div>
+            <div class="flex flex-wrap sm:flex-nowrap justify-between items-center px-4 py-3 bg-slate-50/50 border-b cursor-pointer hover:bg-slate-50 gap-2" onclick="toggleProdiSection(${prodi.prodiId})">
+              <div class="flex items-center flex-wrap gap-2"><span class="font-extrabold text-sm">${prodi.currentName}</span><span class="text-[9px] font-black uppercase px-2.5 py-0.5 rounded-full border ${badgeClass} whitespace-nowrap">${badgeText}</span></div>
+              <div class="flex items-center gap-2 ml-auto"><span id="prodi-lbl-stat-${prodi.prodiId}" class="text-xs font-extrabold text-slate-400 whitespace-nowrap">Hadir: ${draftPresentCount}/${cadetsList.length}</span><i data-lucide="chevron-down" id="prodi-chevron-${prodi.prodiId}" class="w-4.5 h-4.5 text-slate-400 transition-transform shrink-0"></i></div>
             </div>
             <div class="p-4 hidden flex-col gap-4 border-t" id="prodi-body-${prodi.prodiId}">
               ${cadetRowsHtml}
@@ -1954,13 +1987,13 @@
                 </div>
                 <div class="text-xs pt-2 border-t" id="prodi-sum-detail-${prodi.prodiId}"></div>
                 ${isEditable ? `
-  <div class="pt-3 flex justify-end gap-2">
+  <div class="pt-3 flex flex-col sm:flex-row justify-end gap-2.5">
     ${isSaved ? `
-      <button type="button" onclick="resetSingleProdiAttendance(${prodi.prodiId}, '${prodi.currentName}')" class="px-4 py-2 bg-ios-red text-white rounded text-xs font-black shadow-sm hover:opacity-90 active:scale-95 transition-all">
+      <button type="button" onclick="resetSingleProdiAttendance(${prodi.prodiId}, '${prodi.currentName}')" class="w-full sm:w-auto px-4 py-2.5 bg-ios-red text-white rounded text-xs font-black shadow-sm hover:opacity-90 active:scale-95 transition-all">
         Reset Kehadiran
       </button>
     ` : ''}
-    <button type="button" onclick="saveSingleProdiAttendance(${prodi.prodiId}, '${prodi.currentName}')" class="px-4 py-2 bg-ios-blue text-white rounded text-xs font-black shadow-sm hover:opacity-90 active:scale-95 transition-all">
+    <button type="button" onclick="saveSingleProdiAttendance(${prodi.prodiId}, '${prodi.currentName}')" class="w-full sm:w-auto px-4 py-2.5 bg-ios-blue text-white rounded text-xs font-black shadow-sm hover:opacity-90 active:scale-95 transition-all">
       Simpan Sementara
     </button>
   </div>
@@ -2124,16 +2157,55 @@
 
       const cadets = (appData.cadets[prodiName] || []).filter(c => activeCategory === 'Batalyon' || (activeCategory === 'Putra' && c.gender === 'Laki-Laki') || (activeCategory === 'Putri' && c.gender === 'Perempuan'));
       let presentCnt = 0, absentCnt = 0;
+      
+      // Array menampung detail status draft kadet untuk dibundle
+      const cadetsDraftData = [];
+
       cadets.forEach(c => { 
         const st = storage.getItem(`draft_status_${dateStr}_${act}_${prodiId}_${c.no}`) || 'Hadir'; 
+        const rs = storage.getItem(`draft_reason_${dateStr}_${act}_${prodiId}_${c.no}`) || '';
+        const pr = storage.getItem(`draft_proof_${dateStr}_${act}_${prodiId}_${c.no}`) || '';
+
         if (st === 'Hadir') presentCnt++; else absentCnt++; 
+        
+        cadetsDraftData.push({
+          no: c.no,
+          status: st,
+          reason: rs,
+          proof: pr
+        });
       });
 
+      // 1. Simpan ke Local Storage Device Ini
       storage.setItem(`saved_present_cnt_${dateStr}_${act}_${prodiId}`, presentCnt);
       storage.setItem(`saved_absent_cnt_${dateStr}_${act}_${prodiId}`, absentCnt);
       storage.setItem(`saved_total_cnt_${dateStr}_${act}_${prodiId}`, cadets.length);
       storage.setItem(`saved_${dateStr}_${act}_${prodiName}`, 'true');
-      showToast('Tersimpan Sementara', `Prodi ${prodiName} diperbarui.`, 'success');
+
+      // 2. --- PROSES BUNDLING & UPLOAD KE CLOUD ---
+      const bundleKey = `saved_bundle_${dateStr}_${act}_${prodiId}`;
+      const bundleData = {
+        dateStr,
+        act,
+        prodiId,
+        prodiName,
+        presentCnt,
+        absentCnt,
+        totalCnt: cadets.length,
+        cadets: cadetsDraftData
+      };
+      
+      storage.setItem(bundleKey, JSON.stringify(bundleData));
+      
+      if (window.syncLocalStorageToCloud) {
+        showToast('Sinkronisasi', 'Mengirim data simpan sementara ke Cloud...', 'info');
+        window.syncLocalStorageToCloud(bundleKey).then(() => {
+          showToast('Tersimpan Sementara', `Prodi ${prodiName} berhasil sinkron ke Cloud Cloud.`, 'success');
+        });
+      } else {
+        showToast('Tersimpan Sementara', `Prodi ${prodiName} disimpan lokal.`, 'success');
+      }
+      
       loadDashboardAndAppData();
     }
 
@@ -2143,30 +2215,35 @@
       const dateStr = document.getElementById('presensiDate').value; 
       let act = document.getElementById('presensiActivitySelect').value; 
       if (act === 'kustom') act = document.getElementById('customActivityName').value; 
-      if (!act) { 
-        showToast('Validasi', 'Tentukan kegiatan!', 'warning'); 
-        return; 
-      }
+      if (!act) { showToast('Validasi', 'Tentukan kegiatan!', 'warning'); return; }
 
-      // 1. Ambil seluruh daftar kadet asli di prodi ini
       const cadets = appData.cadets[prodiName] || []; 
 
-      // 2. Hapus draft lokal per individu kadet (kembali default Hadir)
+      // Hapus data lokal individu
       cadets.forEach(c => {
         storage.removeItem(`draft_status_${dateStr}_${act}_${prodiId}_${c.no}`); 
         storage.removeItem(`draft_reason_${dateStr}_${act}_${prodiId}_${c.no}`); 
         storage.removeItem(`draft_proof_${dateStr}_${act}_${prodiId}_${c.no}`); 
       });
 
-      // 3. Hapus metrik kuota ringkasan simpan sementara prodi
+      // Hapus rekap lokal prodi
       storage.removeItem(`saved_present_cnt_${dateStr}_${act}_${prodiId}`); 
       storage.removeItem(`saved_absent_cnt_${dateStr}_${act}_${prodiId}`); 
       storage.removeItem(`saved_total_cnt_${dateStr}_${act}_${prodiId}`); 
       storage.removeItem(`saved_${dateStr}_${act}_${prodiName}`); 
 
-      showToast('Reset Berhasil', `Data presensi prodi ${prodiName} telah dibersihkan.`, 'info');
+      // --- HAPUS BUNDLE DI LOKAL & UPDATE CLOUD JADI KOSONG ---
+      const bundleKey = `saved_bundle_${dateStr}_${act}_${prodiId}`;
+      storage.removeItem(bundleKey);
+      
+      if (window.syncLocalStorageToCloud) {
+        localStorage.setItem(bundleKey, "{}"); // Di-set kosong agar cloud tertimpa kosong
+        window.syncLocalStorageToCloud(bundleKey).then(() => {
+           localStorage.removeItem(bundleKey); 
+        });
+      }
 
-      // 4. Refresh data dan render ulang UI
+      showToast('Reset Berhasil', `Data presensi prodi ${prodiName} telah dibersihkan dari cloud & lokal.`, 'info');
       loadDashboardAndAppData(); 
     }
 
@@ -2493,17 +2570,17 @@
       if (list.length === 0) { container.innerHTML = '<p class="text-slate-400 text-xs italic text-center py-4">Tidak ada jadwal.</p>'; return; }
 
       list.forEach(s => {
-        const pBtn = s.photoUrl ? `<button onclick="viewDocumentedPhoto('${s.title}', '${s.photoUrl}')" class="px-2.5 py-1 bg-emerald-100 text-ios-green rounded text-xs font-bold">Foto</button>` : '';
+        const pBtn = s.photoUrl ? `<button onclick="viewDocumentedPhoto('${s.title}', '${s.photoUrl}')" class="flex-1 md:flex-none px-3 py-2 bg-emerald-100 text-ios-green rounded text-xs font-bold">Foto</button>` : '';
         container.innerHTML += `
-          <div class="flex flex-col sm:flex-row justify-between items-center gap-3 p-3.5 bg-slate-50 rounded-ios-md border">
-            <div class="flex flex-col gap-1 w-full sm:w-auto text-center sm:text-left">
-              <div class="flex items-center justify-center sm:justify-start gap-3"><h4 class="text-sm font-black text-ios-blue">${s.time}</h4><span class="text-sm font-bold">${s.title}</span></div>
+          <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 p-3.5 bg-slate-50 rounded-ios-md border">
+            <div class="flex flex-col gap-1 w-full text-left">
+              <div class="flex items-center gap-3"><h4 class="text-sm font-black text-ios-blue">${s.time}</h4><span class="text-sm font-bold">${s.title}</span></div>
               <div class="text-[10px] text-slate-400 font-bold"><i data-lucide="map-pin" class="w-3.5 h-3.5 inline"></i> ${s.location || "-"}</div>
             </div>
-            <div class="admin-piket-only hidden gap-2">
+            <div class="admin-piket-only hidden flex-wrap md:flex-nowrap gap-2 w-full md:w-auto mt-2 md:mt-0">
               ${pBtn}
-              <button onclick="triggerEditScheduleWholeModal('${s.date}', '${s.time}', '${s.title}', '${s.location || ''}')" class="px-3 py-1 bg-slate-200 rounded text-xs font-bold">Ubah</button>
-              <button onclick="deleteSchedule('${s.date}', '${s.time}', '${s.title}')" class="px-3 py-1 bg-red-100 text-red-600 rounded text-xs font-bold">Hapus</button>
+              <button onclick="triggerEditScheduleWholeModal('${s.date}', '${s.time}', '${s.title}', '${s.location || ''}')" class="flex-1 md:flex-none px-4 py-2 bg-slate-200 rounded text-xs font-bold text-center">Ubah</button>
+              <button onclick="deleteSchedule('${s.date}', '${s.time}', '${s.title}')" class="flex-1 md:flex-none px-4 py-2 bg-red-100 text-red-600 rounded text-xs font-bold text-center">Hapus</button>
             </div>
           </div>
         `;
@@ -2608,10 +2685,13 @@
       appData.prodis.forEach(p => {
         const uName = p.currentName.replace(/\s+/g, '').toLowerCase();
         wrapper.innerHTML += `
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-3 p-4 bg-slate-50 rounded-ios-md border text-sm">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 p-4 bg-slate-50 rounded-ios-md border text-sm">
             <div><div class="font-bold">${p.currentName}</div><div class="text-xs text-slate-400">Kompi: ${p.kompiNumber} | User: ${uName}</div></div>
             <div class="flex flex-col gap-2"><input type="text" value="${p.currentName}" id="adm-prodi-name-${p.prodiId}" class="px-3 py-1.5 rounded border text-xs"><input type="password" value="kadet123" id="adm-prodi-pass-${p.prodiId}" class="px-3 py-1.5 rounded border text-xs"></div>
-            <div class="flex items-center gap-2 md:justify-end"><button onclick="saveAdminProdiRow(${p.prodiId}, '${p.currentName}')" class="px-3 py-1.5 bg-ios-blue text-white rounded text-xs font-bold">Simpan Nama</button><button onclick="saveAdminProdiPass('${uName}', ${p.prodiId})" class="px-3 py-1.5 bg-slate-200 rounded text-xs font-bold">Ubah Sandi</button></div>
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 lg:justify-end mt-2 lg:mt-0">
+               <button onclick="saveAdminProdiRow(${p.prodiId}, '${p.currentName}')" class="w-full sm:w-auto px-4 py-2 bg-ios-blue text-white rounded text-xs font-bold">Simpan Nama</button>
+               <button onclick="saveAdminProdiPass('${uName}', ${p.prodiId})" class="w-full sm:w-auto px-4 py-2 bg-slate-200 rounded text-xs font-bold">Ubah Sandi</button>
+            </div>
           </div>`;
       });
     }
@@ -2657,6 +2737,215 @@
       (appData.cadets[p] || []).forEach(c => list.push({ no: c.no, name: standardizeEYD(document.getElementById(`adm-cadet-name-${c.no}`).value), gender: document.getElementById(`adm-cadet-gender-${c.no}`).value }));
       callServer('updateCadetNames', { prodiName: p, cadetsList: list, username: currentUser.username }, () => { showToast('Tersimpan', `Roster ${p} disimpan.`, 'success'); loadDashboardAndAppData(); });
     }
+// 1. FUNGSI RENDER UTAMA LIST PENDATAAN
+    function renderPendataanList() {
+      const container = document.getElementById('pendataanListContainer');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const items = JSON.parse(storage.getItem('e_arvy_pendataan') || '[]');
+      const isAdminPiket = ['Admin', 'Piket', 'Pokdo', 'Pengasuh'].includes(currentUser.role);
+
+      if (items.length === 0) {
+        container.innerHTML = `<p class="text-slate-400 text-xs italic text-center py-4">Belum ada pendataan aktif saat ini.</p>`;
+        return;
+      }
+
+      items.forEach((item) => {
+        let itemHtml = '';
+        if (isAdminPiket) {
+          // TAMPILAN UNTUK ADMIN / PIKET (Bisa Diedit Berbaris)
+          itemHtml = `
+            <div class="p-4 bg-slate-50 dark:bg-zinc-800/40 rounded-ios-md border flex flex-col gap-3 relative animate-fadeIn">
+              <div class="flex justify-between items-start gap-2 flex-wrap">
+                <div class="flex flex-col gap-1.5 flex-1 min-w-[220px]">
+                  <label class="text-[9px] font-black uppercase tracking-widest text-slate-400">Judul Pendataan</label>
+                  <input type="text" id="pendataan-title-${item.id}" value="${item.title}" onblur="this.value = standardizeEYD(this.value);" class="w-full px-3 py-2 rounded border text-xs font-bold" placeholder="Contoh: Pendataan Ukuran Sepatu PDL">
+                </div>
+                <div class="flex items-center gap-2 mt-4 sm:mt-0">
+                  <span id="countdown-pendataan-${item.id}" class="text-[10px] font-black px-2 py-1 rounded bg-slate-100 dark:bg-zinc-800 text-slate-500 font-mono">--:--:--</span>
+                  <button onclick="deletePendataanItem('${item.id}')" class="p-2 bg-rose-50 text-ios-red rounded hover:bg-rose-100 transition-colors" title="Hapus"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                </div>
+              </div>
+              
+              <div class="flex flex-col gap-1.5">
+                <label class="text-[9px] font-black uppercase tracking-widest text-slate-400">Isi / Deskripsi Instruksi</label>
+                <textarea id="pendataan-content-${item.id}" class="w-full px-3 py-1.5 rounded border text-xs h-14 resize-none focus:outline-none" placeholder="Masukkan rincian informasi pembagian kompi...">${item.content}</textarea>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="flex flex-col gap-1.5">
+                  <label class="text-[9px] font-black uppercase tracking-widest text-slate-400">Tanggal Batas (Deadline)</label>
+                  <input type="date" id="pendataan-date-${item.id}" value="${item.deadlineDate}" class="px-3 py-1.5 rounded border text-xs outline-none">
+                </div>
+                <div class="flex flex-col gap-1.5">
+                  <label class="text-[9px] font-black uppercase tracking-widest text-slate-400">Jam & Menit Batas</label>
+                  <input type="time" id="pendataan-time-${item.id}" value="${item.deadlineTime}" class="px-3 py-1.5 rounded border text-xs outline-none">
+                </div>
+                <div class="flex flex-col gap-1.5">
+                  <label class="text-[9px] font-black uppercase tracking-widest text-slate-400">Tautan Google Form</label>
+                  <input type="url" id="pendataan-url-${item.id}" value="${item.gformUrl}" class="px-3 py-1.5 rounded border text-xs outline-none font-mono" placeholder="https://forms.gle/...">
+                </div>
+              </div>
+
+              <div class="flex justify-between items-center pt-2.5 border-t border-slate-200/60 mt-1 flex-wrap gap-2">
+                <button onclick="savePendataanItem('${item.id}')" class="w-full sm:w-auto px-4 py-2 bg-ios-blue text-white rounded text-xs font-black shadow-sm hover:opacity-90 transition-all">Simpan Perubahan</button>
+                <a href="${item.gformUrl || '#'}" target="_blank" class="w-full sm:w-auto text-center px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded text-xs font-black flex items-center justify-center gap-1 shadow-sm"><i data-lucide="external-link" class="w-3.5 h-3.5"></i> Tes Tautan</a>
+              </div>
+            </div>
+          `;
+        } else {
+          // TAMPILAN READ-ONLY UNTUK USER KADET
+          itemHtml = `
+            <div class="p-4 bg-white dark:bg-zinc-900 rounded-ios-md border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-sm animate-fadeIn">
+              <div class="flex flex-col gap-1.5 flex-1">
+                <div class="flex items-center gap-2.5 flex-wrap">
+                  <h4 class="text-sm font-black text-slate-900 dark:text-white">${item.title}</h4>
+                  <span id="countdown-pendataan-${item.id}" class="text-[10px] font-black">--:--:--</span>
+                </div>
+                <p class="text-xs text-slate-500 dark:text-zinc-400 whitespace-pre-line leading-relaxed">${item.content}</p>
+                <span class="text-[10px] text-slate-400 font-bold block mt-0.5"><i data-lucide="calendar" class="w-3.5 h-3.5 inline -mt-0.5"></i> Batas Pengumpulan: <span class="text-slate-600 dark:text-zinc-300">${item.deadlineDate} Pukul ${item.deadlineTime} WIB</span></span>
+              </div>
+              <div class="w-full sm:w-auto shrink-0 flex justify-end">
+                <a href="${item.gformUrl || '#'}" target="_blank" class="w-full sm:w-auto text-center px-6 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black text-xs rounded-ios-sm shadow-md flex items-center justify-center gap-1.5 hover:scale-[1.02] transition-all">
+                  <i data-lucide="external-link" class="w-3.5 h-3.5"></i> Buka
+                </a>
+              </div>
+            </div>
+          `;
+        }
+        container.innerHTML += itemHtml;
+      });
+      lucide.createIcons();
+      updatePendataanCountdowns(); // Jalankan hitung mundur seketika
+    }
+
+    // 2. TIMING COUNTDOWN REALTIME HITUNG MUNDUR (DIJALANKAN TIAP DETIK)
+    function updatePendataanCountdowns() {
+      const items = JSON.parse(storage.getItem('e_arvy_pendataan') || '[]');
+      
+      // Fungsi pembantu untuk mengupdate teks & warna jam berdasarkan ID elemen
+      const updateTimerEl = (elId, item) => {
+        const el = document.getElementById(elId);
+        if (!el) return;
+        
+        const target = new Date(`${item.deadlineDate}T${item.deadlineTime}:00`);
+        const now = new Date();
+        const diffMs = target - now;
+        
+        if (diffMs <= 0) {
+          el.innerText = "Waktu Habis";
+          el.className = "text-[9px] font-black uppercase px-2 py-0.5 rounded bg-rose-100 text-ios-red font-mono whitespace-nowrap border border-rose-200";
+        } else {
+          const diffHrs = Math.floor(diffMs / 3600000);
+          const diffMins = Math.floor((diffMs % 3600000) / 60000);
+          const diffSecs = Math.floor((diffMs % 60000) / 1000);
+          el.innerText = `${diffHrs}j ${diffMins}m ${diffSecs}d`;
+          el.className = "text-[9px] font-black uppercase px-2 py-0.5 rounded bg-amber-100 text-ios-orange font-mono whitespace-nowrap border border-amber-200 animate-pulse";
+        }
+      };
+
+      // 1. Update timer di halaman Announce (semua item)
+      items.forEach(item => {
+        updateTimerEl(`countdown-pendataan-${item.id}`, item);
+      });
+
+      // 2. Update timer di Dashboard (hanya item terbaru / index 0)
+      if (items.length > 0) {
+        updateTimerEl('countdown-dash-pendataan', items[0]);
+      }
+    }
+
+    // 3. SEBUT DATA FORM KOSONG BARU (UNTUK PIKET)
+    function addNewPendataanItem() {
+      const items = JSON.parse(storage.getItem('e_arvy_pendataan') || '[]');
+      const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
+      const tomorrowStr = tomorrow.toISOString().split('T')[0];
+
+      const newItem = {
+        id: "P_" + new Date().getTime(),
+        title: "Pendataan Baru",
+        content: "Silakan isi rincian berkas data melalui tautan Google Form di samping.",
+        deadlineDate: tomorrowStr,
+        deadlineTime: "23:59",
+        gformUrl: "https://forms.gle/"
+      };
+
+      items.unshift(newItem); // Letakkan paling atas
+      storage.setItem('e_arvy_pendataan', JSON.stringify(items));
+      
+      triggerCloudSyncForPendataan();
+      renderPendataanList();
+      showToast('Ditambahkan', 'Item kolom pendataan berhasil dibuat.', 'success');
+    }
+
+    // 4. SIMPAN PERUBAHAN SATU FORM BARIS KE STORAGE & CLOUD
+    function savePendataanItem(id) {
+      const items = JSON.parse(storage.getItem('e_arvy_pendataan') || '[]');
+      const idx = items.findIndex(i => i.id === id);
+      if (idx === -1) return;
+
+      items[idx].title = standardizeEYD(document.getElementById(`pendataan-title-${id}`).value);
+      items[idx].content = document.getElementById(`pendataan-content-${id}`).value;
+      items[idx].deadlineDate = document.getElementById(`pendataan-date-${id}`).value;
+      items[idx].deadlineTime = document.getElementById(`pendataan-time-${id}`).value;
+      items[idx].gformUrl = document.getElementById(`pendataan-url-${id}`).value;
+
+      storage.setItem('e_arvy_pendataan', JSON.stringify(items));
+      triggerCloudSyncForPendataan();
+      renderPendataanList();
+      showToast('Tersimpan', 'Perubahan judul, isi, deadline, dan tautan sinkron.', 'success');
+    }
+
+    // 5. HAPUS DATA PENDATAAN
+    function deletePendataanItem(id) {
+      if (!confirm('Hapus lembar pendataan ini secara permanen dari sistem?')) return;
+      let items = JSON.parse(storage.getItem('e_arvy_pendataan') || '[]');
+      items = items.filter(i => i.id !== id);
+      
+      storage.setItem('e_arvy_pendataan', JSON.stringify(items));
+      triggerCloudSyncForPendataan();
+      renderPendataanList();
+      showToast('Terhapus', 'Lembar kuisioner pendataan dibersihkan.', 'info');
+    }
+
+    // 6. SYNC SINKRONISASI BERSAMA BACK4APP CLOUD
+    function triggerCloudSyncForPendataan() {
+      if (window.syncLocalStorageToCloud) {
+        window.syncLocalStorageToCloud('e_arvy_pendataan');
+      }
+    }
+function updateDashboardPendataan() {
+      const wrapper = document.getElementById('dashPendataanWrapper');
+      const container = document.getElementById('dashPendataanContent');
+      if (!wrapper || !container) return;
+
+      const items = JSON.parse(storage.getItem('e_arvy_pendataan') || '[]');
+      
+      // Sembunyikan kartu jika tidak ada pendataan
+      if (items.length === 0) {
+        wrapper.classList.add('hidden');
+        return;
+      }
+
+      // Tampilkan kartu dan ambil item index 0 (yang paling baru)
+      wrapper.classList.remove('hidden');
+      const item = items[0]; 
+
+      container.innerHTML = `
+        <div class="flex flex-col gap-1.5">
+          <div class="flex items-start justify-between gap-2 flex-wrap">
+            <h4 class="text-sm font-black text-slate-900 dark:text-white leading-tight">${item.title}</h4>
+            <span id="countdown-dash-pendataan" class="text-[10px] font-black shrink-0">--:--:--</span>
+          </div>
+          <p class="text-xs text-slate-600 dark:text-zinc-400 line-clamp-2 leading-relaxed">${item.content}</p>
+        </div>
+        <a href="${item.gformUrl || '#'}" target="_blank" class="mt-1 w-full text-center px-4 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black text-xs rounded-ios-sm shadow-md flex items-center justify-center gap-1.5 hover:opacity-90 hover:scale-[1.02] transition-all">
+          <i data-lucide="external-link" class="w-3.5 h-3.5"></i> Buka Formulir
+        </a>
+      `;
+      lucide.createIcons();
+    }
 
     function switchTab(viewId) {
       if (viewId === 'admin-panel' && currentUser.role !== 'Admin') return switchTab('dashboard');
@@ -2664,7 +2953,10 @@
       const target = document.getElementById(`view-${viewId}`); if (target) { target.classList.remove('hidden'); target.classList.add('active'); }
       document.querySelectorAll('.sidebar-item').forEach(i => i.className = i.id === `side-${viewId}` ? "sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-ios-md text-sm font-bold text-ios-blue bg-blue-100/50" : "sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-ios-md text-sm font-semibold text-slate-600 hover:bg-slate-100/50");
       document.querySelectorAll('.tabbar-item').forEach(i => i.className = i.id === `tab-${viewId}` ? "tabbar-item flex flex-col items-center gap-0.5 text-ios-blue font-bold text-[10px]" : "tabbar-item flex flex-col items-center gap-0.5 text-slate-400 font-semibold text-[10px]");
-      if (viewId === 'statistik') { renderCharts(); renderHistoryTable(); } else if (viewId === 'announce') loadAnnounceSchedules(); else if (viewId === 'profile') updateProfilePage(); else if (viewId === 'kepulangan') { renderKepulanganList(); renderDepartureLogs(); } else if (viewId === 'admin-panel') renderAbsenceStatusManager();
+      if (viewId === 'statistik') { renderCharts(); renderHistoryTable(); } else if (viewId === 'announce') loadAnnounceSchedules(); 
+renderPendataanList();
+}
+  else if (viewId === 'profile') updateProfilePage(); else if (viewId === 'kepulangan') { renderKepulanganList(); renderDepartureLogs(); } else if (viewId === 'admin-panel') renderAbsenceStatusManager();
     }
 
     function toggleTheme() {
@@ -2712,11 +3004,41 @@
     try {
       const CloudStorage = Parse.Object.extend("DataArvy");
       const query = new Parse.Query(CloudStorage);
-      query.limit(100);
+      query.limit(1000); // TINGKATKAN LIMIT AGAR FORM DRAFT TIDAK TERPOTONG
       const results = await query.find();
       
       for (let i = 0; i < results.length; i++) {
         localStorage.setItem(results[i].get("kunci"), results[i].get("jsonString"));
+      }
+
+      // --- LOGIKA TAMBAHAN: MEMBONGKAR BUNDLE DRAFT DARI PERANGKAT LAIN ---
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith("saved_bundle_")) {
+          try {
+            const bundleStr = localStorage.getItem(key);
+            if (!bundleStr || bundleStr === "{}" || bundleStr === "undefined") continue;
+            
+            const bundle = JSON.parse(bundleStr);
+            
+            // Unpack Metadata Rekap Prodi ke Local Storage
+            localStorage.setItem(`saved_present_cnt_${bundle.dateStr}_${bundle.act}_${bundle.prodiId}`, bundle.presentCnt);
+            localStorage.setItem(`saved_absent_cnt_${bundle.dateStr}_${bundle.act}_${bundle.prodiId}`, bundle.absentCnt);
+            localStorage.setItem(`saved_total_cnt_${bundle.dateStr}_${bundle.act}_${bundle.prodiId}`, bundle.totalCnt);
+            localStorage.setItem(`saved_${bundle.dateStr}_${bundle.act}_${bundle.prodiName}`, 'true');
+            
+            // Unpack Status Individu Kadet ke Form
+            if (bundle.cadets && Array.isArray(bundle.cadets)) {
+              bundle.cadets.forEach(c => {
+                if (c.status) localStorage.setItem(`draft_status_${bundle.dateStr}_${bundle.act}_${bundle.prodiId}_${c.no}`, c.status);
+                if (c.reason) localStorage.setItem(`draft_reason_${bundle.dateStr}_${bundle.act}_${bundle.prodiId}_${c.no}`, c.reason);
+                if (c.proof) localStorage.setItem(`draft_proof_${bundle.dateStr}_${bundle.act}_${bundle.prodiId}_${c.no}`, c.proof);
+              });
+            }
+          } catch(err) { 
+            console.error("Gagal membongkar cloud bundle:", err); 
+          }
+        }
       }
     } catch (e) {
       console.error("Gagal menarik data dari cloud:", e);
@@ -2767,7 +3089,8 @@
     
     setTimeout(async () => {
       if (methodName === 'saveAttendance') { await syncLocalStorageToCloud('e_arvy_history_attendance'); } 
-      else if (methodName === 'saveSchedule') { await syncLocalStorageToCloud('e_arvy_schedules'); } 
+      else if (methodName === 'saveSchedule') { await syncLocalStorageToCloud('e_arvy_schedules'); 
+await syncLocalStorageToCloud('e_arvy_pendataan'); } 
       else if (methodName === 'saveDeparture') { await syncLocalStorageToCloud('e_arvy_kepulangan'); await syncLocalStorageToCloud('e_arvy_departure_logs'); } 
       else if (methodName === 'updateTotalCadets') { await syncLocalStorageToCloud('e_arvy_settings'); } 
       else if (methodName === 'updateCadetNames') { await syncLocalStorageToCloud('e_arvy_cadets'); } 
