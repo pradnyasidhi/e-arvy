@@ -325,38 +325,20 @@
                 </div>
                 <span id="dashLastActCat" class="text-xs font-extrabold px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-ios-green border border-emerald-100 dark:border-emerald-900">Lengkap</span>
               </div>
-
-              <div id="dashLastActBox" onclick="viewLastRecapDetail()" class="p-4 bg-slate-50 dark:bg-zinc-800/40 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-ios-md border border-slate-200/50 cursor-pointer transition-all flex flex-col gap-4">
-                <div class="flex justify-between items-center border-b border-slate-200 dark:border-zinc-800 pb-3">
-                  <div class="flex flex-col">
-                    <h4 id="dashLastActName" class="text-base font-extrabold">Apel Pagi</h4>
-                    <span id="dashLastActDate" class="text-[11px] text-slate-400 dark:text-zinc-500 font-bold">2026-06-11</span>
-                  </div>
-                  <i data-lucide="chevron-right" class="w-5 h-5 text-slate-400"></i>
-                </div>
-
-                <div class="grid grid-cols-3 gap-4">
-                  <div class="bg-white dark:bg-zinc-800/80 p-3 rounded-ios-md text-center border border-slate-100 dark:border-zinc-800">
-                    <span class="text-[9px] uppercase tracking-wider font-extrabold text-slate-400">Kuota</span>
-                    <h5 id="dashLastActTotal" class="text-base font-black text-slate-900 dark:text-white mt-1">600</h5>
-                  </div>
-                  <div class="bg-white dark:bg-zinc-800/80 p-3 rounded-ios-md text-center border border-slate-100 dark:border-zinc-800">
-                    <span class="text-[9px] uppercase tracking-wider font-extrabold text-slate-400">Hadir</span>
-                    <h5 id="dashLastActPresent" class="text-base font-black text-ios-green mt-1">599</h5>
-                  </div>
-                  <div class="bg-white dark:bg-zinc-800/80 p-3 rounded-ios-md text-center border border-slate-100 dark:border-zinc-800">
-                    <span class="text-[9px] uppercase tracking-wider font-extrabold text-slate-400">Kurang</span>
-                    <h5 id="dashLastActAbsent" class="text-base font-black text-ios-red mt-1">1</h5>
-                  </div>
-                </div>
-
-                <p id="dashLastActVer" class="text-xs text-slate-500 flex items-center gap-1.5 mt-1">
-                  <i data-lucide="shield-check" class="w-3.5 h-3.5 text-ios-blue"></i> Diverifikasi oleh: Piket
-                </p>
               </div>
+
+            <div id="dashPendataanWrapper" class="hidden p-6 bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/10 dark:to-indigo-900/10 rounded-ios-lg border border-purple-100 dark:border-purple-900/30 shadow-lg flex flex-col gap-4">
+              <div class="flex items-center justify-between border-b border-purple-200 dark:border-purple-800/50 pb-2">
+                <div class="flex items-center gap-2">
+                  <i data-lucide="clipboard-list" class="w-5 h-5 text-purple-600 dark:text-purple-400"></i>
+                  <h3 class="font-extrabold text-base tracking-tight text-slate-900 dark:text-white">Pendataan Terbaru</h3>
+                </div>
+                <button onclick="switchTab('announce')" class="text-[10px] font-black uppercase tracking-wider text-purple-600 hover:underline">Lihat Semua</button>
+              </div>
+              <div id="dashPendataanContent" class="flex flex-col gap-3">
+                 </div>
             </div>
 
-            <!-- Dashboard Schedules (Active & Next Only) -->
             <div class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg border border-slate-200/60 dark:border-zinc-800/60 shadow-lg shadow-black/5 flex flex-col gap-4">
               <div class="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-3">
                 <div class="flex items-center gap-2">
@@ -366,8 +348,7 @@
                 <button onclick="switchTab('announce')" class="text-xs font-bold text-ios-blue hover:underline">Lihat Jadwal Penuh</button>
               </div>
               <div id="dashScheduleFlowWrapper" class="flex flex-col gap-4">
-                <!-- Rendered dynamically (Active & Next) -->
-              </div>
+                </div>
             </div>
 
           </div>
@@ -380,7 +361,6 @@
               <p id="realTimeDate" class="text-[10px] text-slate-400 font-extrabold tracking-widest uppercase">Kamis, 11 Juni 2026</p>
             </div>
 
-            <!-- General Announcement moved here -->
             <div class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg border border-slate-200/60 dark:border-zinc-800/60 shadow-lg shadow-black/5 flex flex-col gap-3">
               <div class="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-3">
                 <h3 class="font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">Pengumuman Umum</h3>
@@ -390,6 +370,11 @@
                 Selamat datang di E-Arvy. Silakan laksanakan presensi harian tepat waktu.
               </p>
             </div>
+
+            <div class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg border border-slate-200/60 dark:border-zinc-800/60 shadow-lg shadow-black/5 flex flex-col gap-4">
+              </div>
+
+          </div>
 <!-- Kartu Pendataan Dashboard -->
             <div id="dashPendataanWrapper" class="hidden p-6 bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/10 dark:to-indigo-900/10 rounded-ios-lg border border-purple-100 dark:border-purple-900/30 shadow-lg flex flex-col gap-4">
               <div class="flex items-center justify-between border-b border-purple-200 dark:border-purple-800/50 pb-2">
