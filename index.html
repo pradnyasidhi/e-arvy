@@ -1424,13 +1424,29 @@
     }
 
     function renderApplicationLogos() {
-      const customLogo = appData.settings.custom_logo || "";
+      // Intip data storage sebelum login untuk mencari logo kustom
+      let customLogo = "";
+      try {
+        const settingsStr = storage.getItem('e_arvy_settings');
+        if (settingsStr) {
+          const settingsObj = JSON.parse(settingsStr);
+          customLogo = settingsObj.custom_logo || appData.settings.custom_logo || "";
+        } else {
+          customLogo = appData.settings.custom_logo || "";
+        }
+      } catch(e) {
+        customLogo = appData.settings.custom_logo || "";
+      }
+
       const hContainer = document.getElementById('headerLogoContainer');
       const lContainer = document.getElementById('loginLogoContainer');
       const aContainer = document.getElementById('adminLogoPreview');
 
       if (hContainer) hContainer.innerHTML = customLogo ? `<img src="${customLogo}" class="w-10 h-10 object-contain rounded filter drop-shadow-md">` : DEFAULT_SVG_LOGO;
-      if (lContainer) lContainer.innerHTML = customLogo ? `<img src="${customLogo}" class="w-14 h-14 object-contain rounded">` : DEFAULT_SVG_LOGO_LOGIN;
+      
+      // Menerapkan logo kustom ke laman Login
+      if (lContainer) lContainer.innerHTML = customLogo ? `<img src="${customLogo}" class="w-14 h-14 object-contain rounded drop-shadow-lg">` : DEFAULT_SVG_LOGO_LOGIN;
+      
       if (aContainer) aContainer.innerHTML = customLogo ? `<img src="${customLogo}" class="w-full h-full object-contain rounded">` : DEFAULT_SVG_LOGO;
     }
 
