@@ -2191,7 +2191,7 @@ markAsUnsaved(prodiId);
           absent++; 
           const reason = storage.getItem(`draft_reason_${dateStr}_${act}_${prodiId}_${c.no}`) || ''; 
           
-          // FORMAT BARU: Nama (Status: "alasan")
+          // FORMAT BARU: Nama (Status: alasan)
           const reasonFormatted = reason ? `: "${reason}"` : '';
           details.push(`• ${c.name} (${status}${reasonFormatted})`); 
         }
