@@ -2187,7 +2187,14 @@ markAsUnsaved(prodiId);
       cadets.forEach(c => {
         const status = storage.getItem(`draft_status_${dateStr}_${act}_${prodiId}_${c.no}`) || 'Hadir';
         if (status === 'Hadir') present++;
-        else { absent++; const reason = storage.getItem(`draft_reason_${dateStr}_${act}_${prodiId}_${c.no}`) || ''; details.push(`• No ${c.no} (${status}) ${reason}`); }
+        else { 
+          absent++; 
+          const reason = storage.getItem(`draft_reason_${dateStr}_${act}_${prodiId}_${c.no}`) || ''; 
+          
+          // FORMAT BARU: Nama (Status: "alasan")
+          const reasonFormatted = reason ? `: "${reason}"` : '';
+          details.push(`• ${c.name} (${status}${reasonFormatted})`); 
+        }
       });
 
       const lblStat = document.getElementById(`prodi-lbl-stat-${prodiId}`);
@@ -2195,7 +2202,7 @@ markAsUnsaved(prodiId);
       const sumP = document.getElementById(`prodi-sum-present-${prodiId}`); if(sumP) sumP.innerText = present;
       const sumA = document.getElementById(`prodi-sum-absent-${prodiId}`); if(sumA) sumA.innerText = absent;
       const det = document.getElementById(`prodi-sum-detail-${prodiId}`);
-      if (det) det.innerHTML = `<strong>Keterangan Tidak Hadir:</strong><p class="${absent > 0 ? 'text-ios-red' : 'text-slate-400 italic'} mt-1 text-xs">${absent > 0 ? details.join('<br>') : 'Nihil'}</p>`;
+      if (det) det.innerHTML = `<strong>Keterangan:</strong><p class="${absent > 0 ? 'text-ios-red' : 'text-slate-400 italic'} mt-1 text-xs">${absent > 0 ? details.join('<br>') : 'Lengkap'}</p>`;
     }
 
 function markAsUnsaved(prodiId) {
