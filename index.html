@@ -2072,12 +2072,19 @@ markAsUnsaved(prodiId);
             </div>
           `;
           compBody.appendChild(prodiBox);
-          updateProdiSummary(prodi.prodiId);
+          // Hapus pemanggilan updateProdiSummary di baris ini
         });
 
         container.appendChild(compCard);
         updateSingleKompiCumulativeHdr(k);
       }
+      
+      // TAMBAHKAN DI SINI: 
+      // Update rekap SETELAH semua elemen selesai dirender di layar
+      appData.prodis.forEach(p => {
+        updateProdiSummary(p.prodiId);
+      });
+
       lucide.createIcons();
     }
 
