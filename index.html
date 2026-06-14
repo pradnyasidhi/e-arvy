@@ -1295,7 +1295,7 @@
                     textRecap += `LENGKAP\n\n\n`;
                 } else {
                     pAbsents.forEach(a => {
-                        textRecap += `- ${a.cadetName} (${a.status}${a.reason ? ', ' + a.reason : ''})\n`;
+                        textRecap += `- ${a.cadetName} (${a.status}${a.reason ? ': ' + a.reason : ''})\n`;
                     });
                     textRecap += `\n`;
                 }
