@@ -947,8 +947,8 @@
     let editingOldTime = '';
     let editingOldTitle = '';
 
-    const DEFAULT_SVG_LOGO = `<svg class="w-10 h-10 filter drop-shadow-md" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#007aff" /><stop offset="100%" stop-color="#5856d6" /></linearGradient><linearGradient id="sixGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ffffff" /><stop offset="100%" stop-color="#e2e8f0" /></linearGradient></defs><path d="M50 5 L85 15 V45 C85 70 50 92 50 92 C50 92 15 70 15 45 V15 L50 5 Z" fill="url(#shieldGrad)" stroke="rgba(255,255,255,0.2)" stroke-width="2"/><path d="M52 26 C40 26 34 35 34 48 C34 60 41 68 53 68 C63 68 70 60 70 49 C70 39 63 32 52 32 C47 32 42 35 40 39 C40 33 45 28 52 28 Z M52 38 C58 38 62 42 62 49 C62 55 58 59 52 59 C46 59 42 55 42 49 C42 42 46 38 52 38 Z" fill="url(#sixGrad)"/></svg>`;
-    const DEFAULT_SVG_LOGO_LOGIN = `<svg class="w-14 h-14" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="shieldGradLogin" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ffffff" /><stop offset="100%" stop-color="#f8fafc" /></linearGradient><linearGradient id="sixGradLogin" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#007aff" /><stop offset="100%" stop-color="#5856d6" /></linearGradient></defs><path d="M50 5 L85 15 V45 C85 70 50 92 50 92 C50 92 15 70 15 45 V15 L50 5 Z" fill="url(#shieldGradLogin)" stroke="rgba(255,255,255,0.4)" stroke-width="2"/><path d="M52 26 C40 26 34 35 34 48 C34 60 41 68 53 68 C63 68 70 60 70 49 C70 39 63 32 52 32 C47 32 42 35 40 39 C40 33 45 28 52 28 Z M52 38 C58 38 62 42 62 49 C62 55 58 59 52 59 C46 59 42 55 42 49 C42 42 46 38 52 38 Z" fill="url(#sixGradLogin)"/></svg>`;
+    const DEFAULT_SVG_LOGO_LOGIN = `<img src="https://www.image2url.com/r2/default/images/1781409226493-1bc2a13a-36c6-4972-9a1c-6114ed273acc.png" class="w-14 h-14 object-contain rounded drop-shadow-lg" alt="Logo Login">`;
+    const DEFAULT_SVG_LOGO = `<img src="https://www.image2url.com/r2/default/images/1781409226493-1bc2a13a-36c6-4972-9a1c-6114ed273acc.png" class="w-14 h-14 object-contain rounded drop-shadow-lg" alt="Logo Header">`;
 
     let appData = {
       settings: { total_batalyon: 600, total_putra: 333, total_putri: 267, general_announcement: "Selamat datang di E-Arvy. Silakan laksanakan presensi harian tepat waktu.", custom_logo: "" },
@@ -3231,6 +3231,7 @@ await syncLocalStorageToCloud('e_arvy_pendataan'); }
   };
 
   const originalHandleProofPhotoUpload = handleProofPhotoUpload;
+
   handleProofPhotoUpload = function(event, prodiId, cadetNo) {
     const file = event.target.files[0];
     if (file && window.uploadFileToCloudStorage) {
