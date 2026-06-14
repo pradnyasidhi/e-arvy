@@ -317,34 +317,45 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div class="lg:col-span-2 flex flex-col gap-6">
             
-            <div class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg border border-slate-200/60 dark:border-zinc-800/60 shadow-lg shadow-black/5 flex flex-col gap-4">
-              <div class="flex items-center justify-between">
+           <div class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg border border-slate-200/60 dark:border-zinc-800/60 shadow-lg shadow-black/5 flex flex-col gap-4">
+              <div class="flex items-center justify-between mb-1">
                 <div class="flex items-center gap-2">
-                  <i data-lucide="activity" class="w-5 h-5 text-ios-blue"></i>
-                  <h3 class="font-extrabold text-lg tracking-tight">Rekap Presensi Terakhir</h3>
+                  <i data-lucide="activity" class="w-6 h-6 text-ios-blue"></i>
+                  <h3 class="font-extrabold text-xl tracking-tight">Rekap Presensi Terakhir</h3>
                 </div>
-                <span id="dashLastActCat" class="text-xs font-extrabold px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-ios-green border border-emerald-100 dark:border-emerald-900">Lengkap</span>
+                <span id="dashLastActCat" class="text-xs font-extrabold px-3 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-ios-green border border-emerald-100 dark:border-emerald-900">Lengkap Hadir</span>
               </div>
-              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div class="p-3 bg-slate-50 dark:bg-zinc-800/40 rounded-ios-md border border-slate-100 dark:border-zinc-800/60">
-                  <span class="text-[9px] font-black uppercase text-slate-400 block mb-1">Nama Kegiatan</span>
-                  <strong id="dashLastActName" class="text-xs font-extrabold text-slate-800 dark:text-white truncate block">-</strong>
+              
+              <div class="bg-slate-50 dark:bg-zinc-800/40 rounded-ios-md border border-slate-100 dark:border-zinc-800/60 p-5 flex flex-col gap-5">
+                
+                <div class="flex justify-between items-center border-b border-slate-200/60 dark:border-zinc-700/60 pb-4">
+                  <div class="flex flex-col gap-1">
+                    <strong id="dashLastActName" class="text-lg font-black text-slate-800 dark:text-white leading-none">-</strong>
+                    <span id="dashLastActDate" class="text-sm font-bold text-slate-400">-</span>
+                  </div>
+                  <i data-lucide="chevron-right" class="w-5 h-5 text-slate-400"></i>
                 </div>
-                <div class="p-3 bg-slate-50 dark:bg-zinc-800/40 rounded-ios-md border border-slate-100 dark:border-zinc-800/60">
-                  <span class="text-[9px] font-black uppercase text-slate-400 block mb-1">Waktu Pelaksanaan</span>
-                  <strong id="dashLastActDate" class="text-xs font-extrabold text-slate-800 dark:text-white">-</strong>
+
+                <div class="grid grid-cols-3 gap-4">
+                  <div class="bg-white dark:bg-zinc-900 p-4 rounded-ios-md border border-slate-100 dark:border-zinc-800/60 flex flex-col items-center justify-center text-center shadow-sm">
+                    <span class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Kuota</span>
+                    <strong id="dashLastActTotal" class="text-xl font-black text-slate-800 dark:text-white">-</strong>
+                  </div>
+                  <div class="bg-white dark:bg-zinc-900 p-4 rounded-ios-md border border-slate-100 dark:border-zinc-800/60 flex flex-col items-center justify-center text-center shadow-sm">
+                    <span class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Hadir</span>
+                    <strong id="dashLastActPresent" class="text-xl font-black text-ios-green">-</strong>
+                  </div>
+                  <div class="bg-white dark:bg-zinc-900 p-4 rounded-ios-md border border-slate-100 dark:border-zinc-800/60 flex flex-col items-center justify-center text-center shadow-sm">
+                    <span class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Kurang</span>
+                    <strong id="dashLastActAbsent" class="text-xl font-black text-ios-red">-</strong>
+                  </div>
                 </div>
-                <div class="p-3 bg-slate-50 dark:bg-zinc-800/40 rounded-ios-md border border-slate-100 dark:border-zinc-800/60">
-                  <span class="text-[9px] font-black uppercase text-slate-400 block mb-1">Total Hadir</span>
-                  <strong class="text-xs font-extrabold text-ios-green"><span id="dashLastActPresent">-</span> / <span id="dashLastActTotal">-</span></strong>
+
+                <div class="flex items-center mt-1">
+                  <span id="dashLastActVer" class="text-xs font-medium text-slate-500 dark:text-zinc-400 flex items-center gap-1.5">
+                    <i data-lucide="shield-check" class="w-4 h-4 text-ios-blue"></i> Belum ada data verifikasi presensi permanen.
+                  </span>
                 </div>
-                <div class="p-3 bg-slate-50 dark:bg-zinc-800/40 rounded-ios-md border border-slate-100 dark:border-zinc-800/60">
-                  <span class="text-[9px] font-black uppercase text-slate-400 block mb-1">Total Kurang</span>
-                  <strong id="dashLastActAbsent" class="text-xs font-extrabold text-ios-red">-</strong>
-                </div>
-              </div>
-              <div class="flex items-center gap-2 mt-1 px-1">
-                <span id="dashLastActVer" class="text-[10px] font-bold text-slate-500 dark:text-zinc-400 flex items-center gap-1.5"><i data-lucide="shield-check" class="w-3.5 h-3.5 text-ios-blue"></i> Belum ada data verifikasi presensi permanen.</span>
               </div>
             </div>
 
