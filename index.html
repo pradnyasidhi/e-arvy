@@ -325,7 +325,28 @@
                 </div>
                 <span id="dashLastActCat" class="text-xs font-extrabold px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-ios-green border border-emerald-100 dark:border-emerald-900">Lengkap</span>
               </div>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div class="p-3 bg-slate-50 dark:bg-zinc-800/40 rounded-ios-md border border-slate-100 dark:border-zinc-800/60">
+                  <span class="text-[9px] font-black uppercase text-slate-400 block mb-1">Nama Kegiatan</span>
+                  <strong id="dashLastActName" class="text-xs font-extrabold text-slate-800 dark:text-white truncate block">-</strong>
+                </div>
+                <div class="p-3 bg-slate-50 dark:bg-zinc-800/40 rounded-ios-md border border-slate-100 dark:border-zinc-800/60">
+                  <span class="text-[9px] font-black uppercase text-slate-400 block mb-1">Waktu Pelaksanaan</span>
+                  <strong id="dashLastActDate" class="text-xs font-extrabold text-slate-800 dark:text-white">-</strong>
+                </div>
+                <div class="p-3 bg-slate-50 dark:bg-zinc-800/40 rounded-ios-md border border-slate-100 dark:border-zinc-800/60">
+                  <span class="text-[9px] font-black uppercase text-slate-400 block mb-1">Total Hadir</span>
+                  <strong class="text-xs font-extrabold text-ios-green"><span id="dashLastActPresent">-</span> / <span id="dashLastActTotal">-</span></strong>
+                </div>
+                <div class="p-3 bg-slate-50 dark:bg-zinc-800/40 rounded-ios-md border border-slate-100 dark:border-zinc-800/60">
+                  <span class="text-[9px] font-black uppercase text-slate-400 block mb-1">Total Kurang</span>
+                  <strong id="dashLastActAbsent" class="text-xs font-extrabold text-ios-red">-</strong>
+                </div>
               </div>
+              <div class="flex items-center gap-2 mt-1 px-1">
+                <span id="dashLastActVer" class="text-[10px] font-bold text-slate-500 dark:text-zinc-400 flex items-center gap-1.5"><i data-lucide="shield-check" class="w-3.5 h-3.5 text-ios-blue"></i> Belum ada data verifikasi presensi permanen.</span>
+              </div>
+            </div>
 
             <div id="dashPendataanWrapper" class="hidden p-6 bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/10 dark:to-indigo-900/10 rounded-ios-lg border border-purple-100 dark:border-purple-900/30 shadow-lg flex flex-col gap-4">
               <div class="flex items-center justify-between border-b border-purple-200 dark:border-purple-800/50 pb-2">
@@ -357,8 +378,8 @@
             
             <div class="p-6 bg-gradient-to-br from-slate-950 via-slate-900 to-zinc-900 text-white rounded-ios-lg shadow-xl flex flex-col items-center justify-center text-center gap-1 border border-white/10">
               <i data-lucide="clock" class="w-8 h-8 text-ios-blue mb-2"></i>
-              <h2 id="realTimeClock" class="text-4xl font-black tracking-tight">12:06:13</h2>
-              <p id="realTimeDate" class="text-[10px] text-slate-400 font-extrabold tracking-widest uppercase">Kamis, 11 Juni 2026</p>
+              <h2 id="realTimeClock" class="text-4xl font-black tracking-tight">--:--:--</h2>
+              <p id="realTimeDate" class="text-[10px] text-slate-400 font-extrabold tracking-widest uppercase">Memuat...</p>
             </div>
 
             <div class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg border border-slate-200/60 dark:border-zinc-800/60 shadow-lg shadow-black/5 flex flex-col gap-3">
@@ -369,24 +390,6 @@
               <p id="dashGeneralAnnouncement" class="text-sm text-slate-600 dark:text-zinc-300 bg-blue-50/40 dark:bg-zinc-800/30 p-4 rounded-ios-md border-l-4 border-ios-blue leading-relaxed">
                 Selamat datang di E-Arvy. Silakan laksanakan presensi harian tepat waktu.
               </p>
-            </div>
-
-            <div class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg border border-slate-200/60 dark:border-zinc-800/60 shadow-lg shadow-black/5 flex flex-col gap-4">
-              </div>
-
-          </div>
-<!-- Kartu Pendataan Dashboard -->
-            <div id="dashPendataanWrapper" class="hidden p-6 bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/10 dark:to-indigo-900/10 rounded-ios-lg border border-purple-100 dark:border-purple-900/30 shadow-lg flex flex-col gap-4">
-              <div class="flex items-center justify-between border-b border-purple-200 dark:border-purple-800/50 pb-2">
-                <div class="flex items-center gap-2">
-                  <i data-lucide="clipboard-list" class="w-5 h-5 text-purple-600 dark:text-purple-400"></i>
-                  <h3 class="font-extrabold text-base tracking-tight text-slate-900 dark:text-white">Pendataan Terbaru</h3>
-                </div>
-                <button onclick="switchTab('announce')" class="text-[10px] font-black uppercase tracking-wider text-purple-600 hover:underline">Lihat Semua</button>
-              </div>
-              <div id="dashPendataanContent" class="flex flex-col gap-3">
-                 <!-- Rendered by JS -->
-              </div>
             </div>
 
             <div class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg border border-slate-200/60 dark:border-zinc-800/60 shadow-lg shadow-black/5 flex flex-col gap-4">
