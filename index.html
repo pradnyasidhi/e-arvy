@@ -1261,7 +1261,7 @@
             for (let st in groupedStatus) {
                 textRecap += `${st.toUpperCase()} (${groupedStatus[st].length})\n`;
                 groupedStatus[st].forEach(a => {
-                    textRecap += `- ${a.cadetName} (${a.status}${a.reason ? ', ' + a.reason : ''})\n`;
+                    textRecap += `- ${a.cadetName} (${a.status}${a.reason ? ': ' + a.reason : ''})\n`;
                     });
                     textRecap += `\n`;
             }
