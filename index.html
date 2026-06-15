@@ -1018,6 +1018,36 @@
       setItem(key, val) { try { window.localStorage.setItem(key, val); } catch(e) { this._data[key] = String(val); } },
       removeItem(key) { try { window.localStorage.removeItem(key); } catch(e) { delete this._data[key]; } }
     };
+// --- TAMBAHKAN KODE INI TEPAT DI BAWAH DEFINISI const storage ---
+
+// Simpan fungsi setItem dan removeItem bawaan
+const originalSetItem = storage.setItem.bind(storage);
+const originalRemoveItem = storage.removeItem.bind(storage);
+
+// Timpa setItem agar setiap ada perubahan, langsung dikirim ke Cloud
+storage.setItem = function(key, val) {
+  originalSetItem(key, val);
+  
+  // Jangan sync data ketikan sementara (draft) agar tidak membebani server
+  // Draft akan dikirim dalam bentuk 'bundle' saat menekan tombol Simpan
+  if (window.syncLocalStorageToCloud && !key.startsWith('draft_')) {
+    // Gunakan setTimeout agar proses UI tidak terhenti (non-blocking)
+    setTimeout(() => {
+      window.syncLocalStorageToCloud(key);
+    }, 100);
+  }
+};
+
+// Timpa removeItem agar data yang dihapus di lokal juga terhapus di Cloud
+storage.removeItem = function(key) {
+  originalRemoveItem(key);
+  
+  if (window.deleteFromCloud) {
+    setTimeout(() => {
+      window.deleteFromCloud(key);
+    }, 100);
+  }
+};
     const isLocalMode = true;
 
     function showToast(title, message, type = 'info') {
@@ -1307,6 +1337,9 @@
         histories.push(logEntry);
         storage.setItem('e_arvy_history_attendance', JSON.stringify(histories));
         logLocalActivity(params.verifier, `Verifikasi presensi permanen: ${params.activityName}`);
+        if (window.savePresensiKeCloud) {
+           window.savePresensiKeCloud(logEntry);
+        }
         
         return { logId, recapText: textRecap };
       }
@@ -1544,18 +1577,36 @@ function togglePassword() {
     }
 
     function uploadCustomAppLogo(e) {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(evt) {
-          appData.settings.custom_logo = evt.target.result;
-          callServer('updateTotalCadets', { ...appData.settings, username: currentUser.username }, () => {
-            renderApplicationLogos(); showToast('Logo Kustom', 'Logo diperbarui.', 'success');
-          });
-        };
-        reader.readAsDataURL(file);
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    
+    // Ubah fungsi menjadi async agar bisa menunggu proses upload selesai
+    reader.onload = async function(evt) {
+      // Tampilkan notifikasi loading agar pengguna tahu proses sedang berjalan
+      showToast('Mengunggah...', 'Mengirim logo ke Cloud Storage...', 'info');
+      
+      try {
+        // 1. Unggah file Base64 ke Cloud dan dapatkan URL publiknya
+        const cloudUrl = await window.uploadFileToCloudStorage(evt.target.result, 'logo_aplikasi', 'custom_app_logo');
+        
+        // 2. Simpan URL cloud tersebut (bukan Base64) ke dalam pengaturan
+        appData.settings.custom_logo = cloudUrl;
+        
+        // 3. Perbarui pengaturan ke database/lokal
+        callServer('updateTotalCadets', { ...appData.settings, username: currentUser.username }, () => {
+          renderApplicationLogos(); 
+          showToast('Selesai', 'Logo kustom berhasil diperbarui.', 'success');
+        });
+      } catch (error) {
+        showToast('Gagal', 'Gagal mengunggah logo ke Cloud.', 'error');
+        console.error(error);
       }
-    }
+    };
+    
+    reader.readAsDataURL(file);
+  }
+}
 
     function resetDefaultAppLogo() {
       if (confirm('Gunakan logo bawaan?')) {
@@ -1792,11 +1843,27 @@ updateDashboardPendataan();
     }
 
     function refreshDataLocally() {
-      const icon = document.getElementById('localRefreshIcon');
-      if (icon) icon.classList.add('animate-spin');
+  const icon = document.getElementById('localRefreshIcon');
+  if (icon) icon.classList.add('animate-spin');
+  
+  // Tarik data terbaru dari Cloud terlebih dahulu
+  if (window.fetchDatabaseFromCloud) {
+    window.fetchDatabaseFromCloud().then(() => {
+      // Setelah data cloud masuk ke lokal, muat ulang tampilan
       loadDashboardAndAppData();
-      setTimeout(() => { if (icon) icon.classList.remove('animate-spin'); showToast('Data Diperbarui', 'Sinkronisasi berhasil.', 'success'); }, 750);
-    }
+      setTimeout(() => { 
+        if (icon) icon.classList.remove('animate-spin'); 
+        showToast('Sinkronisasi Berhasil', 'Data terbaru dari Cloud telah dimuat.', 'success'); 
+      }, 750);
+    }).catch(err => {
+      if (icon) icon.classList.remove('animate-spin');
+      showToast('Gagal Sinkron', 'Periksa koneksi internet Anda.', 'error');
+    });
+  } else {
+    loadDashboardAndAppData();
+    if (icon) icon.classList.remove('animate-spin');
+  }
+}
 
     function populatePresensiActivities() {
       const select = document.getElementById('presensiActivitySelect');
@@ -2575,7 +2642,7 @@ function markAsUnsaved(prodiId) {
                 <span class="text-slate-500 font-semibold">${a.prodiName}</span>
                 <span class="font-bold text-[10px] uppercase tracking-wider text-ios-red bg-rose-50 dark:bg-rose-950/30 px-1.5 py-0.5 rounded">${a.status}</span>
               </div>
-              ${a.reason ? `<p class="mt-2 text-[10px] bg-slate-50 dark:bg-zinc-800/60 p-2 rounded border border-slate-100 dark:border-zinc-700/50 italic text-slate-600 dark:text-zinc-300">"${a.reason}"</p>` : ''}
+              ${a.reason ? `<p class="mt-2 text-[10px] bg-slate-50 dark:bg-zinc-800/60 p-2 rounded border border-slate-100 dark:border-zinc-700/50 text-slate-600 dark:text-zinc-300">${a.reason}</p>` : ''}
             </div>
             ${photoHtml}
           </div>
@@ -2703,38 +2770,46 @@ function markAsUnsaved(prodiId) {
     }
 
     function renderHistoryTable() {
-      const tbody = document.getElementById('historyTableBody');
-      if (!tbody) return;
-      tbody.innerHTML = '';
-      const sDate = document.getElementById('statSearchDate').value;
-      const sAct = document.getElementById('statActivitySelect').value;
-      let list = appData.historyAttendance || [];
-      if (sDate) list = list.filter(h => h.date === sDate);
-      if (sAct && sAct !== 'semua') list = list.filter(h => h.activityName === sAct);
-      
-      document.getElementById('historyRecordsCount').innerText = `${list.length} Log`;
-      if (list.length === 0) { tbody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-400 italic">Tidak ada data.</td></tr>`; return; }
+  const tbody = document.getElementById('historyTableBody');
+  if (!tbody) return;
+  const sDate = document.getElementById('statSearchDate').value;
+  const sAct = document.getElementById('statActivitySelect').value;
+  let list = appData.historyAttendance || [];
+  
+  if (sDate) list = list.filter(h => h.date === sDate);
+  if (sAct && sAct !== 'semua') list = list.filter(h => h.activityName === sAct);
+  
+  document.getElementById('historyRecordsCount').innerText = `${list.length} Log`;
+  if (list.length === 0) { 
+    tbody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-400 italic">Tidak ada data.</td></tr>`; 
+    return; 
+  }
 
-      list.forEach(h => {
-        let absentsSummary = "Nihil (Lengkap)";
-        if (h.absents && h.absents.length > 0) {
-          const grouped = {}; h.absents.forEach(a => { grouped[a.status] = (grouped[a.status] || 0) + 1; });
-          absentsSummary = Object.keys(grouped).map(k => `${k}: ${grouped[k]}`).join(', ');
-        }
-        
-        const delBtn = ['Admin', 'Piket', 'Pokdo', 'Pengasuh'].includes(currentUser.role) ? `<button onclick="deleteHistoryLog('${h.logId}')" class="px-2.5 py-1 bg-rose-50 text-ios-red rounded text-xs font-black">Hapus</button>` : '';
-        tbody.innerHTML += `
-          <tr class="hover:bg-slate-50 border-b text-xs cursor-pointer" onclick="if(event.target.tagName !== 'BUTTON') openDetailAbsentsModal('${h.logId}')">
-            <td class="py-3 px-4"><span class="font-bold block">${h.date}</span></td>
-            <td class="py-3 px-4 font-extrabold flex flex-col"><span>${h.activityName}</span><span class="text-[10px] text-ios-blue font-medium mt-0.5">Klik untuk detail foto</span></td>
-            <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full bg-slate-100 font-bold">${h.category}</span></td>
-            <td class="py-3 px-4"><span class="font-extrabold text-ios-green">${h.presentCount}</span> / <span class="font-bold text-slate-400">${h.totalCadets}</span></td>
-            <td class="py-3 px-4 font-bold ${h.absentCount > 0 ? 'text-ios-red' : 'text-ios-green'}">${absentsSummary}</td>
-            <td class="py-3 px-4 text-right"><div class="flex items-center justify-end gap-1.5"><button onclick="viewHistoryRecap('${h.logId}')" class="px-3 py-1 bg-slate-100 rounded font-black text-ios-blue text-xs">Rekap</button>${delBtn}</div></td>
-          </tr>
-        `;
-      });
+  let htmlContent = ''; // Penampung string
+
+  list.forEach(h => {
+    let absentsSummary = "Nihil (Lengkap)";
+    if (h.absents && h.absents.length > 0) {
+      const grouped = {}; h.absents.forEach(a => { grouped[a.status] = (grouped[a.status] || 0) + 1; });
+      absentsSummary = Object.keys(grouped).map(k => `${k}: ${grouped[k]}`).join(', ');
     }
+    
+    const delBtn = ['Admin', 'Piket', 'Pokdo', 'Pengasuh'].includes(currentUser.role) ? `<button onclick="deleteHistoryLog('${h.logId}')" class="px-2.5 py-1 bg-rose-50 text-ios-red rounded text-xs font-black">Hapus</button>` : '';
+    
+    htmlContent += `
+      <tr class="hover:bg-slate-50 border-b text-xs cursor-pointer" onclick="if(event.target.tagName !== 'BUTTON') openDetailAbsentsModal('${h.logId}')">
+        <td class="py-3 px-4"><span class="font-bold block">${h.date}</span></td>
+        <td class="py-3 px-4 font-extrabold flex flex-col"><span>${h.activityName}</span><span class="text-[10px] text-ios-blue font-medium mt-0.5">Klik untuk detail foto</span></td>
+        <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full bg-slate-100 font-bold">${h.category}</span></td>
+        <td class="py-3 px-4"><span class="font-extrabold text-ios-green">${h.presentCount}</span> / <span class="font-bold text-slate-400">${h.totalCadets}</span></td>
+        <td class="py-3 px-4 font-bold ${h.absentCount > 0 ? 'text-ios-red' : 'text-ios-green'}">${absentsSummary}</td>
+        <td class="py-3 px-4 text-right"><div class="flex items-center justify-end gap-1.5"><button onclick="viewHistoryRecap('${h.logId}')" class="px-3 py-1 bg-slate-100 rounded font-black text-ios-blue text-xs">Rekap</button>${delBtn}</div></td>
+      </tr>
+    `;
+  });
+
+  tbody.innerHTML = htmlContent; // Render ke DOM cukup sekali
+}
 
     function deleteHistoryLog(logId) {
       if (confirm('Hapus permanen log ini?')) {
@@ -2764,7 +2839,7 @@ function markAsUnsaved(prodiId) {
         let listHtml = '';
         grouped[status].forEach(cad => {
           const imgHtml = cad.attachmentBase64 ? `<div class="mt-2 w-36 h-20 border rounded cursor-zoom-in" onclick="viewDocumentedPhoto('${cad.cadetName}', '${cad.attachmentBase64}')"><img src="${cad.attachmentBase64}" class="w-full h-full object-cover"></div>` : '';
-          listHtml += `<div class="text-xs leading-relaxed pl-1 border-l-2 border-ios-blue/40 mt-2"><div><span class="font-extrabold">KK [${cad.prodiName}] ${cad.cadetName}</span> <span class="text-[10px] text-slate-500 block">Absen: ${cad.cadetNo} ${cad.reason ? `"${cad.reason}"` : ''}</span></div>${imgHtml}</div>`;
+          listHtml += `<div class="text-xs leading-relaxed pl-1 border-l-2 border-ios-blue/40 mt-2"><div><span class="font-extrabold">${cad.cadetName}</span> <span class="text-[10px] text-slate-500 block">Keterangan: ${cad.reason ? `${cad.reason}` : ''}</span></div>${imgHtml}</div>`;
         });
         content.innerHTML += `<div class="flex flex-col gap-2 p-3 bg-slate-50 rounded-ios-md border"><div class="border-b pb-1.5 font-black text-ios-blue text-xs uppercase">${status} (${grouped[status].length})</div>${listHtml}</div>`;
       }
@@ -2778,7 +2853,7 @@ function markAsUnsaved(prodiId) {
 
     function renderKepulanganList() {
       const wrapper = document.getElementById('kepulanganListWrapper');
-      if (!wrapper) return; wrapper.innerHTML = '';
+      if (!wrapper) return;
       const selectedDate = document.getElementById('kepulanganFilterDate').value || new Date().toISOString().split('T')[0];
       let sudahCount = 0, belumCount = 0;
 
@@ -2788,13 +2863,16 @@ function markAsUnsaved(prodiId) {
       });
 
       const filtered = appData.kepulangan.filter(k => k.date === selectedDate);
+      
+      let listHtml = ''; // VAR PENAMPUNG STRING
+      
       filtered.forEach((k) => {
         if (k.videoUrl) sudahCount++; else belumCount++;
         const canEdit = ['Admin', 'Piket', 'Pokdo', 'Pengasuh'].includes(currentUser.role) || (currentUser.role === 'Kopral Kadet' && currentUser.prodiName === k.prodiName);
         const disabledAttr = canEdit ? '' : 'disabled';
         const trueIdx = appData.kepulangan.findIndex(item => item.prodiName === k.prodiName && item.date === selectedDate);
 
-        wrapper.innerHTML += `
+        listHtml += `
           <div class="grid grid-cols-6 gap-4 items-center py-3 px-4 border-b text-sm">
             <div class="col-span-2 font-bold">${k.prodiName}</div>
             <div><input type="date" value="${k.date}" id="dep-date-${trueIdx}" ${disabledAttr} class="w-full px-2 py-1.5 rounded bg-slate-50 border text-xs outline-none"></div>
@@ -2811,6 +2889,8 @@ function markAsUnsaved(prodiId) {
           </div>
         `;
       });
+      
+      wrapper.innerHTML = listHtml; // RENDER DOM SEKALI
       document.getElementById('depCountSudah').innerText = `${sudahCount} Prodi`;
       document.getElementById('depCountBelum').innerText = `${belumCount} Prodi`;
       lucide.createIcons();
@@ -2818,15 +2898,18 @@ function markAsUnsaved(prodiId) {
 
     function renderDepartureLogs() {
       const tbody = document.getElementById('departureLogsTableBody');
-      if (!tbody) return; tbody.innerHTML = '';
+      if (!tbody) return; 
       const searchDate = document.getElementById('depLogSearchDate').value;
       const logs = JSON.parse(storage.getItem('e_arvy_departure_logs') || '[]');
       let filtered = searchDate ? logs.filter(l => l.date === searchDate) : logs;
       filtered.sort((a, b) => new Date(b.date + ' ' + b.time) - new Date(a.date + ' ' + a.time));
 
       if (filtered.length === 0) { tbody.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-slate-400 italic">Tidak ada log.</td></tr>`; return; }
+      
+      let tableHtml = ''; // VAR PENAMPUNG STRING
+      
       filtered.forEach(l => {
-        tbody.innerHTML += `
+        tableHtml += `
           <tr class="border-b text-xs">
             <td class="py-2.5 px-3">${l.date}</td><td class="py-2.5 px-3 font-extrabold">${l.prodiName}</td><td class="py-2.5 px-3 font-bold text-ios-blue">${l.time}</td>
             <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${l.videoUrl ? 'bg-emerald-100 text-ios-green' : 'bg-slate-100'}">${l.status}</span></td>
@@ -2837,6 +2920,8 @@ function markAsUnsaved(prodiId) {
           </tr>
         `;
       });
+      
+      tbody.innerHTML = tableHtml; // RENDER DOM SEKALI
       lucide.createIcons();
     }
 
@@ -2880,9 +2965,16 @@ function markAsUnsaved(prodiId) {
 
     function renderAbsenceStatusManager() {
       const wrapper = document.getElementById('absenceStatusListWrapper');
-      if (!wrapper) return; wrapper.innerHTML = '';
+      if (!wrapper) return; 
+      
       const statuses = JSON.parse(storage.getItem('e_arvy_absence_statuses') || '["Sakit", "Izin", "Alpa", "Dinas"]');
-      statuses.forEach(st => wrapper.innerHTML += `<div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 text-xs font-bold border"><span>${st}</span><button onclick="deleteAbsenceStatus('${st}')" class="text-ios-red font-black text-xs">&times;</button></div>`);
+      let statusHtml = ''; // VAR PENAMPUNG
+      
+      statuses.forEach(st => {
+         statusHtml += `<div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 text-xs font-bold border"><span>${st}</span><button onclick="deleteAbsenceStatus('${st}')" class="text-ios-red font-black text-xs">&times;</button></div>`;
+      });
+      
+      wrapper.innerHTML = statusHtml; // RENDER DOM SEKALI
     }
 
     function addNewAbsenceStatus() {
@@ -2905,13 +2997,16 @@ function markAsUnsaved(prodiId) {
     function loadAnnounceSchedules() {
       const date = document.getElementById('announceScheduleDate').value;
       const container = document.getElementById('announceSchedulesList');
-      if (!container) return; container.innerHTML = '';
+      if (!container) return; 
+      
       const list = appData.schedules.filter(s => s.date === date || s.date);
       if (list.length === 0) { container.innerHTML = '<p class="text-slate-400 text-xs italic text-center py-4">Tidak ada jadwal.</p>'; return; }
 
+      let schedulesHtml = ''; // VAR PENAMPUNG
+      
       list.forEach(s => {
         const pBtn = s.photoUrl ? `<button onclick="viewDocumentedPhoto('${s.title}', '${s.photoUrl}')" class="flex-1 md:flex-none px-3 py-2 bg-emerald-100 text-ios-green rounded text-xs font-bold">Foto</button>` : '';
-        container.innerHTML += `
+        schedulesHtml += `
           <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 p-3.5 bg-slate-50 rounded-ios-md border">
             <div class="flex flex-col gap-1 w-full text-left">
               <div class="flex items-center gap-3"><h4 class="text-sm font-black text-ios-blue">${s.time}</h4><span class="text-sm font-bold">${s.title}</span></div>
@@ -2925,6 +3020,9 @@ function markAsUnsaved(prodiId) {
           </div>
         `;
       });
+      
+      container.innerHTML = schedulesHtml; // RENDER DOM SEKALI
+      
       const adminPiket = document.querySelectorAll('.admin-piket-only');
       if (['Admin', 'Piket', 'Pokdo', 'Pengasuh'].includes(currentUser.role)) adminPiket.forEach(el => { el.classList.remove('hidden'); el.classList.add('inline-flex'); });
       lucide.createIcons();
@@ -2992,39 +3090,34 @@ function markAsUnsaved(prodiId) {
       if (currentUser.profilePhoto) { document.getElementById('profilePhotoImg').src = currentUser.profilePhoto; document.getElementById('profilePhotoImg').classList.remove('hidden'); document.getElementById('profilePhotoPlaceholder').classList.add('hidden'); }
       
       callServer('getActivityLogs', null, (logs) => {
-        const container = document.getElementById('activityLogsWrapper'); if (!container) return; container.innerHTML = '';
+        const container = document.getElementById('activityLogsWrapper'); if (!container) return; 
         
-        // Log Filtering Logic
         let filteredLogs = logs;
         if (currentUser.role !== 'Admin') {
           filteredLogs = logs.filter(l => l.username === currentUser.username);
         }
 
         if (filteredLogs.length === 0) { container.innerHTML = '<p class="text-slate-400 text-xs italic py-4">Belum ada aktivitas tercatat.</p>'; return; }
+        
+        let logsHtml = ''; // VAR PENAMPUNG
+        
         filteredLogs.forEach(l => {
           const t = new Date(l.timestamp);
-          container.innerHTML += `<div class="flex justify-between items-center p-2.5 bg-slate-50 rounded border text-xs"><span><strong>${l.username}</strong>: ${l.action}</span><span class="text-[10px] text-slate-400 font-bold">${t.toLocaleTimeString()} ${t.toLocaleDateString()}</span></div>`;
+          logsHtml += `<div class="flex justify-between items-center p-2.5 bg-slate-50 rounded border text-xs"><span><strong>${l.username}</strong>: ${l.action}</span><span class="text-[10px] text-slate-400 font-bold">${t.toLocaleTimeString()} ${t.toLocaleDateString()}</span></div>`;
         });
+        
+        container.innerHTML = logsHtml; // RENDER DOM SEKALI
       });
     }
 
-    function handleProfilePhotoUpload(event) {
-      if (event.target.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          callServer('updateProfilePhoto', { username: currentUser.username, photoBase64: e.target.result }, () => {
-            currentUser.profilePhoto = e.target.result; storage.setItem('e_arvy_session', JSON.stringify(currentUser)); updateProfilePage(); showToast('Diperbarui', 'Foto profil diganti.', 'success');
-          });
-        };
-        reader.readAsDataURL(event.target.files[0]);
-      }
-    }
-
     function renderAdminProdiList() {
-      const wrapper = document.getElementById('adminProdiList'); if (!wrapper) return; wrapper.innerHTML = '';
+      const wrapper = document.getElementById('adminProdiList'); if (!wrapper) return; 
+      
+      let prodiListHtml = ''; // VAR PENAMPUNG
+      
       appData.prodis.forEach(p => {
         const uName = p.currentName.replace(/\s+/g, '').toLowerCase();
-        wrapper.innerHTML += `
+        prodiListHtml += `
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 p-4 bg-slate-50 rounded-ios-md border text-sm">
             <div><div class="font-bold">${p.currentName}</div><div class="text-xs text-slate-400">Kompi: ${p.kompiNumber} | User: ${uName}</div></div>
             <div class="flex flex-col gap-2"><input type="text" value="${p.currentName}" id="adm-prodi-name-${p.prodiId}" class="px-3 py-1.5 rounded border text-xs"><input type="password" value="kadet123" id="adm-prodi-pass-${p.prodiId}" class="px-3 py-1.5 rounded border text-xs"></div>
@@ -3034,6 +3127,8 @@ function markAsUnsaved(prodiId) {
             </div>
           </div>`;
       });
+      
+      wrapper.innerHTML = prodiListHtml; // RENDER DOM SEKALI
     }
 
     function saveAdminProdiRow(pId, oName) {
@@ -3051,9 +3146,12 @@ function markAsUnsaved(prodiId) {
 
     function loadAdminCadetList() {
       const sel = document.getElementById('adminSelectProdi').value; const list = appData.cadets[sel] || [];
-      const w = document.getElementById('adminCadetListWrapper'); if(!w) return; w.innerHTML = '';
+      const w = document.getElementById('adminCadetListWrapper'); if(!w) return; 
+      
+      let cadetsHtml = ''; // VAR PENAMPUNG
+      
       list.forEach(c => {
-        w.innerHTML += `
+        cadetsHtml += `
           <div class="flex flex-col gap-2 p-3 bg-slate-50 rounded border text-xs">
             <div class="flex justify-between"><span class="font-extrabold">No: ${c.no}</span><button onclick="removeCadetFromSelectedProdi(${c.no})" class="text-ios-red font-bold">&times; Hapus</button></div>
             <div class="grid grid-cols-2 gap-2">
@@ -3062,6 +3160,8 @@ function markAsUnsaved(prodiId) {
             </div>
           </div>`;
       });
+      
+      w.innerHTML = cadetsHtml; // RENDER DOM SEKALI
     }
 
     function addBlankCadetToSelectedProdi() {
@@ -3079,86 +3179,84 @@ function markAsUnsaved(prodiId) {
     }
 // 1. FUNGSI RENDER UTAMA LIST PENDATAAN
     function renderPendataanList() {
-      const container = document.getElementById('pendataanListContainer');
-      if (!container) return;
-      container.innerHTML = '';
+  const container = document.getElementById('pendataanListContainer');
+  if (!container) return;
 
-      const items = JSON.parse(storage.getItem('e_arvy_pendataan') || '[]');
-      const isAdminPiket = ['Admin', 'Piket', 'Pokdo', 'Pengasuh'].includes(currentUser.role);
+  const items = JSON.parse(storage.getItem('e_arvy_pendataan') || '[]');
+  const isAdminPiket = ['Admin', 'Piket', 'Pokdo', 'Pengasuh'].includes(currentUser.role);
 
-      if (items.length === 0) {
-        container.innerHTML = `<p class="text-slate-400 text-xs italic text-center py-4">Belum ada pendataan aktif saat ini.</p>`;
-        return;
-      }
+  if (items.length === 0) {
+    container.innerHTML = `<p class="text-slate-400 text-xs italic text-center py-4">Belum ada pendataan aktif saat ini.</p>`;
+    return;
+  }
 
-      items.forEach((item) => {
-        let itemHtml = '';
-        if (isAdminPiket) {
-          // TAMPILAN UNTUK ADMIN / PIKET (Bisa Diedit Berbaris)
-          itemHtml = `
-            <div class="p-4 bg-slate-50 dark:bg-zinc-800/40 rounded-ios-md border flex flex-col gap-3 relative animate-fadeIn">
-              <div class="flex justify-between items-start gap-2 flex-wrap">
-                <div class="flex flex-col gap-1.5 flex-1 min-w-[220px]">
-                  <label class="text-[9px] font-black uppercase tracking-widest text-slate-400">Judul Pendataan</label>
-                  <input type="text" id="pendataan-title-${item.id}" value="${item.title}" onblur="this.value = standardizeEYD(this.value);" class="w-full px-3 py-2 rounded border text-xs font-bold" placeholder="Contoh: Pendataan Ukuran Sepatu PDL">
-                </div>
-                <div class="flex items-center gap-2 mt-4 sm:mt-0">
-                  <span id="countdown-pendataan-${item.id}" class="text-[10px] font-black px-2 py-1 rounded bg-slate-100 dark:bg-zinc-800 text-slate-500 font-mono">--:--:--</span>
-                  <button onclick="deletePendataanItem('${item.id}')" class="p-2 bg-rose-50 text-ios-red rounded hover:bg-rose-100 transition-colors" title="Hapus"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                </div>
-              </div>
-              
-              <div class="flex flex-col gap-1.5">
-                <label class="text-[9px] font-black uppercase tracking-widest text-slate-400">Isi / Deskripsi Instruksi</label>
-                <textarea id="pendataan-content-${item.id}" class="w-full px-3 py-1.5 rounded border text-xs h-14 resize-none focus:outline-none" placeholder="Masukkan rincian informasi pembagian kompi...">${item.content}</textarea>
-              </div>
+  let allPendataanHtml = ''; // Penampung string
 
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div class="flex flex-col gap-1.5">
-                  <label class="text-[9px] font-black uppercase tracking-widest text-slate-400">Tanggal Batas (Deadline)</label>
-                  <input type="date" id="pendataan-date-${item.id}" value="${item.deadlineDate}" class="px-3 py-1.5 rounded border text-xs outline-none">
-                </div>
-                <div class="flex flex-col gap-1.5">
-                  <label class="text-[9px] font-black uppercase tracking-widest text-slate-400">Jam & Menit Batas</label>
-                  <input type="time" id="pendataan-time-${item.id}" value="${item.deadlineTime}" class="px-3 py-1.5 rounded border text-xs outline-none">
-                </div>
-                <div class="flex flex-col gap-1.5">
-                  <label class="text-[9px] font-black uppercase tracking-widest text-slate-400">Tautan Google Form</label>
-                  <input type="url" id="pendataan-url-${item.id}" value="${item.gformUrl}" class="px-3 py-1.5 rounded border text-xs outline-none font-mono" placeholder="https://forms.gle/...">
-                </div>
-              </div>
-
-              <div class="flex justify-between items-center pt-2.5 border-t border-slate-200/60 mt-1 flex-wrap gap-2">
-                <button onclick="savePendataanItem('${item.id}')" class="w-full sm:w-auto px-4 py-2 bg-ios-blue text-white rounded text-xs font-black shadow-sm hover:opacity-90 transition-all">Simpan Perubahan</button>
-                <a href="${item.gformUrl || '#'}" target="_blank" class="w-full sm:w-auto text-center px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded text-xs font-black flex items-center justify-center gap-1 shadow-sm"><i data-lucide="external-link" class="w-3.5 h-3.5"></i> Tes Tautan</a>
-              </div>
+  items.forEach((item) => {
+    let itemHtml = '';
+    if (isAdminPiket) {
+      itemHtml = `
+        <div class="p-4 bg-slate-50 dark:bg-zinc-800/40 rounded-ios-md border flex flex-col gap-3 relative animate-fadeIn">
+          <div class="flex justify-between items-start gap-2 flex-wrap">
+            <div class="flex flex-col gap-1.5 flex-1 min-w-[220px]">
+              <label class="text-[9px] font-black uppercase tracking-widest text-slate-400">Judul Pendataan</label>
+              <input type="text" id="pendataan-title-${item.id}" value="${item.title}" onblur="this.value = standardizeEYD(this.value);" class="w-full px-3 py-2 rounded border text-xs font-bold" placeholder="Contoh: Pendataan Ukuran Sepatu PDL">
             </div>
-          `;
-        } else {
-          // TAMPILAN READ-ONLY UNTUK USER KADET
-          itemHtml = `
-            <div class="p-4 bg-white dark:bg-zinc-900 rounded-ios-md border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-sm animate-fadeIn">
-              <div class="flex flex-col gap-1.5 flex-1">
-                <div class="flex items-center gap-2.5 flex-wrap">
-                  <h4 class="text-sm font-black text-slate-900 dark:text-white">${item.title}</h4>
-                  <span id="countdown-pendataan-${item.id}" class="text-[10px] font-black">--:--:--</span>
-                </div>
-                <p class="text-xs text-slate-500 dark:text-zinc-400 whitespace-pre-line leading-relaxed">${item.content}</p>
-                <span class="text-[10px] text-slate-400 font-bold block mt-0.5"><i data-lucide="calendar" class="w-3.5 h-3.5 inline -mt-0.5"></i> Batas Pengumpulan: <span class="text-slate-600 dark:text-zinc-300">${item.deadlineDate} Pukul ${item.deadlineTime} WIB</span></span>
-              </div>
-              <div class="w-full sm:w-auto shrink-0 flex justify-end">
-                <a href="${item.gformUrl || '#'}" target="_blank" class="w-full sm:w-auto text-center px-6 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black text-xs rounded-ios-sm shadow-md flex items-center justify-center gap-1.5 hover:scale-[1.02] transition-all">
-                  <i data-lucide="external-link" class="w-3.5 h-3.5"></i> Buka
-                </a>
-              </div>
+            <div class="flex items-center gap-2 mt-4 sm:mt-0">
+              <span id="countdown-pendataan-${item.id}" class="text-[10px] font-black px-2 py-1 rounded bg-slate-100 dark:bg-zinc-800 text-slate-500 font-mono">--:--:--</span>
+              <button onclick="deletePendataanItem('${item.id}')" class="p-2 bg-rose-50 text-ios-red rounded hover:bg-rose-100 transition-colors" title="Hapus"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
             </div>
-          `;
-        }
-        container.innerHTML += itemHtml;
-      });
-      lucide.createIcons();
-      updatePendataanCountdowns(); // Jalankan hitung mundur seketika
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label class="text-[9px] font-black uppercase tracking-widest text-slate-400">Isi / Deskripsi Instruksi</label>
+            <textarea id="pendataan-content-${item.id}" class="w-full px-3 py-1.5 rounded border text-xs h-14 resize-none focus:outline-none" placeholder="Masukkan rincian informasi pembagian kompi...">${item.content}</textarea>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[9px] font-black uppercase tracking-widest text-slate-400">Tanggal Batas (Deadline)</label>
+              <input type="date" id="pendataan-date-${item.id}" value="${item.deadlineDate}" class="px-3 py-1.5 rounded border text-xs outline-none">
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[9px] font-black uppercase tracking-widest text-slate-400">Jam & Menit Batas</label>
+              <input type="time" id="pendataan-time-${item.id}" value="${item.deadlineTime}" class="px-3 py-1.5 rounded border text-xs outline-none">
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[9px] font-black uppercase tracking-widest text-slate-400">Tautan Google Form</label>
+              <input type="url" id="pendataan-url-${item.id}" value="${item.gformUrl}" class="px-3 py-1.5 rounded border text-xs outline-none font-mono" placeholder="https://forms.gle/...">
+            </div>
+          </div>
+          <div class="flex justify-between items-center pt-2.5 border-t border-slate-200/60 mt-1 flex-wrap gap-2">
+            <button onclick="savePendataanItem('${item.id}')" class="w-full sm:w-auto px-4 py-2 bg-ios-blue text-white rounded text-xs font-black shadow-sm hover:opacity-90 transition-all">Simpan Perubahan</button>
+            <a href="${item.gformUrl || '#'}" target="_blank" class="w-full sm:w-auto text-center px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded text-xs font-black flex items-center justify-center gap-1 shadow-sm"><i data-lucide="external-link" class="w-3.5 h-3.5"></i> Tes Tautan</a>
+          </div>
+        </div>
+      `;
+    } else {
+      itemHtml = `
+        <div class="p-4 bg-white dark:bg-zinc-900 rounded-ios-md border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-sm animate-fadeIn">
+          <div class="flex flex-col gap-1.5 flex-1">
+            <div class="flex items-center gap-2.5 flex-wrap">
+              <h4 class="text-sm font-black text-slate-900 dark:text-white">${item.title}</h4>
+              <span id="countdown-pendataan-${item.id}" class="text-[10px] font-black">--:--:--</span>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-zinc-400 whitespace-pre-line leading-relaxed">${item.content}</p>
+            <span class="text-[10px] text-slate-400 font-bold block mt-0.5"><i data-lucide="calendar" class="w-3.5 h-3.5 inline -mt-0.5"></i> Batas Pengumpulan: <span class="text-slate-600 dark:text-zinc-300">${item.deadlineDate} Pukul ${item.deadlineTime} WIB</span></span>
+          </div>
+          <div class="w-full sm:w-auto shrink-0 flex justify-end">
+            <a href="${item.gformUrl || '#'}" target="_blank" class="w-full sm:w-auto text-center px-6 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black text-xs rounded-ios-sm shadow-md flex items-center justify-center gap-1.5 hover:scale-[1.02] transition-all">
+              <i data-lucide="external-link" class="w-3.5 h-3.5"></i> Buka
+            </a>
+          </div>
+        </div>
+      `;
     }
+    allPendataanHtml += itemHtml;
+  });
+
+  container.innerHTML = allPendataanHtml; // Render ke DOM cukup sekali
+  lucide.createIcons();
+  updatePendataanCountdowns();
+}
 
     // 2. TIMING COUNTDOWN REALTIME HITUNG MUNDUR (DIJALANKAN TIAP DETIK)
     function updatePendataanCountdowns() {
@@ -3327,14 +3425,34 @@ function updateDashboardPendataan() {
 
 <script type="text/javascript" src="https://unpkg.com/parse/dist/parse.min.js"></script>
 
-<script>
-  // 1. INISIALISASI KUNCI BACK4APP ANDA
-  Parse.initialize("yrivktjbMxh6WkhSfNZHvNypSplAnlNVe1Za6NRT", 
-    "ZMb4e7MYUQH8TlMeO85Ym4I797Zpyw9InkY91jkJ");
+  <script>
+  Parse.initialize("yrivktjbMxh6WkhSfNZHvNypSplAnlNVe1Za6NRT", "ZMb4e7MYUQH8TlMeO85Ym4I797Zpyw9InkY91jkJ");
   Parse.serverURL = 'https://parseapi.back4app.com/';
 
-  // 2. SINKRONISASI DATA TEKS KE CLOUD
-  window.syncLocalStorageToCloud = async function(key) {
+  // Deklarasi Tabel Relasional
+  const LogPresensi = Parse.Object.extend("LogPresensi");
+
+  // Fungsi BARU: Menyimpan Presensi sebagai Baris Tersendiri
+  window.savePresensiKeCloud = async function(dataPresensi) {
+    try {
+      const logBaru = new LogPresensi();
+      logBaru.set("logId", dataPresensi.logId);
+      logBaru.set("tanggal", dataPresensi.date);
+      logBaru.set("namaKegiatan", dataPresensi.activityName);
+      logBaru.set("kategori", dataPresensi.category);
+      logBaru.set("totalKadet", dataPresensi.totalCadets);
+      logBaru.set("jumlahHadir", dataPresensi.presentCount);
+      logBaru.set("jumlahKurang", dataPresensi.absentCount);
+      logBaru.set("teksRekap", dataPresensi.recapText);
+      logBaru.set("verifikator", dataPresensi.verifier);
+      logBaru.set("detailAbsen", dataPresensi.absents); 
+      
+      await logBaru.save();
+    } catch (error) {
+      console.error("Gagal menyimpan presensi ke Cloud: ", error);
+    }
+  };
+window.syncLocalStorageToCloud = async function(key) {
     const data = localStorage.getItem(key);
     if (!data) return;
     try {
@@ -3355,35 +3473,55 @@ function updateDashboardPendataan() {
     }
   };
 
-  // 3. TARIK DATA SAAT APLIKASI PERTAMA KALI DIBUKA
+  // REVISI PENTING: Mencegah Overfetching
   window.fetchDatabaseFromCloud = async function() {
     try {
+      // 1. Ambil pengaturan umum seperti biasa
       const CloudStorage = Parse.Object.extend("DataArvy");
-      const query = new Parse.Query(CloudStorage);
-      query.limit(1000); // TINGKATKAN LIMIT AGAR FORM DRAFT TIDAK TERPOTONG
-      const results = await query.find();
-      
+      const settingQuery = new Parse.Query(CloudStorage);
+      settingQuery.limit(50); 
+      const results = await settingQuery.find();
       for (let i = 0; i < results.length; i++) {
-        localStorage.setItem(results[i].get("kunci"), results[i].get("jsonString"));
+        // Jangan timpa riwayat absensi dari JSON lama
+        if(results[i].get("kunci") !== 'e_arvy_history_attendance') {
+            localStorage.setItem(results[i].get("kunci"), results[i].get("jsonString"));
+        }
       }
 
-      // --- LOGIKA TAMBAHAN: MEMBONGKAR BUNDLE DRAFT DARI PERANGKAT LAIN ---
+      // 2. Ambil History Absensi dari Tabel Relasional (Limit 20 Data Terbaru)
+      const logQuery = new Parse.Query(LogPresensi);
+      logQuery.descending("createdAt"); 
+      logQuery.limit(20); 
+      const logResults = await logQuery.find();
+      
+      const formattedLogs = logResults.map(parseObj => ({
+        logId: parseObj.get("logId"),
+        date: parseObj.get("tanggal"),
+        activityName: parseObj.get("namaKegiatan"),
+        category: parseObj.get("kategori"),
+        totalCadets: parseObj.get("totalKadet"),
+        presentCount: parseObj.get("jumlahHadir"),
+        absentCount: parseObj.get("jumlahKurang"),
+        recapText: parseObj.get("teksRekap"),
+        verifier: parseObj.get("verifikator"),
+        absents: parseObj.get("detailAbsen"),
+        verifiedAt: parseObj.createdAt
+      }));
+
+      localStorage.setItem('e_arvy_history_attendance', JSON.stringify(formattedLogs));
+
+      // Unpack bundle draft logic (sama seperti kode Anda aslinya)
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
         if (key && key.startsWith("saved_bundle_")) {
           try {
             const bundleStr = localStorage.getItem(key);
             if (!bundleStr || bundleStr === "{}" || bundleStr === "undefined") continue;
-            
             const bundle = JSON.parse(bundleStr);
-            
-            // Unpack Metadata Rekap Prodi ke Local Storage
             localStorage.setItem(`saved_present_cnt_${bundle.dateStr}_${bundle.act}_${bundle.prodiId}`, bundle.presentCnt);
             localStorage.setItem(`saved_absent_cnt_${bundle.dateStr}_${bundle.act}_${bundle.prodiId}`, bundle.absentCnt);
             localStorage.setItem(`saved_total_cnt_${bundle.dateStr}_${bundle.act}_${bundle.prodiId}`, bundle.totalCnt);
             localStorage.setItem(`saved_${bundle.dateStr}_${bundle.act}_${bundle.prodiName}`, 'true');
-            
-            // Unpack Status Individu Kadet ke Form
             if (bundle.cadets && Array.isArray(bundle.cadets)) {
               bundle.cadets.forEach(c => {
                 if (c.status) localStorage.setItem(`draft_status_${bundle.dateStr}_${bundle.act}_${bundle.prodiId}_${c.no}`, c.status);
@@ -3391,9 +3529,7 @@ function updateDashboardPendataan() {
                 if (c.proof) localStorage.setItem(`draft_proof_${bundle.dateStr}_${bundle.act}_${bundle.prodiId}_${c.no}`, c.proof);
               });
             }
-          } catch(err) { 
-            console.error("Gagal membongkar cloud bundle:", err); 
-          }
+          } catch(err) { console.error("Gagal membongkar cloud bundle:", err); }
         }
       }
     } catch (e) {
@@ -3440,22 +3576,6 @@ function updateDashboardPendataan() {
     }
   };
 
-  const originalSimulateServerCall = simulateServerCall;
-  simulateServerCall = function(methodName, params) {
-    const result = originalSimulateServerCall(methodName, params);
-    
-    setTimeout(async () => {
-      if (methodName === 'saveAttendance') { await syncLocalStorageToCloud('e_arvy_history_attendance'); } 
-      else if (methodName === 'saveSchedule') { await syncLocalStorageToCloud('e_arvy_schedules'); 
-await syncLocalStorageToCloud('e_arvy_pendataan'); } 
-      else if (methodName === 'saveDeparture') { await syncLocalStorageToCloud('e_arvy_kepulangan'); await syncLocalStorageToCloud('e_arvy_departure_logs'); } 
-      else if (methodName === 'updateTotalCadets') { await syncLocalStorageToCloud('e_arvy_settings'); } 
-      else if (methodName === 'updateCadetNames') { await syncLocalStorageToCloud('e_arvy_cadets'); } 
-      else if (methodName === 'updateProdiNames' || methodName === 'updateAccounts') { await syncLocalStorageToCloud('e_arvy_prodis'); await syncLocalStorageToCloud('e_arvy_users'); }
-    }, 100);
-
-    return result;
-  };
 
   const originalHandleProofPhotoUpload = handleProofPhotoUpload;
 
