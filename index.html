@@ -171,9 +171,42 @@
     body.is-logged-in #loginWrapper {
       display: none !important;
     }
+/* --- GLOBAL PRELOADER (Mencegah FOUC Tailwind CDN) --- */
+#app-preloader {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #f4f4f5; /* Sama dengan bg-zinc-100 */
+  z-index: 999999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.5s;
+}
+.dark #app-preloader {
+  background-color: #000000; /* Mengikuti tema gelap */
+}
+.preloader-hidden {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none;
+}
+.spinner-ios {
+  width: 42px; height: 42px;
+  border: 4px solid rgba(0, 122, 255, 0.2);
+  border-top-color: #007aff; /* Warna ios-blue */
+  border-radius: 50%;
+  animation: spin-ios 1s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+}
+@keyframes spin-ios { 
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); } 
+}
   </style>
 </head>
 <body class="bg-zinc-100 dark:bg-black text-slate-900 dark:text-zinc-100 min-h-screen flex flex-col font-sans transition-all-300 pb-16 lg:pb-4">
+<div id="app-preloader">
+    <div class="spinner-ios"></div>
+  </div>
 
   <script>
     (function() {
@@ -1283,7 +1316,7 @@ storage.removeItem = function(key) {
         
         // Daftar Absen Keseluruhan per Status
         if (absentCount === 0) {
-            textRecap += `LENGKAP\n\n`;
+            textRecap += `LENGKAP\n`;
         } else {
             const groupedStatus = {};
             params.absents.forEach(a => {
@@ -3613,9 +3646,16 @@ window.syncLocalStorageToCloud = async function(key) {
       }).catch(err => {
         if (icon) icon.classList.remove('animate-spin');
         console.error("Gagal sinkronisasi latar belakang: ", err);
+      }).finally(() => {
+        setTimeout(() => {
+          document.getElementById('app-preloader')?.classList.add('preloader-hidden');
+        }, 150);
       });
     } else {
       if (originalOnload) originalOnload();
+      setTimeout(() => {
+        document.getElementById('app-preloader')?.classList.add('preloader-hidden');
+      }, 150);
     }
   };
 
