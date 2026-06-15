@@ -3649,7 +3649,7 @@ window.syncLocalStorageToCloud = async function(key) {
     document.getElementById('kepulanganFilterDate').value = todayStr;
     document.getElementById('announceScheduleDate').value = todayStr;
     
-    // Tampilkan Dashboard menggunakan data memori lokal TANPA delay
+   
     checkLoginSession();
     startRealTimeClock();
 
@@ -3676,7 +3676,31 @@ window.syncLocalStorageToCloud = async function(key) {
         document.getElementById('app-preloader')?.classList.add('preloader-hidden');
       }, 150);
     }
+
+       setInterval(() => {
+       // Hanya tarik data secara diam-diam jika user sudah login
+       if (window.fetchDatabaseFromCloud && currentUser) {
+         window.fetchDatabaseFromCloud().then(() => {
+           loadDashboardAndAppData();
+         });
+       }
+    }, 30000); 
   };
+
+    document.addEventListener("visibilitychange", () => {
+    // Terpicu ketika user membuka kembali tab browser / menyalakan layar HP
+    if (document.visibilityState === "visible" && currentUser && window.fetchDatabaseFromCloud) {
+      const icon = document.getElementById('localRefreshIcon');
+      if (icon) icon.classList.add('animate-spin');
+      
+      window.fetchDatabaseFromCloud().then(() => {
+        loadDashboardAndAppData();
+        if (icon) icon.classList.remove('animate-spin');
+      }).catch(() => {
+        if (icon) icon.classList.remove('animate-spin');
+      });
+    }
+  });
 
 
   const originalHandleProofPhotoUpload = handleProofPhotoUpload;
