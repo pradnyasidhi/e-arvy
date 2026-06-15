@@ -190,24 +190,43 @@
   visibility: hidden !important;
   pointer-events: none;
 }
-.spinner-ios {
-  width: 42px; height: 42px;
-  border: 4px solid rgba(0, 122, 255, 0.2);
-  border-top-color: #007aff; /* Warna ios-blue */
-  border-radius: 50%;
-  animation: spin-ios 1s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+/* Animasi untuk efek kedipan/pulse */
+@keyframes pulse-logo {
+    0% { opacity: 0.4; transform: scale(0.95); }
+    50% { opacity: 1; transform: scale(1); }
+    100% { opacity: 0.4; transform: scale(0.95); }
 }
-@keyframes spin-ios { 
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); } 
+
+/* Terapkan pada container logo di preloader */
+.logo-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: pulse-logo 1.5s ease-in-out infinite;
+}
+
+/* Mengatur ukuran agar tidak terlalu besar */
+.logo-loading svg {
+    width: 80px; /* Sesuaikan ukuran logo */
+    height: 80px;
 }
   </style>
 </head>
 <body class="bg-zinc-100 dark:bg-black text-slate-900 dark:text-zinc-100 min-h-screen flex flex-col font-sans transition-all-300 pb-16 lg:pb-4">
 <div id="app-preloader">
-    <div class="spinner-ios"></div>
-  </div>
-
+  <div class="logo-loading" id="preloader-logo-container">
+    </div>
+</div>
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+        // 'headerLogoContainer' adalah ID dari div logo yang ada di header
+        const mainLogo = document.getElementById('headerLogoContainer'); 
+        if (mainLogo) {
+            const container = document.getElementById('preloader-logo-container');
+            container.innerHTML = mainLogo.innerHTML;
+        }
+    });
+</script>
   <script>
     (function() {
       try {
