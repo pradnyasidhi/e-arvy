@@ -3562,11 +3562,24 @@ window.syncLocalStorageToCloud = async function(key) {
       settingQuery.descending("updatedAt"); 
       
       const results = await settingQuery.find();
+      
+      // =================================================================
+      // PERBAIKAN: Gunakan Set untuk mencatat kunci yang sudah diperbarui 
+      // dengan data TERBARU (Index 0). Abaikan sisa data yang lebih lama.
+      // =================================================================
+      const processedKeys = new Set();
+
       for (let i = 0; i < results.length; i++) {
         const kunci = results[i].get("kunci");
+        
         // Abaikan key history lama dan key sesi agar tidak bocor antar perangkat
         if(kunci !== 'e_arvy_history_attendance' && kunci !== 'e_arvy_session' && kunci !== 'e_arvy_active_tab') {
-            localStorage.setItem(kunci, results[i].get("jsonString"));
+            
+            // JIKA kunci ini belum pernah diproses (berarti ini data paling baru)
+            if (!processedKeys.has(kunci)) {
+                localStorage.setItem(kunci, results[i].get("jsonString"));
+                processedKeys.add(kunci); // Tandai bahwa kunci ini sudah mendapat data terbaru
+            }
         }
       }
 
