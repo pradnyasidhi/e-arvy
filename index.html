@@ -233,6 +233,10 @@
         if (window.localStorage.getItem('e_arvy_session')) {
           document.body.classList.add('is-logged-in');
         }
+        if (window.localStorage.getItem('e_arvy_theme') === 'dark') {
+          document.documentElement.classList.add('dark');
+          document.addEventListener('DOMContentLoaded', () => document.body.setAttribute('data-theme', 'dark'));
+        }
       } catch (e) {}
     })();
   </script>
@@ -805,16 +809,16 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div class="p-5 bg-slate-50/50 dark:bg-zinc-800/10 rounded-ios-md border border-slate-100 flex flex-col gap-3.5">
                 <span class="text-xs font-black text-ios-blue uppercase tracking-widest">Piket Putra</span>
-                <input type="text" id="announcePiketBatPaName" onblur="this.value = standardizeEYD(this.value);" class="w-full px-3 py-2.5 rounded-ios-sm glass-input text-xs" placeholder="Nama Petugas">
-                <input type="url" id="announcePiketBatPaTg" class="w-full px-3 py-2.5 rounded-ios-sm glass-input text-xs" placeholder="Link Telegram">
+                <input type="text" id="announcePiketBatPaName" onblur="this.value = standardizeEYD(this.value);" class="w-full px-3 py-2.5 rounded-ios-sm glass-input text-xs text-slate-900 dark:text-white" placeholder="Nama Petugas">
+               <input type="url" id="announcePiketBatPaTg" class="w-full px-3 py-2.5 rounded-ios-sm glass-input text-xs text-slate-900 dark:text-white" placeholder="Link Telegram">
                 <label class="text-[9px] font-bold text-ios-blue cursor-pointer hover:underline">Ganti Foto Profil
                   <input type="file" id="announcePiketPaAvatar" accept="image/*" onchange="uploadPiketAvatar(event, 'Pa')" class="hidden">
                 </label>
               </div>
               <div class="p-5 bg-slate-50/50 dark:bg-zinc-800/10 rounded-ios-md border border-slate-100 flex flex-col gap-3.5">
                 <span class="text-xs font-black text-ios-blue uppercase tracking-widest">Piket Putri</span>
-                <input type="text" id="announcePiketBatPiName" onblur="this.value = standardizeEYD(this.value);" class="w-full px-3 py-2.5 rounded-ios-sm glass-input text-xs" placeholder="Nama Petugas">
-                <input type="url" id="announcePiketBatPiTg" class="w-full px-3 py-2.5 rounded-ios-sm glass-input text-xs" placeholder="Link Telegram">
+               <input type="text" id="announcePiketBatPiName" onblur="this.value = standardizeEYD(this.value);" class="w-full px-3 py-2.5 rounded-ios-sm glass-input text-xs text-slate-900 dark:text-white" placeholder="Nama Petugas">
+                <input type="url" id="announcePiketBatPiTg" class="w-full px-3 py-2.5 rounded-ios-sm glass-input text-xs text-slate-900 dark:text-white" placeholder="Link Telegram">
                 <label class="text-[9px] font-bold text-ios-blue cursor-pointer hover:underline">Ganti Foto Profil
                   <input type="file" id="announcePiketPiAvatar" accept="image/*" onchange="uploadPiketAvatar(event, 'Pi')" class="hidden">
                 </label>
@@ -985,50 +989,48 @@
 
   <div id="detailAbsentsModal" class="ios-modal fixed inset-0 bg-black/60 z-[3000] hidden items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-md">
     <div class="ios-modal-content w-full sm:max-w-2xl bg-white dark:bg-zinc-900 rounded-t-ios-xl sm:rounded-ios-lg p-6 shadow-2xl flex flex-col gap-4 transform translate-y-full transition-transform">
-      <div class="flex items-center justify-between border-b pb-3">
-        <h3 id="detailAbsModalTitle" class="text-lg font-bold">Keterangan Tidak Hadir</h3>
-        <button onclick="closeModal('detailAbsentsModal')" class="text-slate-400 text-2xl">&times;</button>
+      <div class="flex items-center justify-between border-b dark:border-zinc-800 pb-3">
+        <h3 id="detailAbsModalTitle" class="text-lg font-bold dark:text-white">Keterangan Tidak Hadir</h3>
+        <button onclick="closeModal('detailAbsentsModal')" class="text-slate-400 hover:text-slate-200 text-2xl">&times;</button>
       </div>
       <div id="detailAbsModalContent" class="flex flex-col gap-4 max-h-[450px] overflow-y-auto py-2"></div>
-      <div class="flex justify-end"><button onclick="closeModal('detailAbsentsModal')" class="px-6 py-2.5 rounded-ios-md bg-slate-100 font-bold text-sm">Tutup</button></div>
+      <div class="flex justify-end"><button onclick="closeModal('detailAbsentsModal')" class="px-6 py-2.5 rounded-ios-md bg-slate-100 dark:bg-zinc-800 dark:text-white font-bold text-sm transition-colors">Tutup</button></div>
     </div>
   </div>
 
   <div id="generalAnnounceModal" class="ios-modal fixed inset-0 bg-black/60 z-[3000] hidden items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-md">
     <div class="ios-modal-content w-full sm:max-w-md bg-white dark:bg-zinc-900 rounded-t-ios-xl sm:rounded-ios-lg p-6 shadow-2xl flex flex-col gap-4 transform translate-y-full transition-transform">
-      <div class="flex items-center justify-between border-b pb-3">
-        <h3 class="text-lg font-bold">Edit Pengumuman Umum</h3>
-        <button onclick="closeModal('generalAnnounceModal')" class="text-slate-400 text-2xl">&times;</button>
+      <div class="flex items-center justify-between border-b dark:border-zinc-800 pb-3">
+        <h3 class="text-lg font-bold dark:text-white">Edit Pengumuman Umum</h3>
+        <button onclick="closeModal('generalAnnounceModal')" class="text-slate-400 hover:text-slate-200 text-2xl">&times;</button>
       </div>
-      <textarea id="editGeneralAnnounceText" onblur="this.value = standardizeEYD(this.value);" class="w-full h-32 p-3 rounded-ios-md bg-slate-50 border text-sm resize-none focus:outline-none"></textarea>
+      <textarea id="editGeneralAnnounceText" onblur="this.value = standardizeEYD(this.value);" class="w-full h-32 p-3 rounded-ios-md bg-slate-50 dark:bg-zinc-800 dark:border-zinc-700 dark:text-white border text-sm resize-none focus:outline-none"></textarea>
       <div class="grid grid-cols-2 gap-3">
-        <button onclick="closeModal('generalAnnounceModal')" class="py-2.5 rounded-ios-md bg-slate-100 font-bold text-sm">Batal</button>
-        <button onclick="saveGeneralAnnounce()" class="py-2.5 rounded-ios-md bg-ios-blue text-white font-bold text-sm">Simpan</button>
+        <button onclick="closeModal('generalAnnounceModal')" class="py-2.5 rounded-ios-md bg-slate-100 dark:bg-zinc-800 dark:text-white font-bold text-sm transition-colors">Batal</button>
+        <button onclick="saveGeneralAnnounce()" class="py-2.5 rounded-ios-md bg-ios-blue text-white font-bold text-sm hover:opacity-90 transition-opacity">Simpan</button>
       </div>
     </div>
   </div>
 
   <div id="scheduleModal" class="ios-modal fixed inset-0 bg-black/60 z-[3000] hidden items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-md">
     <div class="ios-modal-content w-full sm:max-w-md bg-white dark:bg-zinc-900 rounded-t-ios-xl sm:rounded-ios-lg p-6 shadow-2xl flex flex-col gap-4 transform translate-y-full transition-transform">
-      <div class="flex items-center justify-between border-b pb-3">
-        <h3 id="scheduleModalTitle" class="text-lg font-bold">Tambah Kegiatan</h3>
-        <button onclick="closeModal('scheduleModal')" class="text-slate-400 text-2xl">&times;</button>
+      <div class="flex items-center justify-between border-b dark:border-zinc-800 pb-3">
+        <h3 id="scheduleModalTitle" class="text-lg font-bold dark:text-white">Tambah Kegiatan</h3>
+        <button onclick="closeModal('scheduleModal')" class="text-slate-400 hover:text-slate-200 text-2xl">&times;</button>
       </div>
       <div class="flex flex-col gap-3">
-        <input type="date" id="schedModalDate" class="w-full px-4 py-2.5 rounded-ios-md glass-input text-sm">
-        <input type="time" id="schedModalTime" class="w-full px-4 py-2.5 rounded-ios-md glass-input text-sm">
-        <input type="text" id="schedModalTitleInput" class="w-full px-4 py-2.5 rounded-ios-md glass-input text-sm" placeholder="Nama Kegiatan">
-        <input type="text" id="schedModalLocation" class="w-full px-4 py-2.5 rounded-ios-md glass-input text-sm" placeholder="Lokasi">
-        <input type="file" id="schedModalPhoto" accept="image/*" class="text-xs">
+        <input type="date" id="schedModalDate" class="w-full px-4 py-2.5 rounded-ios-md glass-input text-sm text-slate-900 dark:text-white">
+        <input type="time" id="schedModalTime" class="w-full px-4 py-2.5 rounded-ios-md glass-input text-sm text-slate-900 dark:text-white">
+        <input type="text" id="schedModalTitleInput" class="w-full px-4 py-2.5 rounded-ios-md glass-input text-sm text-slate-900 dark:text-white" placeholder="Nama Kegiatan">
+        <input type="text" id="schedModalLocation" class="w-full px-4 py-2.5 rounded-ios-md glass-input text-sm text-slate-900 dark:text-white" placeholder="Lokasi">
+        <input type="file" id="schedModalPhoto" accept="image/*" class="text-xs dark:text-zinc-300">
       </div>
       <div class="grid grid-cols-2 gap-3 mt-2">
-        <button onclick="closeModal('scheduleModal')" class="py-2.5 rounded-ios-md bg-slate-100 font-bold text-sm">Batal</button>
-        <button onclick="saveNewSchedule()" class="py-2.5 rounded-ios-md bg-ios-blue text-white font-bold text-sm">Simpan</button>
+        <button onclick="closeModal('scheduleModal')" class="py-2.5 rounded-ios-md bg-slate-100 dark:bg-zinc-800 dark:text-white font-bold text-sm transition-colors">Batal</button>
+        <button onclick="saveNewSchedule()" class="py-2.5 rounded-ios-md bg-ios-blue text-white font-bold text-sm hover:opacity-90 transition-opacity">Simpan</button>
       </div>
     </div>
   </div>
-
-  <!-- FIX Modal Preview Documented Photo (z-index & pointer events) -->
   <div id="photoPreviewModal" class="fixed inset-0 bg-black/80 z-[9999] hidden items-center justify-center p-4 backdrop-blur-md pointer-events-auto">
     <div class="w-full max-w-xl bg-zinc-950 rounded-ios-lg p-4 shadow-2xl flex flex-col gap-3 text-white pointer-events-auto relative">
       <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
@@ -1970,7 +1972,12 @@ updateDashboardPendataan();
       activeCategory = cat;
       ['batalyon', 'putra', 'putri'].forEach(b => {
         const btn = document.getElementById(`cat-btn-${b}`);
-        if (btn) btn.className = b === cat.toLowerCase() ? "flex-1 text-center py-2.5 rounded-ios-sm text-xs font-bold bg-white dark:bg-zinc-700 shadow-sm" : "flex-1 text-center py-2.5 rounded-ios-sm text-xs font-bold text-slate-500 hover:text-slate-800";
+        if (btn) {
+          // Perbaikan: Menambahkan warna text-slate-800 khusus tombol terang agar tidak putih-putih, dan text gelap untuk tombol inaktif
+          btn.className = b === cat.toLowerCase() 
+            ? "flex-1 text-center py-2.5 rounded-ios-sm text-xs font-bold bg-white text-slate-800 dark:bg-zinc-700 dark:text-white shadow-sm" 
+            : "flex-1 text-center py-2.5 rounded-ios-sm text-xs font-bold text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-zinc-200";
+        }
       });
       const key = `total_${cat.toLowerCase()}`;
       document.getElementById('presensiTotalQuota').value = appData.settings[key] || 600;
@@ -2177,8 +2184,8 @@ markAsUnsaved(prodiId);
         compCard.className = 'p-5 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-md rounded-ios-lg border border-slate-200/60 shadow-lg flex flex-col gap-3.5';
         
         compCard.innerHTML = `
-          <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 py-3 px-4 bg-slate-100/80 rounded-ios-md cursor-pointer hover:opacity-95 transition-all" onclick="toggleCompanySection(${k})">
-            <div class="flex items-center gap-2.5"><i data-lucide="users" class="w-4.5 h-4.5 text-ios-blue"></i><span class="font-extrabold text-sm">Kompi ${k}</span></div>
+          <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 py-3 px-4 bg-slate-100/80 dark:bg-zinc-800/80 rounded-ios-md cursor-pointer hover:opacity-95 transition-all" onclick="toggleCompanySection(${k})">
+  <div class="flex items-center gap-2.5"><i data-lucide="users" class="w-4.5 h-4.5 text-ios-blue"></i><span class="font-extrabold text-sm text-slate-900 dark:text-white">Kompi ${k}</span></div>
             <div class="flex items-center gap-3">
               <div class="flex items-center gap-1.5 shrink-0">
                 <span id="kompi-hdr-present-${k}" class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-ios-green border border-emerald-500/20">Hadir: 0</span>
@@ -2217,9 +2224,9 @@ markAsUnsaved(prodiId);
                 <div id="bulk-toolbar-${prodi.prodiId}" class="hidden bg-blue-50 dark:bg-blue-900/30 p-3 rounded flex flex-col items-start justify-between mb-3 border border-blue-200 dark:border-blue-800 gap-3">
                    <span class="text-xs font-bold text-ios-blue" id="bulk-count-${prodi.prodiId}">0 Terpilih</span>
                    <div class="flex flex-col md:flex-row items-stretch md:items-center gap-2 w-full">
-                      <select id="bulk-status-${prodi.prodiId}" class="w-full md:w-auto text-xs px-3 py-2 rounded border outline-none">
-                        ${statusOptionsHtml}
-                      </select>
+                  <select id="bulk-status-${prodi.prodiId}" class="w-full md:w-auto text-xs px-3 py-2 rounded border dark:bg-zinc-800 dark:border-zinc-700 dark:text-white outline-none">
+                    ${statusOptionsHtml}
+                  </select>
                       <input type="file" id="bulk-file-${prodi.prodiId}" accept="image/*" class="w-full md:w-auto text-[10px] bg-white border rounded p-1.5 text-slate-500">
                       <button onclick="applyBulkAction(${prodi.prodiId})" class="w-full md:w-auto px-4 py-2 bg-ios-blue text-white rounded text-xs font-bold">Terapkan Masal</button>
                    </div>
@@ -2238,30 +2245,30 @@ markAsUnsaved(prodiId);
               const checkboxHtml = isEditable ? `<input type="checkbox" class="bulk-cb-${prodi.prodiId} w-3.5 h-3.5 rounded border-gray-300 text-ios-blue focus:ring-ios-blue" onchange="toggleBulkCheck(${prodi.prodiId}, ${c.no}, this.checked)">` : '';
 
               cadetRowsHtml += `
-                <div id="cadet-row-${prodi.prodiId}-${c.no}" class="grid grid-cols-1 md:grid-cols-4 gap-3 items-center py-2.5 border-b border-slate-100 last:border-0 rounded p-1 transition-colors">
+                <div id="cadet-row-${prodi.prodiId}-${c.no}" class="grid grid-cols-1 md:grid-cols-4 gap-3 items-center py-2.5 border-b border-slate-100 dark:border-zinc-800 last:border-0 rounded p-1 transition-colors">
                   <div class="flex items-center gap-2">
                     ${checkboxHtml}
                     <span class="text-xs font-extrabold text-slate-400">No. ${c.no}</span>
                     <span class="text-[9px] font-black px-1.5 py-0.5 rounded ${c.gender === 'Laki-Laki' ? 'bg-blue-100 text-blue-700' : 'bg-pink-100 text-pink-700'}">${c.gender === 'Laki-Laki' ? 'PA' : 'PI'}</span>
                   </div>
                   <div class="md:col-span-2">
-                    <input type="text" class="w-full px-2 py-1 rounded border-0 bg-transparent text-sm font-bold focus:bg-slate-100 focus:outline-none" value="${c.name}" id="cadet-name-${prodi.prodiId}-${c.no}" readonly>
+                    <input type="text" class="w-full px-2 py-1 rounded border-0 bg-transparent text-sm font-bold focus:bg-slate-100 dark:focus:bg-zinc-800 dark:text-white focus:outline-none" value="${c.name}" id="cadet-name-${prodi.prodiId}-${c.no}" readonly>
                   </div>
                   <div>
-                    <select class="w-full px-2 py-1.5 rounded-ios-sm border bg-slate-50 text-xs font-semibold focus:outline-none" id="cadet-status-${prodi.prodiId}-${c.no}" onchange="handleCadetStatusChange(${prodi.prodiId}, ${c.no})" ${isEditable ? '' : 'disabled'}>
+                    <select class="w-full px-2 py-1.5 rounded-ios-sm border bg-slate-50 dark:bg-zinc-800 dark:border-zinc-700 dark:text-white text-xs font-semibold focus:outline-none" id="cadet-status-${prodi.prodiId}-${c.no}" onchange="handleCadetStatusChange(${prodi.prodiId}, ${c.no})" ${isEditable ? '' : 'disabled'}>
                       ${selectOptionsSpecific}
                     </select>
                   </div>
-                  <div id="absence-detail-${prodi.prodiId}-${c.no}" class="${(draftStatus !== 'Hadir' && (isEditable || draftReason || draftProof)) ? 'flex' : 'hidden'} col-span-1 md:col-span-4 flex-col gap-3 p-3 bg-rose-50/50 rounded-ios-md border border-dashed border-rose-200 mt-1 transition-all">
+                  <div id="absence-detail-${prodi.prodiId}-${c.no}" class="${(draftStatus !== 'Hadir' && (isEditable || draftReason || draftProof)) ? 'flex' : 'hidden'} col-span-1 md:col-span-4 flex-col gap-3 p-3 bg-rose-50/50 dark:bg-rose-950/20 rounded-ios-md border border-dashed border-rose-200 dark:border-rose-900 mt-1 transition-all">
                     
                     ${isEditable ? 
-                      `<input type="text" class="w-full px-3 py-2 rounded bg-white border text-xs focus:ring-1 focus:ring-ios-blue outline-none" placeholder="Sebutkan alasan (opsional)..." id="absence-reason-${prodi.prodiId}-${c.no}" value="${draftReason}" onblur="this.value = standardizeEYD(this.value); syncDraftReason(${prodi.prodiId}, ${c.no});">` 
+                      `<input type="text" class="w-full px-3 py-2 rounded bg-white dark:bg-zinc-800 dark:border-zinc-700 dark:text-white border text-xs focus:ring-1 focus:ring-ios-blue outline-none" placeholder="Sebutkan alasan (opsional)..." id="absence-reason-${prodi.prodiId}-${c.no}" value="${draftReason}" onblur="this.value = standardizeEYD(this.value); syncDraftReason(${prodi.prodiId}, ${c.no});">` 
                     : 
-                      (draftReason ? `<div class="text-xs font-bold text-rose-700 bg-rose-100/60 px-3 py-2 rounded border border-rose-200 shadow-sm">Keterangan: ${draftReason}</div><input type="hidden" id="absence-reason-${prodi.prodiId}-${c.no}" value="${draftReason}">` : `<input type="hidden" id="absence-reason-${prodi.prodiId}-${c.no}" value="">`)
+                      (draftReason ? `<div class="text-xs font-bold text-rose-700 dark:text-rose-400 bg-rose-100/60 dark:bg-rose-950/40 px-3 py-2 rounded border border-rose-200 dark:border-rose-900 shadow-sm">Keterangan: ${draftReason}</div><input type="hidden" id="absence-reason-${prodi.prodiId}-${c.no}" value="${draftReason}">` : `<input type="hidden" id="absence-reason-${prodi.prodiId}-${c.no}" value="">`)
                     }
 
                     <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-                      ${isEditable ? `<label class="w-full sm:w-auto text-center px-4 py-2 rounded bg-white border border-slate-200 text-xs font-bold cursor-pointer hover:bg-slate-50 block"><i data-lucide="upload" class="w-3.5 h-3.5 inline"></i> Unggah Bukti <input type="file" accept="image/*" class="hidden" onchange="handleProofPhotoUpload(event, ${prodi.prodiId}, ${c.no})"></label>` : ''}
+                      ${isEditable ? `<label class="w-full sm:w-auto text-center px-4 py-2 rounded bg-white dark:bg-zinc-800 dark:border-zinc-700 dark:text-white border border-slate-200 text-xs font-bold cursor-pointer hover:bg-slate-50 dark:hover:bg-zinc-700 block"><i data-lucide="upload" class="w-3.5 h-3.5 inline"></i> Unggah Bukti <input type="file" accept="image/*" class="hidden" onchange="handleProofPhotoUpload(event, ${prodi.prodiId}, ${c.no})"></label>` : ''}
                       <img id="proof-preview-${prodi.prodiId}-${c.no}" src="${draftProof}" class="h-12 w-20 object-cover rounded border shadow-sm ${draftProof ? '' : 'hidden'} cursor-zoom-in" onclick="if('${draftProof}') viewDocumentedPhoto('${c.name}', '${draftProof}')">
                     </div>
                     <input type="hidden" id="proof-base64-${prodi.prodiId}-${c.no}" value="${draftProof}">
@@ -2272,23 +2279,22 @@ markAsUnsaved(prodiId);
           }
 
           prodiBox.innerHTML = `
-            <div class="flex flex-wrap sm:flex-nowrap justify-between items-center px-4 py-3 bg-slate-50/50 border-b cursor-pointer hover:bg-slate-50 gap-2" onclick="toggleProdiSection(${prodi.prodiId})">
-              <div class="flex items-center flex-wrap gap-2">
-                <span class="font-extrabold text-sm">${prodi.currentName}</span>
-                <!-- BAGIAN YANG DIUBAH 1: Menambahkan id="prodi-badge-..." -->
+            <div class="flex flex-wrap sm:flex-nowrap justify-between items-center px-4 py-3 bg-slate-50/50 dark:bg-zinc-800/50 border-b dark:border-zinc-700/60 cursor-pointer hover:bg-slate-50 dark:hover:bg-zinc-700/50 gap-2" onclick="toggleProdiSection(${prodi.prodiId})">
+  <div class="flex items-center flex-wrap gap-2">
+    <span class="font-extrabold text-sm text-slate-900 dark:text-white">${prodi.currentName}</span>
                 <span id="prodi-badge-${prodi.prodiId}" class="text-[9px] font-black uppercase px-2.5 py-0.5 rounded-full border ${badgeClass} whitespace-nowrap">${badgeText}</span>
               </div>
               <div class="flex items-center gap-2 ml-auto"><span id="prodi-lbl-stat-${prodi.prodiId}" class="text-xs font-extrabold text-slate-400 whitespace-nowrap">Hadir: ${draftPresentCount}/${cadetsList.length}</span><i data-lucide="chevron-down" id="prodi-chevron-${prodi.prodiId}" class="w-4.5 h-4.5 text-slate-400 transition-transform shrink-0"></i></div>
             </div>
             <div class="p-4 hidden flex-col gap-4 border-t" id="prodi-body-${prodi.prodiId}">
               ${cadetRowsHtml}
-              <div class="p-4 bg-slate-50 rounded-ios-md border flex flex-col gap-3 mt-3">
+              <div class="p-4 bg-slate-50 dark:bg-zinc-800/40 dark:border-zinc-700/60 rounded-ios-md border flex flex-col gap-3 mt-3">
                 <div class="grid grid-cols-3 gap-2 text-center">
-                  <div><h4 class="text-base font-extrabold">${cadetsList.length}</h4><p class="text-[9px] text-slate-400 uppercase font-bold">Total</p></div>
+                  <div><h4 class="text-base font-extrabold text-slate-900 dark:text-white">${cadetsList.length}</h4><p class="text-[9px] text-slate-400 uppercase font-bold">Total</p></div>
                   <div><h4 id="prodi-sum-present-${prodi.prodiId}" class="text-base font-extrabold text-ios-green">${draftPresentCount}</h4><p class="text-[9px] text-slate-400 uppercase font-bold">Hadir</p></div>
                   <div><h4 id="prodi-sum-absent-${prodi.prodiId}" class="text-base font-extrabold text-slate-500">${cadetsList.length - draftPresentCount}</h4><p class="text-[9px] text-slate-400 uppercase font-bold">Kurang</p></div>
                 </div>
-                <div class="text-xs pt-2 border-t" id="prodi-sum-detail-${prodi.prodiId}"></div>
+                <div class="text-xs pt-2 border-t dark:border-zinc-700" id="prodi-sum-detail-${prodi.prodiId}"></div>
                 ${isEditable ? `
   <!-- BAGIAN YANG DIUBAH 2: Menambahkan id="prodi-action-btns-..." -->
   <div id="prodi-action-btns-${prodi.prodiId}" class="pt-3 flex flex-col sm:flex-row justify-end gap-2.5">
@@ -2912,12 +2918,12 @@ function markAsUnsaved(prodiId) {
       const grouped = {}; item.absents.forEach(a => { if(!grouped[a.status]) grouped[a.status] = []; grouped[a.status].push(a); });
       for (const status in grouped) {
         let listHtml = '';
-        grouped[status].forEach(cad => {
-          const imgHtml = cad.attachmentBase64 ? `<div class="mt-2 w-36 h-20 border rounded cursor-zoom-in" onclick="viewDocumentedPhoto('${cad.cadetName}', '${cad.attachmentBase64}')"><img src="${cad.attachmentBase64}" class="w-full h-full object-cover"></div>` : '';
-          listHtml += `<div class="text-xs leading-relaxed pl-1 border-l-2 border-ios-blue/40 mt-2"><div><span class="font-extrabold">${cad.cadetName}</span> <span class="text-[10px] text-slate-500 block">Keterangan: ${cad.reason ? `${cad.reason}` : ''}</span></div>${imgHtml}</div>`;
-        });
-        content.innerHTML += `<div class="flex flex-col gap-2 p-3 bg-slate-50 rounded-ios-md border"><div class="border-b pb-1.5 font-black text-ios-blue text-xs uppercase">${status} (${grouped[status].length})</div>${listHtml}</div>`;
-      }
+          grouped[status].forEach(cad => {
+            const imgHtml = cad.attachmentBase64 ? `<div class="mt-2 w-36 h-20 border dark:border-zinc-700 rounded cursor-zoom-in" onclick="viewDocumentedPhoto('${cad.cadetName}', '${cad.attachmentBase64}')"><img src="${cad.attachmentBase64}" class="w-full h-full object-cover"></div>` : '';
+            listHtml += `<div class="text-xs leading-relaxed pl-1 border-l-2 border-ios-blue/40 mt-2"><div><span class="font-extrabold text-slate-900 dark:text-white">${cad.cadetName}</span> <span class="text-[10px] text-slate-500 block">Keterangan: ${cad.reason ? `${cad.reason}` : ''}</span></div>${imgHtml}</div>`;
+          });
+          content.innerHTML += `<div class="flex flex-col gap-2 p-3 bg-slate-50 dark:bg-zinc-800/60 dark:border-zinc-700/60 rounded-ios-md border"><div class="border-b dark:border-zinc-700 pb-1.5 font-black text-ios-blue text-xs uppercase">${status} (${grouped[status].length})</div>${listHtml}</div>`;
+}
       openModal('detailAbsentsModal');
     }
 
@@ -2948,19 +2954,19 @@ function markAsUnsaved(prodiId) {
         const trueIdx = appData.kepulangan.findIndex(item => item.prodiName === k.prodiName && item.date === selectedDate);
 
         listHtml += `
-          <div class="grid grid-cols-6 gap-4 items-center py-3 px-4 border-b text-sm">
-            <div class="col-span-2 font-bold">${k.prodiName}</div>
-            <div><input type="date" value="${k.date}" id="dep-date-${trueIdx}" ${disabledAttr} class="w-full px-2 py-1.5 rounded bg-slate-50 border text-xs outline-none"></div>
-            <div><input type="time" value="${k.time}" id="dep-time-${trueIdx}" ${disabledAttr} class="w-full px-2 py-1.5 rounded bg-slate-50 border text-xs outline-none"></div>
-            <div><input type="text" value="${k.status}" id="dep-status-${trueIdx}" ${disabledAttr} class="w-full px-2 py-1.5 rounded bg-slate-50 border text-xs outline-none"></div>
+          <div class="grid grid-cols-6 gap-4 items-center py-3 px-4 border-b dark:border-zinc-800/60 text-sm">
+            <div class="col-span-2 font-bold text-slate-900 dark:text-white">${k.prodiName}</div>
+            <div><input type="date" value="${k.date}" id="dep-date-${trueIdx}" ${disabledAttr} class="w-full px-2 py-1.5 rounded bg-white dark:bg-zinc-900 border dark:border-zinc-700 text-slate-900 dark:text-white text-xs outline-none focus:ring-1 focus:ring-ios-blue"></div>
+            <div><input type="time" value="${k.time}" id="dep-time-${trueIdx}" ${disabledAttr} class="w-full px-2 py-1.5 rounded bg-white dark:bg-zinc-900 border dark:border-zinc-700 text-slate-900 dark:text-white text-xs outline-none focus:ring-1 focus:ring-ios-blue"></div>
+            <div><input type="text" value="${k.status}" id="dep-status-${trueIdx}" ${disabledAttr} class="w-full px-2 py-1.5 rounded bg-white dark:bg-zinc-900 border dark:border-zinc-700 text-slate-900 dark:text-white text-xs outline-none focus:ring-1 focus:ring-ios-blue"></div>
             <div>
               <div class="flex flex-col gap-1.5">
-                ${canEdit ? `<label class="w-fit px-2.5 py-1 rounded bg-slate-100 border text-[10px] font-bold cursor-pointer"><i data-lucide="video" class="w-3.5 h-3.5 inline"></i> Upload <input type="file" accept="video/*" class="hidden" onchange="handleDepVideoUpload(event, ${trueIdx})"></label>` : ''}
-                <div id="dep-video-preview-box-${trueIdx}" class="text-[10px]">${k.videoUrl ? `<a href="${k.videoUrl}" target="_blank" class="text-ios-blue font-semibold">Lihat Bukti</a>` : ''}</div>
+                ${canEdit ? `<label class="w-fit px-2.5 py-1 rounded bg-slate-100 dark:bg-zinc-700 border dark:border-zinc-600 text-slate-700 dark:text-zinc-200 hover:bg-slate-200 dark:hover:bg-zinc-600 text-[10px] font-bold cursor-pointer transition-colors"><i data-lucide="video" class="w-3.5 h-3.5 inline"></i> Upload <input type="file" accept="video/*" class="hidden" onchange="handleDepVideoUpload(event, ${trueIdx})"></label>` : ''}
+                <div id="dep-video-preview-box-${trueIdx}" class="text-[10px]">${k.videoUrl ? `<a href="${k.videoUrl}" target="_blank" class="text-ios-blue font-semibold hover:underline">Lihat Bukti</a>` : ''}</div>
                 <input type="hidden" id="dep-video-base64-${trueIdx}">
               </div>
             </div>
-            <div class="text-right">${canEdit ? `<button id="dep-save-btn-${trueIdx}" onclick="saveDepartureRow(${trueIdx}, '${k.prodiName}')" class="px-4 py-1.5 bg-ios-blue text-white rounded text-xs font-bold">Simpan</button>` : '<span class="inline-block px-3 py-1 bg-slate-100 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-400 text-[10px] font-black uppercase tracking-wider rounded-full shadow-sm">READ ONLY</span>'}</div>
+            <div class="text-right">${canEdit ? `<button id="dep-save-btn-${trueIdx}" onclick="saveDepartureRow(${trueIdx}, '${k.prodiName}')" class="px-4 py-1.5 bg-ios-blue text-white rounded text-xs font-bold hover:opacity-90">Simpan</button>` : '<span class="inline-block px-3 py-1 bg-slate-100 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-400 text-[10px] font-black uppercase tracking-wider rounded-full shadow-sm">READ ONLY</span>'}</div>
           </div>
         `;
       });
@@ -3046,7 +3052,7 @@ function markAsUnsaved(prodiId) {
       let statusHtml = ''; // VAR PENAMPUNG
       
       statuses.forEach(st => {
-         statusHtml += `<div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 text-xs font-bold border"><span>${st}</span><button onclick="deleteAbsenceStatus('${st}')" class="text-ios-red font-black text-xs">&times;</button></div>`;
+         statusHtml += `<div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-200 text-xs font-bold border"><span>${st}</span><button onclick="deleteAbsenceStatus('${st}')" class="text-ios-red font-black text-xs">&times;</button></div>`;
       });
       
       wrapper.innerHTML = statusHtml; // RENDER DOM SEKALI
@@ -3082,15 +3088,15 @@ function markAsUnsaved(prodiId) {
       list.forEach(s => {
         const pBtn = s.photoUrl ? `<button onclick="viewDocumentedPhoto('${s.title}', '${s.photoUrl}')" class="flex-1 md:flex-none px-3 py-2 bg-emerald-100 text-ios-green rounded text-xs font-bold">Foto</button>` : '';
         schedulesHtml += `
-          <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 p-3.5 bg-slate-50 rounded-ios-md border">
+          <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 p-3.5 bg-slate-50 dark:bg-zinc-800/40 dark:border-zinc-700/60 rounded-ios-md border">
             <div class="flex flex-col gap-1 w-full text-left">
-              <div class="flex items-center gap-3"><h4 class="text-sm font-black text-ios-blue">${s.time}</h4><span class="text-sm font-bold">${s.title}</span></div>
+              <div class="flex items-center gap-3"><h4 class="text-sm font-black text-ios-blue">${s.time}</h4><span class="text-sm font-bold text-slate-900 dark:text-white">${s.title}</span></div>
               <div class="text-[10px] text-slate-400 font-bold"><i data-lucide="map-pin" class="w-3.5 h-3.5 inline"></i> ${s.location || "-"}</div>
             </div>
             <div class="admin-piket-only hidden flex-wrap md:flex-nowrap gap-2 w-full md:w-auto mt-2 md:mt-0">
               ${pBtn}
-              <button onclick="triggerEditScheduleWholeModal('${s.date}', '${s.time}', '${s.title}', '${s.location || ''}')" class="flex-1 md:flex-none px-4 py-2 bg-slate-200 rounded text-xs font-bold text-center">Ubah</button>
-              <button onclick="deleteSchedule('${s.date}', '${s.time}', '${s.title}')" class="flex-1 md:flex-none px-4 py-2 bg-red-100 text-red-600 rounded text-xs font-bold text-center">Hapus</button>
+              <button onclick="triggerEditScheduleWholeModal('${s.date}', '${s.time}', '${s.title}', '${s.location || ''}')" class="flex-1 md:flex-none px-4 py-2 bg-slate-200 dark:bg-zinc-700 text-slate-800 dark:text-zinc-200 rounded text-xs font-bold text-center transition-colors">Ubah</button>
+<button onclick="deleteSchedule('${s.date}', '${s.time}', '${s.title}')" class="flex-1 md:flex-none px-4 py-2 bg-red-100 dark:bg-rose-950/40 text-red-600 dark:text-rose-400 rounded text-xs font-bold text-center transition-colors">Hapus</button>
             </div>
           </div>
         `;
@@ -3178,7 +3184,7 @@ function markAsUnsaved(prodiId) {
         
         filteredLogs.forEach(l => {
           const t = new Date(l.timestamp);
-          logsHtml += `<div class="flex justify-between items-center p-2.5 bg-slate-50 rounded border text-xs"><span><strong>${l.username}</strong>: ${l.action}</span><span class="text-[10px] text-slate-400 font-bold">${t.toLocaleTimeString()} ${t.toLocaleDateString()}</span></div>`;
+          logsHtml += `<div class="flex justify-between items-center p-2.5 bg-slate-50 dark:bg-zinc-800/60 dark:border-zinc-700/50 rounded border text-xs text-slate-700 dark:text-zinc-200"><span><strong class="text-slate-900 dark:text-white">${l.username}</strong>: ${l.action}</span><span class="text-[10px] text-slate-400 font-bold">${t.toLocaleTimeString()} ${t.toLocaleDateString()}</span></div>`;
         });
         
         container.innerHTML = logsHtml; // RENDER DOM SEKALI
@@ -3193,12 +3199,12 @@ function markAsUnsaved(prodiId) {
       appData.prodis.forEach(p => {
         const uName = p.currentName.replace(/\s+/g, '').toLowerCase();
         prodiListHtml += `
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 p-4 bg-slate-50 rounded-ios-md border text-sm">
-            <div><div class="font-bold">${p.currentName}</div><div class="text-xs text-slate-400">Kompi: ${p.kompiNumber} | User: ${uName}</div></div>
-            <div class="flex flex-col gap-2"><input type="text" value="${p.currentName}" id="adm-prodi-name-${p.prodiId}" class="px-3 py-1.5 rounded border text-xs"><input type="password" value="kadet123" id="adm-prodi-pass-${p.prodiId}" class="px-3 py-1.5 rounded border text-xs"></div>
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 p-4 bg-slate-50 dark:bg-zinc-800/50 dark:border-zinc-700/80 rounded-ios-md border text-sm">
+            <div><div class="font-bold text-slate-900 dark:text-white">${p.currentName}</div><div class="text-xs text-slate-400">Kompi: ${p.kompiNumber} | User: ${uName}</div></div>
+            <div class="flex flex-col gap-2"><input type="text" value="${p.currentName}" id="adm-prodi-name-${p.prodiId}" class="px-3 py-1.5 rounded border dark:bg-zinc-800 dark:border-zinc-700 dark:text-white text-xs"><input type="password" value="kadet123" id="adm-prodi-pass-${p.prodiId}" class="px-3 py-1.5 rounded border dark:bg-zinc-800 dark:border-zinc-700 dark:text-white text-xs"></div>
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 lg:justify-end mt-2 lg:mt-0">
                <button onclick="saveAdminProdiRow(${p.prodiId}, '${p.currentName}')" class="w-full sm:w-auto px-4 py-2 bg-ios-blue text-white rounded text-xs font-bold">Simpan Nama</button>
-               <button onclick="saveAdminProdiPass('${uName}', ${p.prodiId})" class="w-full sm:w-auto px-4 py-2 bg-slate-200 rounded text-xs font-bold">Ubah Sandi</button>
+               <button onclick="saveAdminProdiPass('${uName}', ${p.prodiId})" class="w-full sm:w-auto px-4 py-2 bg-slate-200 dark:bg-zinc-700 text-slate-800 dark:text-zinc-200 rounded text-xs font-bold transition-colors">Ubah Sandi</button>
             </div>
           </div>`;
       });
@@ -3227,11 +3233,11 @@ function markAsUnsaved(prodiId) {
       
       list.forEach(c => {
         cadetsHtml += `
-          <div class="flex flex-col gap-2 p-3 bg-slate-50 rounded border text-xs">
-            <div class="flex justify-between"><span class="font-extrabold">No: ${c.no}</span><button onclick="removeCadetFromSelectedProdi(${c.no})" class="text-ios-red font-bold">&times; Hapus</button></div>
+          <div class="flex flex-col gap-2 p-3 bg-slate-50 dark:bg-zinc-800/50 dark:border-zinc-700/80 rounded border text-xs">
+            <div class="flex justify-between"><span class="font-extrabold text-slate-900 dark:text-white">No: ${c.no}</span><button onclick="removeCadetFromSelectedProdi(${c.no})" class="text-ios-red font-bold">&times; Hapus</button></div>
             <div class="grid grid-cols-2 gap-2">
-              <input type="text" value="${c.name}" id="adm-cadet-name-${c.no}" class="px-2 py-1.5 border rounded">
-              <select id="adm-cadet-gender-${c.no}" class="px-2 py-1.5 border rounded"><option value="Laki-Laki" ${c.gender==='Laki-Laki'?'selected':''}>Putra</option><option value="Perempuan" ${c.gender==='Perempuan'?'selected':''}>Putri</option></select>
+              <input type="text" value="${c.name}" id="adm-cadet-name-${c.no}" class="px-2 py-1.5 border rounded dark:bg-zinc-800 dark:border-zinc-700 dark:text-white">
+              <select id="adm-cadet-gender-${c.no}" class="px-2 py-1.5 border rounded dark:bg-zinc-800 dark:border-zinc-700 dark:text-white"><option value="Laki-Laki" ${c.gender==='Laki-Laki'?'selected':''}>Putra</option><option value="Perempuan" ${c.gender==='Perempuan'?'selected':''}>Putri</option></select>
             </div>
           </div>`;
       });
@@ -3271,36 +3277,36 @@ function markAsUnsaved(prodiId) {
     let itemHtml = '';
     if (isAdminPiket) {
       itemHtml = `
-        <div class="p-4 bg-slate-50 dark:bg-zinc-800/40 rounded-ios-md border flex flex-col gap-3 relative animate-fadeIn">
+        <div class="p-4 bg-slate-50 dark:bg-zinc-800/40 rounded-ios-md border dark:border-zinc-700/60 flex flex-col gap-3 relative animate-fadeIn">
           <div class="flex justify-between items-start gap-2 flex-wrap">
             <div class="flex flex-col gap-1.5 flex-1 min-w-[220px]">
               <label class="text-[9px] font-black uppercase tracking-widest text-slate-400">Judul Pendataan</label>
-              <input type="text" id="pendataan-title-${item.id}" value="${item.title}" onblur="this.value = standardizeEYD(this.value);" class="w-full px-3 py-2 rounded border text-xs font-bold" placeholder="Contoh: Pendataan Ukuran Sepatu PDL">
+              <input type="text" id="pendataan-title-${item.id}" value="${item.title}" onblur="this.value = standardizeEYD(this.value);" class="w-full px-3 py-2 rounded border dark:border-zinc-700 bg-white dark:bg-zinc-900 text-slate-900 dark:text-white text-xs font-bold focus:ring-1 focus:ring-ios-blue outline-none" placeholder="Contoh: Pendataan Ukuran Sepatu PDL">
             </div>
             <div class="flex items-center gap-2 mt-4 sm:mt-0">
-              <span id="countdown-pendataan-${item.id}" class="text-[10px] font-black px-2 py-1 rounded bg-slate-100 dark:bg-zinc-800 text-slate-500 font-mono">--:--:--</span>
-              <button onclick="deletePendataanItem('${item.id}')" class="p-2 bg-rose-50 text-ios-red rounded hover:bg-rose-100 transition-colors" title="Hapus"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+              <span id="countdown-pendataan-${item.id}" class="text-[10px] font-black px-2 py-1 rounded bg-slate-100 dark:bg-zinc-800 text-slate-500 font-mono border dark:border-zinc-700">--:--:--</span>
+              <button onclick="deletePendataanItem('${item.id}')" class="p-2 bg-rose-50 dark:bg-rose-950/40 text-ios-red dark:text-rose-400 rounded hover:bg-rose-100 dark:hover:bg-rose-900/60 transition-colors" title="Hapus"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
             </div>
           </div>
           <div class="flex flex-col gap-1.5">
             <label class="text-[9px] font-black uppercase tracking-widest text-slate-400">Isi / Deskripsi Instruksi</label>
-            <textarea id="pendataan-content-${item.id}" class="w-full px-3 py-1.5 rounded border text-xs h-14 resize-none focus:outline-none" placeholder="Masukkan rincian informasi pembagian kompi...">${item.content}</textarea>
+            <textarea id="pendataan-content-${item.id}" class="w-full px-3 py-1.5 rounded border dark:border-zinc-700 bg-white dark:bg-zinc-900 text-slate-900 dark:text-white text-xs h-14 resize-none focus:ring-1 focus:ring-ios-blue outline-none" placeholder="Masukkan rincian informasi pembagian kompi...">${item.content}</textarea>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div class="flex flex-col gap-1.5">
               <label class="text-[9px] font-black uppercase tracking-widest text-slate-400">Tanggal Batas (Deadline)</label>
-              <input type="date" id="pendataan-date-${item.id}" value="${item.deadlineDate}" class="px-3 py-1.5 rounded border text-xs outline-none">
+              <input type="date" id="pendataan-date-${item.id}" value="${item.deadlineDate}" class="px-3 py-1.5 rounded border dark:border-zinc-700 bg-white dark:bg-zinc-900 text-slate-900 dark:text-white dark:[color-scheme:dark] text-xs focus:ring-1 focus:ring-ios-blue outline-none">
             </div>
             <div class="flex flex-col gap-1.5">
               <label class="text-[9px] font-black uppercase tracking-widest text-slate-400">Jam & Menit Batas</label>
-              <input type="time" id="pendataan-time-${item.id}" value="${item.deadlineTime}" class="px-3 py-1.5 rounded border text-xs outline-none">
+              <input type="time" id="pendataan-time-${item.id}" value="${item.deadlineTime}" class="px-3 py-1.5 rounded border dark:border-zinc-700 bg-white dark:bg-zinc-900 text-slate-900 dark:text-white dark:[color-scheme:dark] text-xs focus:ring-1 focus:ring-ios-blue outline-none">
             </div>
             <div class="flex flex-col gap-1.5">
               <label class="text-[9px] font-black uppercase tracking-widest text-slate-400">Tautan Google Form</label>
-              <input type="url" id="pendataan-url-${item.id}" value="${item.gformUrl}" class="px-3 py-1.5 rounded border text-xs outline-none font-mono" placeholder="https://forms.gle/...">
+              <input type="url" id="pendataan-url-${item.id}" value="${item.gformUrl}" class="px-3 py-1.5 rounded border dark:border-zinc-700 bg-white dark:bg-zinc-900 text-slate-900 dark:text-white text-xs focus:ring-1 focus:ring-ios-blue outline-none font-mono" placeholder="https://forms.gle/...">
             </div>
           </div>
-          <div class="flex justify-between items-center pt-2.5 border-t border-slate-200/60 mt-1 flex-wrap gap-2">
+          <div class="flex justify-between items-center pt-2.5 border-t border-slate-200/60 dark:border-zinc-700/60 mt-1 flex-wrap gap-2">
             <button onclick="savePendataanItem('${item.id}')" class="w-full sm:w-auto px-4 py-2 bg-ios-blue text-white rounded text-xs font-black shadow-sm hover:opacity-90 transition-all">Simpan Perubahan</button>
             <a href="${item.gformUrl || '#'}" target="_blank" class="w-full sm:w-auto text-center px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded text-xs font-black flex items-center justify-center gap-1 shadow-sm"><i data-lucide="external-link" class="w-3.5 h-3.5"></i> Tes Tautan</a>
           </div>
@@ -3493,8 +3499,18 @@ function updateDashboardPendataan() {
     }
 
     function toggleTheme() {
-      const html = document.documentElement; html.classList.toggle('dark');
-      if (html.classList.contains('dark')) document.body.setAttribute('data-theme', 'dark'); else document.body.removeAttribute('data-theme');
+      const html = document.documentElement; 
+      html.classList.toggle('dark');
+      
+      const isDark = html.classList.contains('dark');
+      if (isDark) {
+        document.body.setAttribute('data-theme', 'dark');
+        window.localStorage.setItem('e_arvy_theme', 'dark');
+      } else {
+        document.body.removeAttribute('data-theme');
+        window.localStorage.setItem('e_arvy_theme', 'light');
+      }
+      
       if (document.getElementById('view-statistik').classList.contains('active')) renderCharts();
     }
 
@@ -3650,56 +3666,44 @@ window.syncLocalStorageToCloud = async function(key) {
 <script>
   const originalOnload = window.onload;
   window.onload = function() {
-    // 1. Render logo secara instan
-    if (typeof renderApplicationLogos === 'function') {
-      renderApplicationLogos();
+    try {
+      if (typeof renderApplicationLogos === 'function') renderApplicationLogos();
+      const icon = document.getElementById('localRefreshIcon');
+      if (icon) icon.classList.add('animate-spin');
+
+      initMockDatabase();
+      const todayStr = new Date().toISOString().split('T')[0];
+      const pDate = document.getElementById('presensiDate'); if(pDate) pDate.value = todayStr;
+      const kDate = document.getElementById('kepulanganFilterDate'); if(kDate) kDate.value = todayStr;
+      const aDate = document.getElementById('announceScheduleDate'); if(aDate) aDate.value = todayStr;
+
+      if (typeof checkLoginSession === 'function') checkLoginSession();
+      if (typeof startRealTimeClock === 'function') startRealTimeClock();
+
+      if (window.fetchDatabaseFromCloud) {
+        window.fetchDatabaseFromCloud().then(() => {
+          if (icon) icon.classList.remove('animate-spin');
+          if (typeof currentUser !== 'undefined' && currentUser && typeof loadDashboardAndAppData === 'function') {
+            loadDashboardAndAppData();
+          }
+        }).catch(err => {
+          if (icon) icon.classList.remove('animate-spin');
+        }).finally(() => {
+          setTimeout(() => document.getElementById('app-preloader')?.classList.add('preloader-hidden'), 150);
+        });
+      } else {
+        setTimeout(() => document.getElementById('app-preloader')?.classList.add('preloader-hidden'), 150);
+      }
+
+      setInterval(() => {
+         if (window.fetchDatabaseFromCloud && typeof currentUser !== 'undefined' && currentUser) {
+           window.fetchDatabaseFromCloud().then(() => { if (typeof loadDashboardAndAppData === 'function') loadDashboardAndAppData(); });
+         }
+      }, 30000); 
+    } catch (e) {
+      console.error("Error saat inisialisasi:", e);
+      setTimeout(() => document.getElementById('app-preloader')?.classList.add('preloader-hidden'), 150);
     }
-
-    const icon = document.getElementById('localRefreshIcon');
-    if (icon) icon.classList.add('animate-spin');
-
-    initMockDatabase();
-    const todayStr = new Date().toISOString().split('T')[0];
-    document.getElementById('presensiDate').value = todayStr;
-    document.getElementById('kepulanganFilterDate').value = todayStr;
-    document.getElementById('announceScheduleDate').value = todayStr;
-    
-   
-    checkLoginSession();
-    startRealTimeClock();
-
-    if (window.fetchDatabaseFromCloud) {
-      window.fetchDatabaseFromCloud().then(() => {
-        if (icon) icon.classList.remove('animate-spin');
-        
-        // Setelah data terbaru dari Cloud selesai diunduh, 
-        // segarkan data (refresh) Dashboard secara mulus di latar belakang
-        if (currentUser) {
-          loadDashboardAndAppData();
-        }
-      }).catch(err => {
-        if (icon) icon.classList.remove('animate-spin');
-        console.error("Gagal sinkronisasi latar belakang: ", err);
-      }).finally(() => {
-        setTimeout(() => {
-          document.getElementById('app-preloader')?.classList.add('preloader-hidden');
-        }, 150);
-      });
-    } else {
-      if (originalOnload) originalOnload();
-      setTimeout(() => {
-        document.getElementById('app-preloader')?.classList.add('preloader-hidden');
-      }, 150);
-    }
-
-       setInterval(() => {
-       // Hanya tarik data secara diam-diam jika user sudah login
-       if (window.fetchDatabaseFromCloud && currentUser) {
-         window.fetchDatabaseFromCloud().then(() => {
-           loadDashboardAndAppData();
-         });
-       }
-    }, 30000); 
   };
 
     document.addEventListener("visibilitychange", () => {
