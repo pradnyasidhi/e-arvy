@@ -3583,26 +3583,36 @@ window.syncLocalStorageToCloud = async function(key) {
 <script>
   const originalOnload = window.onload;
   window.onload = function() {
-    // --- PERBAIKAN: Render logo secara instan dari memori lokal ---
-    // Jangan tunggu Cloud selesai, langsung panggil logo detik pertama!
+    // 1. Render logo secara instan
     if (typeof renderApplicationLogos === 'function') {
       renderApplicationLogos();
     }
-    // --------------------------------------------------------------
 
     const icon = document.getElementById('localRefreshIcon');
     if (icon) icon.classList.add('animate-spin');
 
+    initMockDatabase();
+    const todayStr = new Date().toISOString().split('T')[0];
+    document.getElementById('presensiDate').value = todayStr;
+    document.getElementById('kepulanganFilterDate').value = todayStr;
+    document.getElementById('announceScheduleDate').value = todayStr;
+    
+    // Tampilkan Dashboard menggunakan data memori lokal TANPA delay
+    checkLoginSession();
+    startRealTimeClock();
+
     if (window.fetchDatabaseFromCloud) {
       window.fetchDatabaseFromCloud().then(() => {
         if (icon) icon.classList.remove('animate-spin');
-        initMockDatabase();
-        const todayStr = new Date().toISOString().split('T')[0];
-        document.getElementById('presensiDate').value = todayStr;
-        document.getElementById('kepulanganFilterDate').value = todayStr;
-        document.getElementById('announceScheduleDate').value = todayStr;
-        checkLoginSession();
-        startRealTimeClock();
+        
+        // Setelah data terbaru dari Cloud selesai diunduh, 
+        // segarkan data (refresh) Dashboard secara mulus di latar belakang
+        if (currentUser) {
+          loadDashboardAndAppData();
+        }
+      }).catch(err => {
+        if (icon) icon.classList.remove('animate-spin');
+        console.error("Gagal sinkronisasi latar belakang: ", err);
       });
     } else {
       if (originalOnload) originalOnload();
