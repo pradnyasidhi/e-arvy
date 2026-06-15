@@ -1027,11 +1027,12 @@ const originalRemoveItem = storage.removeItem.bind(storage);
 // Timpa setItem agar setiap ada perubahan, langsung dikirim ke Cloud
 storage.setItem = function(key, val) {
   originalSetItem(key, val);
-  
-  // Jangan sync data ketikan sementara (draft) agar tidak membebani server
-  // Draft akan dikirim dalam bentuk 'bundle' saat menekan tombol Simpan
-  if (window.syncLocalStorageToCloud && !key.startsWith('draft_')) {
-    // Gunakan setTimeout agar proses UI tidak terhenti (non-blocking)
+
+  // Daftar kunci yang MURNI LOKAL (hanya untuk HP ini) dan tidak boleh bocor ke Cloud
+  const localOnlyKeys = ['e_arvy_session', 'e_arvy_active_tab', 'e_arvy_initialized_real_data'];
+
+  // Jangan sync data ketikan sementara (draft) dan data lokal
+  if (window.syncLocalStorageToCloud && !key.startsWith('draft_') && !localOnlyKeys.includes(key)) {
     setTimeout(() => {
       window.syncLocalStorageToCloud(key);
     }, 100);
@@ -1504,12 +1505,13 @@ function togglePassword() {
 
     function logout() {
   if(confirm('Keluar sistem?')) {
-    storage.removeItem('e_arvy_session'); currentUser = null;
-    
-    document.body.classList.remove('is-logged-in'); // Tambahkan baris ini
-    document.getElementById('userInfoHeader').classList.add('hidden');
-    renderApplicationLogos(); 
-    // Hapus kode: document.getElementById('loginWrapper').classList.remove('hidden');
+    // Hapus data sesi dan memori tab dari perangkat ini
+    storage.removeItem('e_arvy_session'); 
+    storage.removeItem('e_arvy_active_tab');
+    currentUser = null;
+
+    // Segarkan ulang (refresh) seluruh halaman agar memori UI benar-benar bersih dan kembali ke layar Login
+    window.location.reload();
   }
 }
 
@@ -1546,7 +1548,8 @@ function togglePassword() {
       }
 
       loadDashboardAndAppData();
-      switchTab('dashboard');
+const lastActiveTab = storage.getItem('e_arvy_active_tab') || 'dashboard';
+      switchTab(lastActiveTab);
     }
 
     function renderApplicationLogos() {
@@ -3405,33 +3408,37 @@ function updateDashboardPendataan() {
       lucide.createIcons();
     }
 
-    function switchTab(viewId) {
-  if (viewId === 'admin-panel' && currentUser.role !== 'Admin') return switchTab('dashboard');
-  
-  document.querySelectorAll('.view-screen').forEach(s => { s.classList.add('hidden'); s.classList.remove('active'); });
-  const target = document.getElementById(`view-${viewId}`); 
-  if (target) { target.classList.remove('hidden'); target.classList.add('active'); }
-  
-  document.querySelectorAll('.sidebar-item').forEach(i => i.className = i.id === `side-${viewId}` ? "sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-ios-md text-sm font-bold text-ios-blue bg-blue-100/50" : "sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-ios-md text-sm font-semibold text-slate-600 hover:bg-slate-100/50");
-  
-  document.querySelectorAll('.tabbar-item').forEach(i => i.className = i.id === `tab-${viewId}` ? "tabbar-item flex flex-col items-center gap-0.5 text-ios-blue font-bold text-[10px]" : "tabbar-item flex flex-col items-center gap-0.5 text-slate-400 font-semibold text-[10px]");
-  
-  // Perbaikan logika IF/ELSE
-  if (viewId === 'statistik') { 
-    renderCharts(); 
-    renderHistoryTable(); 
-  } else if (viewId === 'announce') { 
-    loadAnnounceSchedules();
-    renderPendataanList();
-  } else if (viewId === 'profile') { 
-    updateProfilePage(); 
-  } else if (viewId === 'kepulangan') { 
-    renderKepulanganList(); 
-    renderDepartureLogs(); 
-  } else if (viewId === 'admin-panel') { 
-    renderAbsenceStatusManager();
-  }
-}
+   function switchTab(viewId) {
+      if (viewId === 'admin-panel' && currentUser.role !== 'Admin') return switchTab('dashboard');
+      
+      // --- TAMBAHAN: Simpan tab terakhir ke LocalStorage ---
+      storage.setItem('e_arvy_active_tab', viewId);
+      // -----------------------------------------------------
+
+      document.querySelectorAll('.view-screen').forEach(s => { s.classList.add('hidden'); s.classList.remove('active'); });
+      const target = document.getElementById(`view-${viewId}`); 
+      if (target) { target.classList.remove('hidden'); target.classList.add('active'); }
+      
+      document.querySelectorAll('.sidebar-item').forEach(i => i.className = i.id === `side-${viewId}` ? "sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-ios-md text-sm font-bold text-ios-blue bg-blue-100/50" : "sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-ios-md text-sm font-semibold text-slate-600 hover:bg-slate-100/50");
+      
+      document.querySelectorAll('.tabbar-item').forEach(i => i.className = i.id === `tab-${viewId}` ? "tabbar-item flex flex-col items-center gap-0.5 text-ios-blue font-bold text-[10px]" : "tabbar-item flex flex-col items-center gap-0.5 text-slate-400 font-semibold text-[10px]");
+      
+      // Perbaikan logika IF/ELSE
+      if (viewId === 'statistik') { 
+        renderCharts(); 
+        renderHistoryTable(); 
+      } else if (viewId === 'announce') { 
+        loadAnnounceSchedules();
+        renderPendataanList();
+      } else if (viewId === 'profile') { 
+        updateProfilePage(); 
+      } else if (viewId === 'kepulangan') { 
+        renderKepulanganList(); 
+        renderDepartureLogs(); 
+      } else if (viewId === 'admin-panel') { 
+        renderAbsenceStatusManager();
+      }
+    }
 
     function toggleTheme() {
       const html = document.documentElement; html.classList.toggle('dark');
@@ -3502,9 +3509,10 @@ window.syncLocalStorageToCloud = async function(key) {
       settingQuery.limit(50); 
       const results = await settingQuery.find();
       for (let i = 0; i < results.length; i++) {
-        // Jangan timpa riwayat absensi dari JSON lama
-        if(results[i].get("kunci") !== 'e_arvy_history_attendance') {
-            localStorage.setItem(results[i].get("kunci"), results[i].get("jsonString"));
+        const kunci = results[i].get("kunci");
+        // Abaikan key history lama dan key sesi agar tidak bocor antar perangkat
+        if(kunci !== 'e_arvy_history_attendance' && kunci !== 'e_arvy_session' && kunci !== 'e_arvy_active_tab') {
+            localStorage.setItem(kunci, results[i].get("jsonString"));
         }
       }
 
@@ -3573,10 +3581,15 @@ window.syncLocalStorageToCloud = async function(key) {
 </script>
 
 <script>
-  // OVERRIDE LOGIKA BAWAAN APLIKASI AGAR TERHUBUNG KE CLOUD AUTOMATIS
-  // OVERRIDE LOGIKA BAWAAN APLIKASI AGAR TERHUBUNG KE CLOUD AUTOMATIS
   const originalOnload = window.onload;
   window.onload = function() {
+    // --- PERBAIKAN: Render logo secara instan dari memori lokal ---
+    // Jangan tunggu Cloud selesai, langsung panggil logo detik pertama!
+    if (typeof renderApplicationLogos === 'function') {
+      renderApplicationLogos();
+    }
+    // --------------------------------------------------------------
+
     const icon = document.getElementById('localRefreshIcon');
     if (icon) icon.classList.add('animate-spin');
 
