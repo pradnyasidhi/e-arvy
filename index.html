@@ -3676,10 +3676,17 @@ window.syncLocalStorageToCloud = async function(key) {
       const pDate = document.getElementById('presensiDate'); if(pDate) pDate.value = todayStr;
       const kDate = document.getElementById('kepulanganFilterDate'); if(kDate) kDate.value = todayStr;
       const aDate = document.getElementById('announceScheduleDate'); if(aDate) aDate.value = todayStr;
-
+      
       if (typeof checkLoginSession === 'function') checkLoginSession();
       if (typeof startRealTimeClock === 'function') startRealTimeClock();
 
+      // ==============================================================
+      // PERBAIKAN: SEMBUNYIKAN LAYAR LOADING SECARA INSTAN!
+      // Jangan tunggu Cloud selesai. Langsung buka layar dalam 0.2 detik
+      // ==============================================================
+      setTimeout(() => document.getElementById('app-preloader')?.classList.add('preloader-hidden'), 200);
+
+      // Proses sinkronisasi Cloud tetap berjalan di latar belakang
       if (window.fetchDatabaseFromCloud) {
         window.fetchDatabaseFromCloud().then(() => {
           if (icon) icon.classList.remove('animate-spin');
@@ -3688,11 +3695,7 @@ window.syncLocalStorageToCloud = async function(key) {
           }
         }).catch(err => {
           if (icon) icon.classList.remove('animate-spin');
-        }).finally(() => {
-          setTimeout(() => document.getElementById('app-preloader')?.classList.add('preloader-hidden'), 150);
         });
-      } else {
-        setTimeout(() => document.getElementById('app-preloader')?.classList.add('preloader-hidden'), 150);
       }
 
       setInterval(() => {
@@ -3702,7 +3705,7 @@ window.syncLocalStorageToCloud = async function(key) {
       }, 30000); 
     } catch (e) {
       console.error("Error saat inisialisasi:", e);
-      setTimeout(() => document.getElementById('app-preloader')?.classList.add('preloader-hidden'), 150);
+      setTimeout(() => document.getElementById('app-preloader')?.classList.add('preloader-hidden'), 200);
     }
   };
 
