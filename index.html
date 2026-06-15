@@ -3558,7 +3558,9 @@ window.syncLocalStorageToCloud = async function(key) {
       // 1. Ambil pengaturan umum seperti biasa
       const CloudStorage = Parse.Object.extend("DataArvy");
       const settingQuery = new Parse.Query(CloudStorage);
-      settingQuery.limit(50); 
+      settingQuery.limit(1000); 
+      settingQuery.descending("updatedAt"); 
+      
       const results = await settingQuery.find();
       for (let i = 0; i < results.length; i++) {
         const kunci = results[i].get("kunci");
