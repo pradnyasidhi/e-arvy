@@ -3801,10 +3801,10 @@ window.syncLocalStorageToCloud = async function(key) {
         }
       }
 
-      // 2. Ambil History Absensi dari Tabel Relasional (Limit 20 Data Terbaru)
+      // 2. Ambil History Absensi dari Tabel Relasional (Tarik Semua Data)
       const logQuery = new Parse.Query(LogPresensi);
       logQuery.descending("createdAt"); 
-      logQuery.limit(20); 
+      logQuery.limit(10000); // Ubah ke angka maksimal yang besar agar semua log ditarik
       const logResults = await logQuery.find();
       
       const formattedLogs = logResults.map(parseObj => ({
