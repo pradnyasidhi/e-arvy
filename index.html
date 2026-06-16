@@ -640,48 +640,45 @@
                 <input type="date" id="statSearchDate" onchange="renderHistoryTable()" class="w-full pl-10 pr-4 py-2.5 rounded-ios-md glass-input text-sm text-slate-900 dark:text-white">
               </div>
             </div>
-            <div class="flex items-end gap-2">
-              <button onclick="resetSearchFilter()" class="px-4 py-2.5 rounded-ios-md bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-300 hover:bg-slate-200 text-xs font-bold transition-all">Bersihkan Filter</button>
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Status Pie Chart</label>
+              <div class="flex items-center gap-2">
+                <select id="pieLogSourceSelect" onchange="renderCharts()" class="flex-1 px-4 py-2.5 rounded-ios-md glass-input text-sm text-slate-900 dark:text-white">
+                  <option value="last">Kegiatan Terakhir Saja</option>
+                  <option value="all">Akumulasi Semua Riwayat</option>
+                </select>
+                <button onclick="resetSearchFilter()" class="px-4 py-2.5 rounded-ios-md bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-300 hover:bg-slate-200 text-xs font-bold transition-all whitespace-nowrap">Bersihkan Filter</button>
+              </div>
             </div>
           </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg shadow-lg flex flex-col gap-4">
-            <h4 id="lineChartTitle" class="font-extrabold text-base tracking-tight">Grafik Kehadiran Mingguan</h4>
-            <div class="relative h-[280px] w-full"><canvas id="lineChart"></canvas></div>
+          <div class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg shadow-lg flex flex-col gap-4 min-h-[320px]">
+            <h4 class="font-extrabold text-base tracking-tight">Tren Kehadiran (30 Hari Terakhir)</h4>
+            <div class="flex-1 relative w-full h-full"><canvas id="lineChart"></canvas></div>
           </div>
-
-          <div class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg shadow-lg flex flex-col gap-4">
-            <div class="flex justify-between items-center border-b border-slate-100 dark:border-zinc-800 pb-2">
-              <h4 id="pieChartTitle" class="font-extrabold text-base tracking-tight">Distribusi Status</h4>
-              <select id="pieLogSourceSelect" onchange="renderCharts()" class="px-2.5 py-1 text-[11px] rounded bg-slate-100 dark:bg-zinc-800 text-slate-800 dark:text-slate-200 border-none font-bold outline-none">
-                <option value="last">Log Terakhir</option>
-                <option value="all">Kumulatif</option>
-              </select>
-            </div>
-            <div class="relative h-[280px] w-full flex justify-center"><canvas id="pieChart"></canvas></div>
+          <div class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg shadow-lg flex flex-col gap-4 min-h-[320px]">
+            <h4 class="font-extrabold text-base tracking-tight">Proporsi Ketidakhadiran</h4>
+            <div class="flex-1 relative w-full h-full"><canvas id="pieChart"></canvas></div>
           </div>
         </div>
 
         <div class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg shadow-lg flex flex-col gap-4">
           <div class="flex justify-between items-center pb-2 border-b border-slate-100 dark:border-zinc-800/60">
             <h4 class="font-extrabold text-base tracking-tight">Riwayat Kegiatan & Keterangan Roster</h4>
-            <span id="historyRecordsCount" class="text-xs font-bold px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-ios-blue font-mono">0 Log</span>
+            <div class="flex items-center gap-2">
+              <button id="bulkDeleteHistoryBtn" onclick="deleteSelectedHistoryLogs()" class="hidden px-3.5 py-1.5 bg-rose-50 dark:bg-rose-950/40 text-ios-red dark:text-rose-400 rounded-full text-xs font-bold hover:bg-rose-100 transition-colors border border-rose-200 dark:border-rose-900 shadow-sm">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5 inline mr-1"></i>Hapus (<span id="bulkDeleteCount">0</span>)
+              </button>
+              <span id="historyRecordsCount" class="text-xs font-bold px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-ios-blue font-mono">0 Log</span>
+            </div>
           </div>
 
           <div class="overflow-x-auto no-scrollbar">
             <table class="min-w-full text-sm text-left">
-              <thead>
-                <tr class="border-b border-slate-100 dark:border-zinc-800 text-[10px] font-black uppercase text-slate-400 tracking-wider">
-                  <th class="py-3 px-4">Tanggal / Waktu</th>
-                  <th class="py-3 px-4">Nama Kegiatan</th>
-                  <th class="py-3 px-4">Kategori</th>
-                  <th class="py-3 px-4">Hadir / Quota</th>
-                  <th class="py-3 px-4">Detail Kekurangan</th>
-                  <th class="py-3 px-4 text-right">Aksi</th>
-                </tr>
-              </thead>
+              <thead id="historyTableHeader">
+                </thead>
               <tbody id="historyTableBody" class="divide-y divide-slate-100 dark:divide-zinc-800/60 font-medium"></tbody>
             </table>
           </div>
@@ -1175,7 +1172,7 @@ storage.removeItem = function(key) {
           { prodiId: 23, originalName: "TM", currentName: "TM", kompiNumber: 6 },
           { prodiId: 24, originalName: "FIS", currentName: "FIS", kompiNumber: 6 }
         ];
-        storage.setItem('e_arvy_prodis', JSON.stringify(defaultProdiList));
+        originalSetItem('e_arvy_prodis', JSON.stringify(defaultProdiList));
 
         const users = [
           { username: 'admin', password: 'admin123', role: 'Admin', prodiName: '', kompiName: '', profilePhoto: '' },
@@ -1189,7 +1186,7 @@ storage.removeItem = function(key) {
           kompiName: 'Kompi ' + p.kompiNumber, 
           profilePhoto: '' 
         }));
-        storage.setItem('e_arvy_users', JSON.stringify(users));
+        originalSetItem('e_arvy_users', JSON.stringify(users));
 
         // Database Nama Anggota
         const rawCadetData = {
@@ -1283,19 +1280,17 @@ storage.removeItem = function(key) {
           });
         });
 
-        storage.setItem('e_arvy_cadets', JSON.stringify(cadets));
-        storage.setItem('e_arvy_settings', JSON.stringify(appData.settings));
+        originalSetItem('e_arvy_cadets', JSON.stringify(cadets));
+originalSetItem('e_arvy_settings', JSON.stringify(appData.settings));
 
         const todayStr = new Date().toISOString().split('T')[0];
-        const defaultSchedules = [
-          { date: todayStr, time: "05:00", title: "Apel Pagi", location: "Lapangan Utama", photoUrl: "" },
-          { date: todayStr, time: "12:00", title: "Makan Siang", location: "Ruang Makan", photoUrl: "" },
-          { date: todayStr, time: "20:00", title: "Apel Malam", location: "Lapangan Utama", photoUrl: "" }
-        ];
-        storage.setItem('e_arvy_schedules', JSON.stringify(defaultSchedules));
-        storage.setItem('e_arvy_kepulangan', JSON.stringify([]));
-        storage.setItem('e_arvy_absence_statuses', JSON.stringify(['Sakit', 'Izin', 'Alpa', 'Dinas', 'Bajaga', 'Gasuh', 'Kontrol RSPPN', 'Rawat Jalan', 'Tanpa Keterangan']));
-        storage.setItem('e_arvy_initialized_real_data', 'true');
+const defaultSchedules = [
+{ date: todayStr, time: "05:00", title: "Apel Pagi", location: "Lapangan Utama", photoUrl: "" },
+          { date: todayStr, time: "12:00", title: "Makan Siang", location: "Ruang Makan"} ];
+originalSetItem('e_arvy_schedules', JSON.stringify(defaultSchedules));
+originalSetItem('e_arvy_kepulangan', JSON.stringify([]));
+originalSetItem('e_arvy_absence_statuses', JSON.stringify(['Sakit', 'Izin', 'Dinas Luar', 'Dinas Dalam', 'Gasuh', 'Kontrol', 'Rawat Jalan', 'Tanpa Keterangan']));
+originalSetItem('e_arvy_initialized_real_data', 'true');
     }
   } 
 
@@ -1309,7 +1304,6 @@ storage.removeItem = function(key) {
       }
     }, 150);
   }
-
     function simulateServerCall(methodName, params) {
       if (methodName === 'login') {
         const users = JSON.parse(storage.getItem('e_arvy_users'));
@@ -1483,13 +1477,30 @@ let textRecap = `DATA ${params.activityName.toUpperCase()} KOPRAL KADET${kategor
         const pIdx = prodis.findIndex(p => p.currentName === params.oldName);
         if (pIdx !== -1) prodis[pIdx].currentName = params.newName;
         storage.setItem('e_arvy_prodis', JSON.stringify(prodis));
+        
+        const cadets = JSON.parse(storage.getItem('e_arvy_cadets') || '{}');
+        if (cadets[params.oldName]) {
+          cadets[params.newName] = cadets[params.oldName];
+          delete cadets[params.oldName];
+          storage.setItem('e_arvy_cadets', JSON.stringify(cadets));
+          // Paksa update ke Cloud
+          if (window.syncLocalStorageToCloud) window.syncLocalStorageToCloud('e_arvy_cadets');
+        }
+
+        if (window.syncLocalStorageToCloud) window.syncLocalStorageToCloud('e_arvy_prodis');
+
         logLocalActivity(params.username, `Ganti nama prodi: ${params.oldName} -> ${params.newName}`);
         return { success: true };
       }
+      
       if (methodName === 'updateCadetNames') {
-        const cadets = JSON.parse(storage.getItem('e_arvy_cadets'));
+        const cadets = JSON.parse(storage.getItem('e_arvy_cadets') || '{}');
         cadets[params.prodiName] = params.cadetsList;
         storage.setItem('e_arvy_cadets', JSON.stringify(cadets));
+        
+        // Paksa update data Kadet terbaru ke Cloud
+        if (window.syncLocalStorageToCloud) window.syncLocalStorageToCloud('e_arvy_cadets');
+        
         logLocalActivity(params.username, `Ubah roster prodi ${params.prodiName}`);
         return { success: true };
       }
@@ -2980,9 +2991,11 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
       }
     }
 
+   let selectedHistoryLogs = new Set();
     function renderHistoryTable() {
       const tbody = document.getElementById('historyTableBody');
-      if (!tbody) return;
+      const thead = document.getElementById('historyTableHeader');
+      if (!tbody || !thead) return;
       
       const sDate = document.getElementById('statSearchDate').value;
       const sAct = document.getElementById('statActivitySelect').value;
@@ -2992,9 +3005,27 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
       if (sAct && sAct !== 'semua') list = list.filter(h => h.activityName === sAct);
       
       document.getElementById('historyRecordsCount').innerText = `${list.length} Log`;
+
+          selectedHistoryLogs.clear();
+      updateBulkDeleteHistoryBtn();
+
+      const isAdmin = ['Admin', 'Piket', 'Pokdo', 'Pengasuh'].includes(currentUser.role);
+
+      thead.innerHTML = `
+        <tr class="border-b border-slate-100 dark:border-zinc-800 text-[10px] font-black uppercase text-slate-400 tracking-wider">
+          ${isAdmin ? `<th class="py-3 px-4 w-10 text-center"><input type="checkbox" id="selectAllHistoryCb" onchange="toggleAllHistoryLogs(this.checked)" class="w-3.5 h-3.5 rounded border-slate-300 text-ios-red focus:ring-ios-red cursor-pointer"></th>` : ''}
+          <th class="py-3 px-4">Tanggal / Waktu</th>
+          <th class="py-3 px-4">Nama Kegiatan</th>
+          <th class="py-3 px-4">Kategori</th>
+          <th class="py-3 px-4">Hadir / Quota</th>
+          <th class="py-3 px-4">Detail Kekurangan</th>
+          <th class="py-3 px-4 text-right">Aksi</th>
+        </tr>
+      `;
       
       if (list.length === 0) { 
-        tbody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-400 italic">Tidak ada data.</td></tr>`; 
+        const cols = isAdmin ? 7 : 6;
+        tbody.innerHTML = `<tr><td colspan="${cols}" class="py-6 text-center text-slate-400 italic">Tidak ada data.</td></tr>`; 
         return; 
       }
 
@@ -3007,9 +3038,6 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
           absentsSummary = Object.keys(grouped).map(k => `${k}: ${grouped[k]}`).join(', ');
         }
         
-        const delBtn = ['Admin', 'Piket', 'Pokdo', 'Pengasuh'].includes(currentUser.role) ? `<button onclick="deleteHistoryLog('${h.logId}')" class="px-2.5 py-1 bg-rose-50 text-ios-red rounded text-xs font-black">Hapus</button>` : '';
-        
-        // --- TAMBAHAN WAKTU TERVERIFIKASI ---
         let timeVerifHtml = '';
         if (h.verifiedAt) {
           const vDate = new Date(h.verifiedAt);
@@ -3017,48 +3045,95 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
           const mins = String(vDate.getMinutes()).padStart(2, '0');
           timeVerifHtml = `<span class="text-[10px] text-slate-500 font-semibold flex items-center gap-1 mt-0.5"><i data-lucide="clock" class="w-3 h-3"></i> ${hrs}:${mins} WIB</span>`;
         }
-        // ------------------------------------
+
+        const cbHtml = isAdmin ? `<td class="py-3 px-4 text-center" onclick="event.stopPropagation()"><input type="checkbox" value="${h.logId}" onchange="toggleHistoryLogSelection('${h.logId}', this.checked)" class="history-log-cb w-3.5 h-3.5 rounded border-slate-300 text-ios-red focus:ring-ios-red cursor-pointer"></td>` : '';
         
         htmlContent += `
-          <tr class="hover:bg-slate-50 border-b text-xs cursor-pointer" onclick="if(event.target.tagName !== 'BUTTON') openDetailAbsentsModal('${h.logId}')">
+          <tr class="hover:bg-slate-50 dark:hover:bg-zinc-800/40 border-b dark:border-zinc-800/60 text-xs cursor-pointer transition-colors" onclick="if(event.target.tagName !== 'BUTTON' && event.target.tagName !== 'INPUT') openDetailAbsentsModal('${h.logId}')">
+            ${cbHtml}
             <td class="py-3 px-4">
-              <span class="font-bold block">${h.date}</span>
-              ${timeVerifHtml} </td>
-            <td class="py-3 px-4 font-extrabold flex flex-col"><span>${h.activityName}</span><span class="text-[10px] text-ios-blue font-medium mt-0.5">Klik untuk detail foto</span></td>
-            <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full bg-slate-100 font-bold">${h.category}</span></td>
-            <td class="py-3 px-4"><span class="font-extrabold text-ios-green">${h.presentCount}</span> / <span class="font-bold text-slate-400">${h.totalCadets}</span></td>
+              <span class="font-bold block text-slate-900 dark:text-white">${h.date}</span>
+              ${timeVerifHtml} 
+            </td>
+            <td class="py-3 px-4 font-extrabold flex flex-col">
+              <span class="text-slate-900 dark:text-white">${h.activityName}</span>
+              <span class="text-[10px] text-ios-blue font-medium mt-0.5">Klik untuk detail foto</span>
+            </td>
+            <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 font-bold">${h.category}</span></td>
+            <td class="py-3 px-4"><span class="font-extrabold text-ios-green">${h.presentCount}</span> <span class="text-slate-400 dark:text-zinc-500">/</span> <span class="font-bold text-slate-400 dark:text-zinc-400">${h.totalCadets}</span></td>
             <td class="py-3 px-4 font-bold ${h.absentCount > 0 ? 'text-ios-red' : 'text-ios-green'}">${absentsSummary}</td>
-            <td class="py-3 px-4 text-right"><div class="flex items-center justify-end gap-1.5"><button onclick="viewHistoryRecap('${h.logId}')" class="px-3 py-1 bg-slate-100 rounded font-black text-ios-blue text-xs">Rekap</button>${delBtn}</div></td>
+            <td class="py-3 px-4 text-right">
+              <div class="flex items-center justify-end gap-1.5">
+                <button onclick="viewHistoryRecap('${h.logId}')" class="px-3 py-1.5 bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 rounded-ios-sm font-black text-ios-blue text-xs transition-colors">Rekap</button>
+              </div>
+            </td>
           </tr>
         `;
       });
 
       tbody.innerHTML = htmlContent; 
-      
-      // Wajib dipanggil untuk merender icon jam yang baru ditambahkan
       lucide.createIcons(); 
     }
+    function toggleHistoryLogSelection(logId, isChecked) {
+      if (isChecked) selectedHistoryLogs.add(logId);
+      else selectedHistoryLogs.delete(logId);
+      updateBulkDeleteHistoryBtn();
+    }
 
-    function deleteHistoryLog(logId) {
-      if (confirm('Hapus permanen log ini?')) {
-        appData.historyAttendance = appData.historyAttendance.filter(h => h.logId !== logId);
-        storage.setItem('e_arvy_history_attendance', JSON.stringify(appData.historyAttendance));
-        
-        // --- SINKRONISASI PENGHAPUSAN KE CLOUD ---
-        if (window.syncLocalStorageToCloud) {
-          window.syncLocalStorageToCloud('e_arvy_history_attendance');
-        }
-        
-        // Hapus juga secara spesifik dari Tabel LogPresensi di Back4App
-        if (window.deletePresensiFromCloud) {
-          window.deletePresensiFromCloud(logId);
-        }
-        // ------------------------------------------
+    function toggleAllHistoryLogs(isChecked) {
+      const checkboxes = document.querySelectorAll('.history-log-cb');
+      checkboxes.forEach(cb => {
+        cb.checked = isChecked;
+        if (isChecked) selectedHistoryLogs.add(cb.value);
+        else selectedHistoryLogs.delete(cb.value);
+      });
+      updateBulkDeleteHistoryBtn();
+    }
 
-        logLocalActivity(currentUser.username, `Hapus log presensi: ${logId}`);
-        showToast('Terhapus', 'Log presensi dihapus.', 'success'); 
-        loadDashboardAndAppData();
+    function updateBulkDeleteHistoryBtn() {
+      const btn = document.getElementById('bulkDeleteHistoryBtn');
+      const countSpan = document.getElementById('bulkDeleteCount');
+      if (!btn || !countSpan) return;
+
+      if (selectedHistoryLogs.size > 0) {
+        btn.classList.remove('hidden');
+        countSpan.innerText = selectedHistoryLogs.size;
+      } else {
+        btn.classList.add('hidden');
       }
+    }
+
+    async function deleteSelectedHistoryLogs() {
+      if (selectedHistoryLogs.size === 0) return;
+      if (!confirm(`Hapus permanen ${selectedHistoryLogs.size} log kegiatan terpilih?`)) return;
+
+      const btn = document.getElementById('bulkDeleteHistoryBtn');
+      btn.innerHTML = '<i data-lucide="loader" class="w-3.5 h-3.5 inline mr-1 animate-spin"></i>Menghapus...';
+      lucide.createIcons();
+
+      appData.historyAttendance = appData.historyAttendance.filter(h => !selectedHistoryLogs.has(h.logId));
+      storage.setItem('e_arvy_history_attendance', JSON.stringify(appData.historyAttendance));
+     
+      if (window.syncLocalStorageToCloud) {
+        window.syncLocalStorageToCloud('e_arvy_history_attendance');
+      }
+      
+      if (window.deletePresensiFromCloud) {
+        for (const logId of selectedHistoryLogs) {
+          await window.deletePresensiFromCloud(logId);
+        }
+      }
+
+      logLocalActivity(currentUser.username, `Hapus masal log presensi (${selectedHistoryLogs.size} item)`);
+      showToast('Terhapus', `${selectedHistoryLogs.size} log presensi dibersihkan.`, 'success');
+
+      selectedHistoryLogs.clear();
+      updateBulkDeleteHistoryBtn();
+      
+      // Kembalikan teks asli tombol
+      btn.innerHTML = '<i data-lucide="trash-2" class="w-3.5 h-3.5 inline mr-1"></i>Hapus (<span id="bulkDeleteCount">0</span>)';
+      
+      loadDashboardAndAppData();
     }
 
     function openDetailAbsentsModal(logId) {
