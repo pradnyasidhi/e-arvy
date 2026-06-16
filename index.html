@@ -3044,14 +3044,20 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
         appData.historyAttendance = appData.historyAttendance.filter(h => h.logId !== logId);
         storage.setItem('e_arvy_history_attendance', JSON.stringify(appData.historyAttendance));
         
-        // --- TAMBAHAN: SINKRONISASI KE CLOUD AGAR TERHAPUS PERMANEN ---
+        // --- SINKRONISASI PENGHAPUSAN KE CLOUD ---
         if (window.syncLocalStorageToCloud) {
           window.syncLocalStorageToCloud('e_arvy_history_attendance');
         }
-        // --------------------------------------------------------------
+        
+        // Hapus juga secara spesifik dari Tabel LogPresensi di Back4App
+        if (window.deletePresensiFromCloud) {
+          window.deletePresensiFromCloud(logId);
+        }
+        // ------------------------------------------
 
         logLocalActivity(currentUser.username, `Hapus log presensi: ${logId}`);
-        showToast('Terhapus', 'Log presensi dihapus.', 'success'); loadDashboardAndAppData();
+        showToast('Terhapus', 'Log presensi dihapus.', 'success'); 
+        loadDashboardAndAppData();
       }
     }
 
@@ -3690,6 +3696,38 @@ function updateDashboardPendataan() {
 
   // Deklarasi Tabel Relasional
   const LogPresensi = Parse.Object.extend("LogPresensi");
+
+// FUNGSI BARU: Menghapus data general (kunci DataArvy) dari Cloud
+  window.deleteFromCloud = async function(key) {
+    try {
+      const CloudStorage = Parse.Object.extend("DataArvy");
+      const query = new Parse.Query(CloudStorage);
+      query.equalTo("kunci", key);
+      const record = await query.first();
+      
+      if (record) {
+        await record.destroy();
+      }
+    } catch (e) {
+      console.error("Gagal menghapus kunci dari Back4App:", e);
+    }
+  };
+
+  // FUNGSI BARU: Menghapus log spesifik dari tabel relasional LogPresensi
+  window.deletePresensiFromCloud = async function(logId) {
+    try {
+      const LogPresensi = Parse.Object.extend("LogPresensi");
+      const query = new Parse.Query(LogPresensi);
+      query.equalTo("logId", logId);
+      const record = await query.first();
+      
+      if (record) {
+        await record.destroy();
+      }
+    } catch (e) {
+      console.error("Gagal menghapus LogPresensi dari Back4App:", e);
+    }
+  };
 
   // Fungsi BARU: Menyimpan Presensi sebagai Baris Tersendiri
   window.savePresensiKeCloud = async function(dataPresensi) {
