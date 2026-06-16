@@ -552,9 +552,12 @@
             
             <!-- Pencarian Nama -->
             <div class="relative w-full md:w-64">
-              <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
-              <input type="text" id="searchCadetInput" onkeyup="if(event.key==='Enter') searchCadet()" class="w-full pl-10 pr-4 py-2 rounded-ios-md glass-input text-sm focus:outline-none" placeholder="Cari Nama Kadet">
-            </div>
+  <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+  
+  <input type="text" id="searchCadetInput" oninput="handleSearchInput()" class="w-full pl-10 pr-4 py-2 rounded-ios-md glass-input text-sm focus:outline-none" placeholder="Cari Nama Kadet">
+  
+  <div id="searchSuggestionsBox" class="hidden absolute top-full left-0 mt-2 w-full bg-white dark:bg-zinc-800 rounded-ios-md border border-slate-200 dark:border-zinc-700 shadow-xl max-h-60 overflow-y-auto z-[100] flex-col"></div>
+</div>
           </div>
           
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
