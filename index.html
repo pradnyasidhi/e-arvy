@@ -393,53 +393,57 @@
     <main class="content-area flex-1 flex flex-col gap-6 min-w-0 mb-16 lg:mb-0">
 
       <!-- View: Dashboard -->
+     <!-- View: Dashboard -->
       <section id="view-dashboard" class="view-screen active flex flex-col gap-6 transition-all-300">
         
-        <!-- Welcome Banner with Glow Effect -->
-        <div class="p-6 rounded-ios-lg bg-gradient-to-r from-ios-blue via-blue-600 to-indigo-600 text-white flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-[0_0_20px_rgba(0,122,255,0.4)]">
-          <div class="flex flex-col gap-1">
-            <h2 class="text-xl sm:text-2xl font-black tracking-tight">Portal e-Arvy #6 (Tahap Pengembangan)</h2>
+        <!-- Welcome Banner (Dikembalikan) -->
+        <div class="p-6 md:p-8 rounded-3xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-[0_8px_30px_rgb(0,122,255,0.2)]">
+          <div class="flex flex-col gap-1.5">
+            <h2 class="text-2xl sm:text-3xl font-black tracking-tight">Portal e-Arvy #6</h2>
             <p class="text-sm text-blue-100 font-medium">Batalyon Nara Arvyaksa - Sistem Interoperabilitas & Presensi Terpadu</p>
           </div>
-          <button onclick="switchTab('kehadiran')" class="px-5 py-2.5 bg-white text-ios-blue font-bold text-sm rounded-ios-md hover:bg-slate-50 active:scale-95 transition-all shadow-md">
+          <button onclick="switchTab('kehadiran')" class="px-6 py-3 bg-white text-ios-blue font-bold text-sm rounded-xl hover:scale-105 active:scale-95 transition-all shadow-md">
             Mulai Presensi
           </button>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          <!-- KIRI: KONTEN UTAMA (Span 2) -->
           <div class="lg:col-span-2 flex flex-col gap-6">
             
-           <div class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg border border-slate-200/60 dark:border-zinc-800/60 shadow-lg shadow-black/5 flex flex-col gap-4">
+            <!-- Card 1: Rekap Presensi -->
+            <div class="p-6 bg-white dark:bg-zinc-900 rounded-3xl border border-slate-100 dark:border-zinc-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col gap-5">
               <div class="flex items-center justify-between mb-1">
                 <div class="flex items-center gap-2">
                   <i data-lucide="activity" class="w-6 h-6 text-ios-blue"></i>
-                  <h3 class="font-extrabold text-xl tracking-tight">Rekap Presensi Terakhir</h3>
+                  <h3 class="font-black text-xl tracking-tight">Rekap Presensi Terakhir</h3>
                 </div>
-                <span id="dashLastActCat" class="text-xs font-extrabold px-3 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-ios-green border border-emerald-100 dark:border-emerald-900">Lengkap Hadir</span>
+                <span id="dashLastActCat" class="text-xs font-extrabold px-3 py-1.5 rounded-full bg-rose-50 text-ios-red border border-rose-100">Ada Kekurangan</span>
               </div>
               
-              <div class="bg-slate-50 dark:bg-zinc-800/40 rounded-ios-md border border-slate-100 dark:border-zinc-800/60 p-5 flex flex-col gap-5">
+              <div class="bg-[#f8f9fa] dark:bg-zinc-800/40 rounded-2xl border border-slate-100 dark:border-zinc-800/60 p-5 flex flex-col gap-5">
                 
                 <div class="flex justify-between items-center border-b border-slate-200/60 dark:border-zinc-700/60 pb-4 cursor-pointer hover:opacity-80 transition-all" onclick="viewLastRecapDetail()">
-  <div class="flex flex-col gap-1">
-    <strong id="dashLastActName" class="text-lg font-black text-slate-800 dark:text-white leading-none">-</strong>
-    <span id="dashLastActDate" class="text-sm font-bold text-slate-400">-</span>
-  </div>
-  <i data-lucide="chevron-right" class="w-5 h-5 text-ios-blue animate-pulse"></i>
-</div>
+                  <div class="flex flex-col gap-1">
+                    <strong id="dashLastActName" class="text-lg font-black text-slate-800 dark:text-white leading-none">-</strong>
+                    <span id="dashLastActDate" class="text-sm font-bold text-slate-400">-</span>
+                  </div>
+                  <i data-lucide="chevron-right" class="w-5 h-5 text-ios-blue animate-pulse"></i>
+                </div>
 
                 <div class="grid grid-cols-3 gap-4">
-                  <div class="bg-white dark:bg-zinc-900 p-4 rounded-ios-md border border-slate-100 dark:border-zinc-800/60 flex flex-col items-center justify-center text-center shadow-sm">
-                    <span class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Kuota</span>
-                    <strong id="dashLastActTotal" class="text-xl font-black text-slate-800 dark:text-white">-</strong>
+                  <div class="bg-white dark:bg-zinc-900 py-4 px-2 rounded-xl border border-slate-100 dark:border-zinc-800/60 flex flex-col items-center justify-center text-center shadow-sm">
+                    <span class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Kuota</span>
+                    <strong id="dashLastActTotal" class="text-2xl sm:text-3xl font-black text-slate-800 dark:text-white">-</strong>
                   </div>
-                  <div class="bg-white dark:bg-zinc-900 p-4 rounded-ios-md border border-slate-100 dark:border-zinc-800/60 flex flex-col items-center justify-center text-center shadow-sm">
-                    <span class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Hadir</span>
-                    <strong id="dashLastActPresent" class="text-xl font-black text-ios-green">-</strong>
+                  <div class="bg-white dark:bg-zinc-900 py-4 px-2 rounded-xl border border-slate-100 dark:border-zinc-800/60 flex flex-col items-center justify-center text-center shadow-sm">
+                    <span class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Hadir</span>
+                    <strong id="dashLastActPresent" class="text-2xl sm:text-3xl font-black text-ios-green">-</strong>
                   </div>
-                  <div class="bg-white dark:bg-zinc-900 p-4 rounded-ios-md border border-slate-100 dark:border-zinc-800/60 flex flex-col items-center justify-center text-center shadow-sm">
-                    <span class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Kurang</span>
-                    <strong id="dashLastActAbsent" class="text-xl font-black text-ios-red">-</strong>
+                  <div class="bg-white dark:bg-zinc-900 py-4 px-2 rounded-xl border border-slate-100 dark:border-zinc-800/60 flex flex-col items-center justify-center text-center shadow-sm">
+                    <span class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Kurang</span>
+                    <strong id="dashLastActAbsent" class="text-2xl sm:text-3xl font-black text-ios-red">-</strong>
                   </div>
                 </div>
 
@@ -451,88 +455,100 @@
               </div>
             </div>
 
-            <div id="dashPendataanWrapper" class="hidden p-6 bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/10 dark:to-indigo-900/10 rounded-ios-lg border border-purple-100 dark:border-purple-900/30 shadow-lg flex flex-col gap-4">
-              <div class="flex items-center justify-between border-b border-purple-200 dark:border-purple-800/50 pb-2">
+            <!-- Card 2: Pendataan Terbaru -->
+            <div id="dashPendataanWrapper" class="hidden p-6 bg-[#f8f6ff] dark:bg-purple-900/10 rounded-3xl border border-purple-100/50 dark:border-purple-900/30 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col gap-5">
+              <div class="flex items-center justify-between pb-2 border-b border-purple-100/50 dark:border-purple-800/50">
                 <div class="flex items-center gap-2">
                   <i data-lucide="clipboard-list" class="w-5 h-5 text-purple-600 dark:text-purple-400"></i>
-                  <h3 class="font-extrabold text-base tracking-tight text-slate-900 dark:text-white">Pendataan Terbaru</h3>
+                  <h3 class="font-black text-base tracking-tight text-slate-900 dark:text-white">Pendataan Terbaru</h3>
                 </div>
                 <button onclick="switchTab('announce')" class="text-[10px] font-black uppercase tracking-wider text-purple-600 hover:underline">Lihat Semua</button>
               </div>
               <div id="dashPendataanContent" class="flex flex-col gap-3">
-                 </div>
+                 <!-- JS akan menyuntikkan isi disini -->
+              </div>
             </div>
 
-            <div class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg border border-slate-200/60 dark:border-zinc-800/60 shadow-lg shadow-black/5 flex flex-col gap-4">
-              <div class="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-3">
+            <!-- Status Kegiatan (Opsional, disembunyikan otomatis jika tidak ada) -->
+            <div class="p-6 bg-white dark:bg-zinc-900 rounded-3xl border border-slate-100 dark:border-zinc-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col gap-5">
+              <div class="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-zinc-800">
                 <div class="flex items-center gap-2">
                   <i data-lucide="calendar" class="w-5 h-5 text-ios-blue"></i>
-                  <h3 class="font-extrabold text-lg tracking-tight">Status Kegiatan & Jadwal</h3>
+                  <h3 class="font-black text-base tracking-tight text-slate-900 dark:text-white">Status Kegiatan & Jadwal</h3>
                 </div>
                 <button onclick="switchTab('announce')" class="text-xs font-bold text-ios-blue hover:underline">Lihat Jadwal Penuh</button>
               </div>
-              
-              <div id="dashScheduleFlowWrapper" class="flex flex-col gap-4">
-                </div>
-
-              <div class="bg-slate-50 dark:bg-zinc-800/40 p-3.5 rounded-ios-md border border-slate-100 dark:border-zinc-800/60 mt-1">
-                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Seragam Dinas Hari Ini:</span>
-                <p id="dashPakaianText" class="font-extrabold text-sm text-slate-900 dark:text-white">Pakaian Dinas Harian (PDH)</p>
-              </div>
-
+              <div id="dashScheduleFlowWrapper" class="flex flex-col gap-4"></div>
             </div>
 
+          </div>
+
+          <!-- KANAN: SIDE PANEL (Span 1) -->
           <div class="flex flex-col gap-6">
             
-            <div class="p-6 bg-gradient-to-br from-slate-950 via-slate-900 to-zinc-900 text-white rounded-ios-lg shadow-xl flex flex-col items-center justify-center text-center gap-1 border border-white/10">
-              <i data-lucide="clock" class="w-8 h-8 text-ios-blue mb-2"></i>
+            <!-- Card 3: Clock (Dikembalikan ke mode Gelap/Dark) -->
+            <div class="p-6 bg-[#111827] dark:bg-zinc-900 text-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.15)] flex flex-col items-center justify-center text-center gap-2 min-h-[160px]">
+              <i data-lucide="clock" class="w-8 h-8 text-[#007aff] mb-1"></i>
               <h2 id="realTimeClock" class="text-4xl font-black tracking-tight">--:--:--</h2>
-              <p id="realTimeDate" class="text-[10px] text-slate-400 font-extrabold tracking-widest uppercase">Memuat...</p>
+              <p id="realTimeDate" class="text-[10px] text-slate-400 font-bold tracking-widest uppercase mt-1">Memuat...</p>
             </div>
 
-            <div class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg border border-slate-200/60 dark:border-zinc-800/60 shadow-lg shadow-black/5 flex flex-col gap-3">
-              <div class="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-3">
-                <h3 class="font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">Pengumuman Umum</h3>
+            <!-- Card 4: Pengumuman Umum -->
+            <div class="p-6 bg-white dark:bg-zinc-900 rounded-3xl border border-slate-100 dark:border-zinc-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col gap-4">
+              <div class="flex items-center justify-between">
+                <h3 class="font-black text-lg tracking-tight text-slate-900 dark:text-white">Pengumuman Umum</h3>
                 <button onclick="openEditGeneralAnnounceModal()" class="admin-piket-only hidden text-xs font-bold text-ios-blue hover:underline">Edit</button>
               </div>
-              <p id="dashGeneralAnnouncement" class="text-sm text-slate-600 dark:text-zinc-300 bg-blue-50/40 dark:bg-zinc-800/30 p-4 rounded-ios-md border-l-4 border-ios-blue leading-relaxed">
-                Selamat datang di E-Arvy. Silakan laksanakan presensi harian tepat waktu.
-              </p>
+              <div class="bg-[#f8f9fa] dark:bg-zinc-800/40 p-4 rounded-2xl border border-slate-100 dark:border-zinc-800/60 border-l-4 border-l-ios-blue">
+                <p id="dashGeneralAnnouncement" class="text-sm text-slate-600 dark:text-zinc-300 leading-relaxed">
+                  Selamat datang di E-Arvy. Silakan laksanakan presensi harian tepat waktu.
+                </p>
+              </div>
             </div>
 
-            <div class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg border border-slate-200/60 dark:border-zinc-800/60 shadow-lg shadow-black/5 flex flex-col gap-4">
-              <div class="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-3">
-                <h3 class="font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">Petugas Piket Batalyon</h3>
+            <!-- Card 5: Gabungan Pakaian & Petugas Piket -->
+            <div class="p-6 bg-white dark:bg-zinc-900 rounded-3xl border border-slate-100 dark:border-zinc-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col gap-5">
+              <div class="flex items-center justify-between">
+                <h3 class="font-black text-lg tracking-tight text-slate-900 dark:text-white">Pakaian & Petugas Piket</h3>
                 <button onclick="switchTab('announce')" class="admin-piket-only hidden text-xs font-bold text-ios-blue hover:underline">Edit</button>
               </div>
 
+              <!-- Bagian Pakaian -->
+              <div class="bg-[#f8f9fa] dark:bg-zinc-800/40 p-4 rounded-2xl border border-slate-100 dark:border-zinc-800/60">
+                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Seragam Dinas Hari Ini:</span>
+                <p id="dashPakaianText" class="font-extrabold text-sm text-slate-900 dark:text-white">Pakaian Dinas Lapangan (PDL) + Baret</p>
+              </div>
+
+              <!-- Bagian Profil Petugas -->
               <div class="flex flex-col gap-3">
-                <div class="p-3.5 bg-slate-50 dark:bg-zinc-800/40 rounded-ios-md border border-slate-100 dark:border-zinc-800/60 flex justify-between items-center">
+                <div class="p-3 bg-[#f8f9fa] dark:bg-zinc-800/40 rounded-2xl border border-slate-100 dark:border-zinc-800/60 flex justify-between items-center">
                   <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full border border-ios-blue/30 overflow-hidden bg-slate-200 flex items-center justify-center shadow-inner">
-                      <img id="dashPiketPaAvatar" src="" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100?text=Pa'">
+                    <div class="w-10 h-10 rounded-full border border-slate-200 overflow-hidden bg-slate-200 flex items-center justify-center text-slate-400 font-bold text-sm">
+                      <img id="dashPiketPaAvatar" src="" class="w-full h-full object-cover hidden" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                      <span>Pa</span>
                     </div>
                     <div>
-                      <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">Piket Batalyon Putra</span>
-                      <h4 id="dashPiketBatPaName" class="text-xs font-extrabold text-slate-900 dark:text-white">-</h4>
+                      <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">Piket Batalyon Putra</span>
+                      <h4 id="dashPiketBatPaName" class="text-xs font-black text-slate-900 dark:text-white">-</h4>
                     </div>
                   </div>
-                  <a id="dashPiketBatPaTg" target="_blank" href="#" class="p-2 rounded-full bg-blue-50 dark:bg-blue-950/50 text-ios-blue hover:bg-blue-100 transition-colors">
+                  <a id="dashPiketBatPaTg" target="_blank" href="#" class="p-2 text-ios-blue hover:opacity-80 transition-colors">
                     <i data-lucide="send" class="w-4 h-4"></i>
                   </a>
                 </div>
 
-                <div class="p-3.5 bg-slate-50 dark:bg-zinc-800/40 rounded-ios-md border border-slate-100 dark:border-zinc-800/60 flex justify-between items-center">
+                <div class="p-3 bg-[#f8f9fa] dark:bg-zinc-800/40 rounded-2xl border border-slate-100 dark:border-zinc-800/60 flex justify-between items-center">
                   <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full border border-ios-blue/30 overflow-hidden bg-slate-200 flex items-center justify-center shadow-inner">
-                      <img id="dashPiketPiAvatar" src="" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100?text=Pi'">
+                    <div class="w-10 h-10 rounded-full border border-slate-200 overflow-hidden bg-slate-200 flex items-center justify-center text-slate-400 font-bold text-sm">
+                      <img id="dashPiketPiAvatar" src="" class="w-full h-full object-cover hidden" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                      <span>Pi</span>
                     </div>
                     <div>
-                      <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">Piket Batalyon Putri</span>
-                      <h4 id="dashPiketBatPiName" class="text-xs font-extrabold text-slate-900 dark:text-white">-</h4>
+                      <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">Piket Batalyon Putri</span>
+                      <h4 id="dashPiketBatPiName" class="text-xs font-black text-slate-900 dark:text-white">-</h4>
                     </div>
                   </div>
-                  <a id="dashPiketBatPiTg" target="_blank" href="#" class="p-2 rounded-full bg-blue-50 dark:bg-blue-950/50 text-ios-blue hover:bg-blue-100 transition-colors">
+                  <a id="dashPiketBatPiTg" target="_blank" href="#" class="p-2 text-ios-blue hover:opacity-80 transition-colors">
                     <i data-lucide="send" class="w-4 h-4"></i>
                   </a>
                 </div>
@@ -1072,7 +1088,7 @@
     const DEFAULT_SVG_LOGO = `<img src="https://www.image2url.com/r2/default/images/1781409226493-1bc2a13a-36c6-4972-9a1c-6114ed273acc.png" class="w-14 h-14 object-contain rounded drop-shadow-lg" alt="Logo Header">`;
 
     let appData = {
-      settings: { total_batalyon: 600, total_putra: 333, total_putri: 267, general_announcement: "Selamat datang di E-Arvy. Silakan laksanakan presensi harian tepat waktu.", custom_logo: "" },
+      settings: { total_batalyon: 598, total_putra: 332, total_putri: 266, general_announcement: "Selamat datang di E-Arvy. Silakan laksanakan presensi harian tepat waktu.", custom_logo: "" },
       prodis: [], cadets: {}, schedules: [], kepulangan: [], announcements: [], latestAttendance: null, historyAttendance: []
     };
 
