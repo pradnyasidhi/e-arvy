@@ -294,8 +294,9 @@
     <div class="flex w-full max-w-4xl h-[560px] bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl overflow-hidden border border-white/20 dark:border-zinc-800/40 animate-fadeIn">
 
       <div class="relative hidden md:flex w-1/2 bg-cover bg-center items-end justify-center" style="background-image: url('https://fsp.idu.ac.id/storage/slideshow/0-1768203046.jpg');">
-        <div class="relative z-20 text-black text-xs font-semibold pb-6 opacity-50 text-center tracking-wide">
-          INFORMATICS © 2026 </div>
+        <div class="relative z-20 pb-6 text-center text-[10px] font-bold tracking-widest uppercase text-black opacity-50">
+          Ni Komang Pradnya © 2026 · Informatika UNHAN RI
+        </div>
       </div>
 
       <div class="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center bg-white dark:bg-zinc-900">
@@ -397,7 +398,7 @@
         <!-- Welcome Banner with Glow Effect -->
         <div class="p-6 rounded-ios-lg bg-gradient-to-r from-ios-blue via-blue-600 to-indigo-600 text-white flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-[0_0_20px_rgba(0,122,255,0.4)]">
           <div class="flex flex-col gap-1">
-            <h2 class="text-xl sm:text-2xl font-black tracking-tight">Portal e-Arvy #6</h2>
+            <h2 class="text-xl sm:text-2xl font-black tracking-tight">Portal e-Arvy #6 (Tahap Pengembangan)</h2>
             <p class="text-sm text-blue-100 font-medium">Batalyon Nara Arvyaksa - Sistem Interoperabilitas & Presensi Terpadu</p>
           </div>
           <button onclick="switchTab('kehadiran')" class="px-5 py-2.5 bg-white text-ios-blue font-bold text-sm rounded-ios-md hover:bg-slate-50 active:scale-95 transition-all shadow-md">
@@ -938,6 +939,11 @@
         </div>
 
       </section>
+<footer class="mt-auto pt-8 pb-4 text-center w-full">
+        <p class="text-[10px] font-bold tracking-widest uppercase text-slate-400 dark:text-zinc-600">
+          Ni Komang Pradnya © 2026 · Informatika UNHAN RI         
+</p>
+      </footer>
     </main>
   </div>
 
@@ -964,12 +970,21 @@
       
       <!-- Sistem Navigasi Tab -->
       <div class="flex gap-2 bg-slate-100 dark:bg-zinc-800/80 p-1 rounded-ios-md">
-        <button onclick="switchRecapTab('text')" id="recapTabBtnText" class="flex-1 py-2 rounded-ios-sm text-sm font-bold bg-white dark:bg-zinc-700 shadow-sm text-slate-800 dark:text-white transition-all">Teks Rekap</button>
-        <button onclick="switchRecapTab('evidence')" id="recapTabBtnEvidence" class="flex-1 py-2 rounded-ios-sm text-sm font-bold text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-white transition-all">Kumpulan Bukti</button>
-      </div>
+  <button onclick="switchRecapTab('text')" id="recapTabBtnText" class="flex-1 py-2 rounded-ios-sm text-sm font-bold bg-white dark:bg-zinc-700 shadow-sm text-slate-800 dark:text-white transition-all">Teks Rekap</button>
+  
+  <button onclick="switchRecapTab('evidence')" id="recapTabBtnEvidence" class="hidden flex-1 py-2 rounded-ios-sm text-sm font-bold text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-white transition-all">Kumpulan Bukti</button>
+</div>
 
       <!-- Konten Tab: Teks Rekap -->
       <div id="recapTabContentText" class="flex flex-col gap-4">
+        
+        <!-- Opsi Filter Khusus Batalyon -->
+        <div id="recapFilterOptions" class="hidden flex bg-slate-100 dark:bg-zinc-800/80 p-1 rounded-ios-md border border-slate-200/40 dark:border-zinc-700/60 -mb-2">
+          <button type="button" onclick="applyRecapFilter('Batalyon')" id="recap-filter-batalyon" class="flex-1 text-center py-2 rounded-ios-sm text-xs font-bold transition-all text-slate-800 bg-white dark:bg-zinc-700 dark:text-white shadow-sm">Keseluruhan</button>
+          <button type="button" onclick="applyRecapFilter('Putra')" id="recap-filter-putra" class="flex-1 text-center py-2 rounded-ios-sm text-xs font-bold transition-all text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-zinc-200">Khusus Putra</button>
+          <button type="button" onclick="applyRecapFilter('Putri')" id="recap-filter-putri" class="flex-1 text-center py-2 rounded-ios-sm text-xs font-bold transition-all text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-zinc-200">Khusus Putri</button>
+        </div>
+
         <textarea id="recapTextarea" readonly class="w-full h-72 sm:h-96 p-3 bg-slate-50 dark:bg-zinc-800 text-xs font-mono rounded-ios-md border border-slate-200 dark:border-zinc-700 focus:outline-none resize-none text-slate-800 dark:text-zinc-200"></textarea>
         <div class="grid grid-cols-2 gap-3">
           <button onclick="closeModal('recapModal')" class="py-2.5 rounded-ios-md bg-slate-200 dark:bg-zinc-800 text-slate-800 dark:text-white font-bold text-sm">Tutup</button>
@@ -1347,7 +1362,8 @@ storage.removeItem = function(key) {
             for (let st in groupedStatus) {
                 textRecap += `${st.toUpperCase()} (${groupedStatus[st].length})\n`;
                 groupedStatus[st].forEach(a => {
-                    textRecap += `- ${a.cadetName} (${a.status}${a.reason ? ': ' + a.reason : ''})\n`;
+                    textRecap += `- ${a.cadetName} ${a.reason ? '(' + a.reason + ')' : ''}\n`;
+
                     });
                     textRecap += `\n`;
             }
@@ -1961,12 +1977,7 @@ updateDashboardPendataan();
         };
         reader.readAsDataURL(file);
       }
-    }
-
-    function viewLastRecapDetail() {
-      if (appData.latestAttendance) { document.getElementById('recapTextarea').value = appData.latestAttendance.recapText; openModal('recapModal'); } 
-      else showToast('Log Kosong', 'Belum ada log presensi.', 'warning');
-    }
+    }     
 
     function setCategory(cat) {
       activeCategory = cat;
@@ -2663,26 +2674,41 @@ function markAsUnsaved(prodiId) {
         loadDashboardAndAppData(); showToast('Verifikasi Permanen', 'Selesai dan Akses Dikunci.', 'success');
       }, () => { btn.innerHTML = '<i data-lucide="check-circle2" class="w-4.5 h-4.5"></i> Verifikasi'; showToast('Gagal', 'Terjadi kesalahan.', 'error'); });
     }
-// === FUNGSI TAB & GALERI REKAP BUKTI ===
-    function switchRecapTab(tab) {
-      const btnText = document.getElementById('recapTabBtnText');
-      const btnEvidence = document.getElementById('recapTabBtnEvidence');
-      const contentText = document.getElementById('recapTabContentText');
-      const contentEvidence = document.getElementById('recapTabContentEvidence');
 
-      const activeClass = "flex-1 py-2 rounded-ios-sm text-sm font-bold bg-white dark:bg-zinc-700 shadow-sm text-slate-800 dark:text-white transition-all";
-      const inactiveClass = "flex-1 py-2 rounded-ios-sm text-sm font-bold text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-white transition-all";
+    // === FUNGSI TAB & GALERI REKAP BUKTI ===
+let currentViewedLog = null; 
 
-      if (tab === 'text') {
-        btnText.className = activeClass; btnEvidence.className = inactiveClass;
-        contentText.classList.remove('hidden'); contentText.classList.add('flex');
-        contentEvidence.classList.add('hidden'); contentEvidence.classList.remove('flex');
-      } else {
-        btnEvidence.className = activeClass; btnText.className = inactiveClass;
-        contentEvidence.classList.remove('hidden'); contentEvidence.classList.add('flex');
-        contentText.classList.add('hidden'); contentText.classList.remove('flex');
-      }
-    }
+function switchRecapTab(tab) {
+  // Cek otorisasi user
+  const isAuthorized = ['Admin', 'Piket', 'Pokdo', 'Pengasuh'].includes(currentUser.role);
+  
+  if (tab === 'evidence' && !isAuthorized) {
+    showToast('Akses Ditolak', 'Kumpulan bukti foto hanya dapat dilihat oleh Piket/Pokdo.', 'error');
+    return;
+  }
+
+  const btnText = document.getElementById('recapTabBtnText');
+  const btnEvidence = document.getElementById('recapTabBtnEvidence');
+  const contentText = document.getElementById('recapTabContentText');
+  const contentEvidence = document.getElementById('recapTabContentEvidence');
+
+  const activeClass = "flex-1 py-2 rounded-ios-sm text-sm font-bold bg-white dark:bg-zinc-700 shadow-sm text-slate-800 dark:text-white transition-all";
+  const inactiveClass = "flex-1 py-2 rounded-ios-sm text-sm font-bold text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-white transition-all";
+
+  if (tab === 'text') {
+    btnText.className = activeClass; 
+    if (isAuthorized) btnEvidence.className = inactiveClass; // Hanya ubah class jika memiliki akses
+    
+    contentText.classList.remove('hidden'); contentText.classList.add('flex');
+    contentEvidence.classList.add('hidden'); contentEvidence.classList.remove('flex');
+  } else if (tab === 'evidence' && isAuthorized) {
+    btnEvidence.className = activeClass; 
+    btnText.className = inactiveClass;
+    
+    contentEvidence.classList.remove('hidden'); contentEvidence.classList.add('flex');
+    contentText.classList.add('hidden'); contentText.classList.remove('flex');
+  }
+}
 
     function renderEvidenceGallery(absentsArray) {
       const evContainer = document.getElementById('recapEvidenceContainer');
@@ -2715,28 +2741,147 @@ function markAsUnsaved(prodiId) {
       lucide.createIcons();
     }
 
-    // Mengganti fungsi viewLastRecapDetail bawaan
-    function viewLastRecapDetail() {
-      if (appData.latestAttendance) { 
-        document.getElementById('recapTextarea').value = appData.latestAttendance.recapText; 
-        renderEvidenceGallery(appData.latestAttendance.absents);
-        switchRecapTab('text'); 
-        openModal('recapModal'); 
-      } else {
-        showToast('Data Kosong', 'Belum ada log presensi.', 'warning');
-      }
+    function applyRecapFilter(mode) {
+      if (!currentViewedLog) return;
+      
+      ['batalyon', 'putra', 'putri'].forEach(b => {
+        const btn = document.getElementById(`recap-filter-${b}`);
+        if (btn) {
+          btn.className = b === mode.toLowerCase() 
+            ? "flex-1 text-center py-2 rounded-ios-sm text-xs font-bold bg-white text-slate-800 dark:bg-zinc-700 dark:text-white shadow-sm transition-all" 
+            : "flex-1 text-center py-2 rounded-ios-sm text-xs font-bold text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-zinc-200 transition-all";
+        }
+      });
+
+      document.getElementById('recapTextarea').value = buildDynamicRecapText(currentViewedLog, mode);
     }
 
-    // Mengganti fungsi viewHistoryRecap bawaan
-    function viewHistoryRecap(logId) {
-      const item = appData.historyAttendance.find(h => h.logId === logId);
-      if (item) { 
-        document.getElementById('recapTextarea').value = item.recapText; 
-        renderEvidenceGallery(item.absents);
-        switchRecapTab('text'); 
-        openModal('recapModal'); 
+    function buildDynamicRecapText(log, mode) {
+      // Jika mode Batalyon, panggil langsung data aslinya
+      if (mode === 'Batalyon') return log.recapText;
+
+      const isPutra = mode === 'Putra';
+      const targetGender = isPutra ? 'Laki-Laki' : 'Perempuan';
+      const totalQuota = isPutra ? (appData.settings.total_putra || 0) : (appData.settings.total_putri || 0);
+
+      const filteredAbsents = log.absents.filter(a => {
+        const pCadets = appData.cadets[a.prodiName] || [];
+        const cadet = pCadets.find(c => c.name === a.cadetName);
+        return cadet && cadet.gender === targetGender;
+      });
+
+      const absentCount = filteredAbsents.length;
+      const presentCount = totalQuota - absentCount;
+
+      const dateObj = new Date(log.date);
+      const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+      const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+      const formattedDate = `${days[dateObj.getDay()]}, ${dateObj.getDate()} ${months[dateObj.getMonth()]} ${dateObj.getFullYear()}`;
+
+      let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET ${mode.toUpperCase()} (${formattedDate.toUpperCase()})\n\n`;
+      text += `JUMLAH   : ${totalQuota}\n`;
+      text += `KURANG   : ${absentCount}\n`;
+      text += `HADIR    : ${presentCount}\n\n`;
+      text += `KETERANGAN:\n`;
+
+      if (absentCount === 0) {
+        text += `LENGKAP\n\n`;
+      } else {
+        const groupedStatus = {};
+        filteredAbsents.forEach(a => {
+            if (!groupedStatus[a.status]) groupedStatus[a.status] = [];
+            groupedStatus[a.status].push(a);
+        });
+        for (let st in groupedStatus) {
+            text += `${st.toUpperCase()} (${groupedStatus[st].length})\n`;
+            groupedStatus[st].forEach(a => {
+                text += `- ${a.cadetName} ${a.reason ? '(' + a.reason + ')' : ''}\n`;
+});
+            text += `\n`;
+        }
       }
+
+      text += `REKAPITULASI PRODI (${mode.toUpperCase()}):\n\n`;
+
+      appData.prodis.forEach(p => {
+        const pCadets = (appData.cadets[p.currentName] || []).filter(c => c.gender === targetGender);
+        const pTotal = pCadets.length;
+        
+        if (pTotal > 0) {
+          const pAbsents = filteredAbsents.filter(a => a.prodiName === p.currentName);
+          const pKurang = pAbsents.length;
+          const pHadir = pTotal - pKurang;
+
+          text += `• ${p.currentName}:\n`;
+          text += `JUMLAH: ${pTotal}\n`;
+          text += `KURANG: ${pKurang}\n`;
+          text += `HADIR: ${pHadir}\n`;
+          text += `KETERANGAN:\n`;
+
+          if (pKurang === 0) {
+            text += `LENGKAP\n\n\n`;
+          } else {
+            pAbsents.forEach(a => {
+              text += `- ${a.cadetName} (${a.status}${a.reason ? ': ' + a.reason : ''})\n`;
+            });
+            text += `\n`;
+          }
+        }
+      });
+
+      return text;
     }
+
+
+    function viewLastRecapDetail() {
+  if (appData.latestAttendance) { 
+    currentViewedLog = appData.latestAttendance;
+    
+    const filterEl = document.getElementById('recapFilterOptions');
+    if (currentViewedLog.category === 'Batalyon') filterEl.classList.remove('hidden');
+    else filterEl.classList.add('hidden');
+
+    // Tampilkan tombol "Kumpulan Bukti" HANYA JIKA user berwenang
+    const isAuthorized = ['Admin', 'Piket', 'Pokdo', 'Pengasuh'].includes(currentUser.role);
+    const evidenceBtn = document.getElementById('recapTabBtnEvidence');
+    if (evidenceBtn) {
+      if (isAuthorized) evidenceBtn.classList.remove('hidden');
+      else evidenceBtn.classList.add('hidden');
+    }
+
+    applyRecapFilter('Batalyon'); 
+    renderEvidenceGallery(appData.latestAttendance.absents);
+    switchRecapTab('text'); 
+    openModal('recapModal'); 
+  } else {
+    showToast('Data Kosong', 'Belum ada log presensi.', 'warning');
+  }
+}
+
+   
+    function viewHistoryRecap(logId) {
+  const item = appData.historyAttendance.find(h => h.logId === logId);
+  if (item) { 
+    currentViewedLog = item;
+
+    const filterEl = document.getElementById('recapFilterOptions');
+    if (currentViewedLog.category === 'Batalyon') filterEl.classList.remove('hidden');
+    else filterEl.classList.add('hidden');
+
+    // Tampilkan tombol "Kumpulan Bukti" HANYA JIKA user berwenang
+    const isAuthorized = ['Admin', 'Piket', 'Pokdo', 'Pengasuh'].includes(currentUser.role);
+    const evidenceBtn = document.getElementById('recapTabBtnEvidence');
+    if (evidenceBtn) {
+      if (isAuthorized) evidenceBtn.classList.remove('hidden');
+      else evidenceBtn.classList.add('hidden');
+    }
+
+    applyRecapFilter('Batalyon'); 
+    renderEvidenceGallery(item.absents);
+    switchRecapTab('text'); 
+    openModal('recapModal');
+  }
+}
 
     function copyRecapText() {
       const t = document.getElementById('recapTextarea'); t.select(); t.setSelectionRange(0, 99999);
@@ -2915,15 +3060,21 @@ function markAsUnsaved(prodiId) {
       const content = document.getElementById('detailAbsModalContent'); content.innerHTML = '';
       if (!item.absents || item.absents.length === 0) { content.innerHTML = `<div class="text-center py-8 text-slate-400 italic">Hadir Lengkap.</div>`; openModal('detailAbsentsModal'); return; }
 
+      // 1. Cek apakah user adalah Piket/Admin/Pokdo
+      const isAuthorized = ['Admin', 'Piket', 'Pokdo', 'Pengasuh'].includes(currentUser.role);
+
       const grouped = {}; item.absents.forEach(a => { if(!grouped[a.status]) grouped[a.status] = []; grouped[a.status].push(a); });
       for (const status in grouped) {
         let listHtml = '';
           grouped[status].forEach(cad => {
-            const imgHtml = cad.attachmentBase64 ? `<div class="mt-2 w-36 h-20 border dark:border-zinc-700 rounded cursor-zoom-in" onclick="viewDocumentedPhoto('${cad.cadetName}', '${cad.attachmentBase64}')"><img src="${cad.attachmentBase64}" class="w-full h-full object-cover"></div>` : '';
+            
+            // 2. Hanya render gambar/foto JIKA user memiliki otorisasi
+            const imgHtml = (cad.attachmentBase64 && isAuthorized) ? `<div class="mt-2 w-36 h-20 border dark:border-zinc-700 rounded cursor-zoom-in" onclick="viewDocumentedPhoto('${cad.cadetName}', '${cad.attachmentBase64}')"><img src="${cad.attachmentBase64}" class="w-full h-full object-cover"></div>` : '';
+            
             listHtml += `<div class="text-xs leading-relaxed pl-1 border-l-2 border-ios-blue/40 mt-2"><div><span class="font-extrabold text-slate-900 dark:text-white">${cad.cadetName}</span> <span class="text-[10px] text-slate-500 block">Keterangan: ${cad.reason ? `${cad.reason}` : ''}</span></div>${imgHtml}</div>`;
           });
           content.innerHTML += `<div class="flex flex-col gap-2 p-3 bg-slate-50 dark:bg-zinc-800/60 dark:border-zinc-700/60 rounded-ios-md border"><div class="border-b dark:border-zinc-700 pb-1.5 font-black text-ios-blue text-xs uppercase">${status} (${grouped[status].length})</div>${listHtml}</div>`;
-}
+      }
       openModal('detailAbsentsModal');
     }
 
@@ -2995,8 +3146,7 @@ function markAsUnsaved(prodiId) {
 
       if (filtered.length === 0) { tbody.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-slate-400 italic">Tidak ada log.</td></tr>`; return; }
       
-      let tableHtml = ''; // VAR PENAMPUNG STRING
-      
+      let tableHtml = '';       
       filtered.forEach(l => {
           tableHtml += `
           <tr class="border-b dark:border-zinc-800/60 text-xs">
@@ -3012,7 +3162,7 @@ function markAsUnsaved(prodiId) {
         `;
       });
       
-      tbody.innerHTML = tableHtml; // RENDER DOM SEKALI
+      tbody.innerHTML = tableHtml; 
       lucide.createIcons();
     }
 
