@@ -2028,44 +2028,97 @@ updateDashboardPendataan();
     }
 
     // Interactive Search Logic
-    function searchCadet() {
+    // --- FITUR AUTO-SUGGEST PENCARIAN KADET ---
+    function handleSearchInput() {
       const query = document.getElementById('searchCadetInput').value.toLowerCase().trim();
-      if (!query) return;
+      const box = document.getElementById('searchSuggestionsBox');
 
-      let found = false;
+      // Sembunyikan pop-up jika ketikan kurang dari 2 huruf
+      if (query.length < 2) {
+        box.classList.add('hidden');
+        box.classList.remove('flex');
+        box.innerHTML = '';
+        return;
+      }
+
+      let results = [];
+      // Cari kecocokan nama di semua prodi
       for (const prodi of appData.prodis) {
         const cadets = appData.cadets[prodi.currentName] || [];
         for (const c of cadets) {
           if (c.name.toLowerCase().includes(query)) {
-            // Found it. 
-            activeCategory = 'Batalyon';
-            setCategory('Batalyon'); // ensure Batalyon view to see all
-            
-            setTimeout(() => {
-              // Open kompi
-              const kompiBody = document.getElementById(`company-body-${prodi.kompiNumber}`);
-              if (kompiBody && kompiBody.classList.contains('hidden')) toggleCompanySection(prodi.kompiNumber);
-              
-              // Open prodi
-              const prodiBody = document.getElementById(`prodi-body-${prodi.prodiId}`);
-              if (prodiBody && prodiBody.classList.contains('hidden')) toggleProdiSection(prodi.prodiId);
-              
-              // Scroll and Highlight
-              const row = document.getElementById(`cadet-row-${prodi.prodiId}-${c.no}`);
-              if (row) {
-                row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                row.classList.add('highlight-search');
-                setTimeout(() => row.classList.remove('highlight-search'), 3000);
-              }
-            }, 100);
-            found = true;
-            break;
+            results.push({ cadet: c, prodi: prodi });
+            if (results.length >= 10) break; // Batasi maksimal 10 hasil agar tidak nge-lag
           }
         }
-        if(found) break;
+        if (results.length >= 10) break;
       }
-      if (!found) showToast('Tidak Ditemukan', `Kadet dengan nama "${query}" tidak ditemukan.`, 'error');
+
+      if (results.length === 0) {
+        box.innerHTML = `<div class="p-4 text-xs text-slate-400 text-center italic">Tidak ada nama yang cocok.</div>`;
+        box.classList.remove('hidden'); box.classList.add('flex');
+        return;
+      }
+
+      let html = '';
+      results.forEach(res => {
+        // Efek teks tebal biru pada huruf yang diketik
+        const regex = new RegExp(`(${query})`, "gi");
+        const highlightedName = res.cadet.name.replace(regex, "<span class='text-ios-blue font-black'>$1</span>");
+
+        html += `
+          <div onclick="executeSearchAction(${res.prodi.kompiNumber}, ${res.prodi.prodiId}, ${res.cadet.no}, '${res.cadet.name}')" class="p-3 hover:bg-blue-50 dark:hover:bg-zinc-700 cursor-pointer border-b border-slate-100 dark:border-zinc-700/50 last:border-0 transition-colors flex flex-col gap-1">
+            <span class="text-xs font-bold text-slate-900 dark:text-white leading-tight">${highlightedName}</span>
+            <span class="text-[9px] font-black uppercase tracking-widest text-slate-400">${res.prodi.currentName} &bull; Kompi ${res.prodi.kompiNumber}</span>
+          </div>
+        `;
+      });
+
+      box.innerHTML = html;
+      box.classList.remove('hidden');
+      box.classList.add('flex');
     }
+
+    function executeSearchAction(kompiNum, prodiId, cadetNo, cadetName) {
+      // 1. Sembunyikan kotak pop-up dan kembalikan teks input ke nama yang dipilih
+      const box = document.getElementById('searchSuggestionsBox');
+      box.classList.add('hidden'); box.classList.remove('flex');
+      document.getElementById('searchCadetInput').value = cadetName;
+
+      // 2. Ubah kategori ke Batalyon (agar Kadet PA/PI tetap terlihat)
+      activeCategory = 'Batalyon';
+      setCategory('Batalyon');
+
+      // 3. Jeda sedikit untuk menunggu DOM selesai merender sebelum Scroll
+      setTimeout(() => {
+        // Buka Tab Kompi jika sedang tertutup
+        const kompiBody = document.getElementById(`company-body-${kompiNum}`);
+        if (kompiBody && kompiBody.classList.contains('hidden')) toggleCompanySection(kompiNum);
+
+        // Buka Tab Prodi jika sedang tertutup
+        const prodiBody = document.getElementById(`prodi-body-${prodiId}`);
+        if (prodiBody && prodiBody.classList.contains('hidden')) toggleProdiSection(prodiId);
+
+        // Scroll (Gulir) ke baris Kadet dan berikan efek Highlight
+        const row = document.getElementById(`cadet-row-${prodiId}-${cadetNo}`);
+        if (row) {
+          row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          row.classList.add('highlight-search');
+          setTimeout(() => row.classList.remove('highlight-search'), 3000);
+        }
+      }, 150);
+    }
+
+    // Menutup Pop-up Suggestion jika mengklik sembarang tempat di luar kotak pencarian
+    document.addEventListener('click', function(event) {
+      const box = document.getElementById('searchSuggestionsBox');
+      const searchInput = document.getElementById('searchCadetInput');
+      if (box && searchInput && event.target !== searchInput && !box.contains(event.target)) {
+         box.classList.add('hidden');
+         box.classList.remove('flex');
+      }
+    });
+    // --- AKHIR FITUR AUTO-SUGGEST PENCARIAN KADET ---
 
     // Bulk Select Actions Array
     let bulkSelection = {};
