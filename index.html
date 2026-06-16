@@ -3079,8 +3079,10 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
             // 2. Hanya render gambar/foto JIKA user memiliki otorisasi
             const imgHtml = (cad.attachmentBase64 && isAuthorized) ? `<div class="mt-2 w-36 h-20 border dark:border-zinc-700 rounded cursor-zoom-in" onclick="viewDocumentedPhoto('${cad.cadetName}', '${cad.attachmentBase64}')"><img src="${cad.attachmentBase64}" class="w-full h-full object-cover"></div>` : '';
             
-            // 3. PERBAIKAN: Hanya render teks keterangan jika alasannya memang diisi
-            const reasonHtml = cad.reason ? `<span class="text-[10px] text-slate-500 block mt-0.5">Keterangan: ${cad.reason}</span>` : '';
+            // 3. PERBAIKAN FINAL: Cek spasi kosong, string "undefined", atau "null"
+            const cleanReason = (cad.reason && typeof cad.reason === 'string' && cad.reason.trim() !== '' && cad.reason !== 'undefined' && cad.reason !== 'null') ? cad.reason.trim() : null;
+            
+            const reasonHtml = cleanReason ? `<span class="text-[10px] text-slate-500 block mt-0.5">Keterangan: ${cleanReason}</span>` : '';
             
             listHtml += `<div class="text-xs leading-relaxed pl-1 border-l-2 border-ios-blue/40 mt-2"><div><span class="font-extrabold text-slate-900 dark:text-white">${cad.cadetName}</span>${reasonHtml}</div>${imgHtml}</div>`;
           });
