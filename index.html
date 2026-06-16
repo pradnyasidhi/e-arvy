@@ -3078,11 +3078,11 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
             
             // 2. Hanya render gambar/foto JIKA user memiliki otorisasi
             const imgHtml = (cad.attachmentBase64 && isAuthorized) ? `<div class="mt-2 w-36 h-20 border dark:border-zinc-700 rounded cursor-zoom-in" onclick="viewDocumentedPhoto('${cad.cadetName}', '${cad.attachmentBase64}')"><img src="${cad.attachmentBase64}" class="w-full h-full object-cover"></div>` : '';
-
-// 3. PERBAIKAN: Hanya render teks keterangan jika alasannya memang diisi
+            
+            // 3. PERBAIKAN: Hanya render teks keterangan jika alasannya memang diisi
             const reasonHtml = cad.reason ? `<span class="text-[10px] text-slate-500 block mt-0.5">Keterangan: ${cad.reason}</span>` : '';
             
-            listHtml += `<div class="text-xs leading-relaxed pl-1 border-l-2 border-ios-blue/40 mt-2"><div><span class="font-extrabold text-slate-900 dark:text-white">${cad.cadetName}</span> <span class="text-[10px] text-slate-500 block">Keterangan: ${cad.reason ? `${cad.reason}` : ''}</span></div>${imgHtml}</div>`;
+            listHtml += `<div class="text-xs leading-relaxed pl-1 border-l-2 border-ios-blue/40 mt-2"><div><span class="font-extrabold text-slate-900 dark:text-white">${cad.cadetName}</span>${reasonHtml}</div>${imgHtml}</div>`;
           });
           content.innerHTML += `<div class="flex flex-col gap-2 p-3 bg-slate-50 dark:bg-zinc-800/60 dark:border-zinc-700/60 rounded-ios-md border"><div class="border-b dark:border-zinc-700 pb-1.5 font-black text-ios-blue text-xs uppercase">${status} (${grouped[status].length})</div>${listHtml}</div>`;
       }
