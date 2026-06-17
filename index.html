@@ -292,7 +292,7 @@
     <div class="flex w-full max-w-4xl h-[560px] bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl overflow-hidden border border-white/20 dark:border-zinc-800/40 animate-fadeIn">
 
       <div class="relative hidden md:flex w-1/2 bg-cover bg-center items-end justify-center" style="background-image: url('https://fsp.idu.ac.id/storage/slideshow/0-1768203046.jpg');">
-        <div class="relative z-20 pb-6 text-center text-[10px] font-bold tracking-widest uppercase text-black opacity-50">
+        <div class="relative z-20 pb-6 text-center text-[8px] font-bold tracking-widest uppercase text-black opacity-50">
           Ni Komang Pradnya © 2026 · Informatika Cohort 6 UNHAN RI
         </div>
       </div>
@@ -947,7 +947,7 @@
       </section>
 <footer class="mt-auto pt-8 pb-4 text-center w-full">
         <p class="text-[10px] font-bold tracking-widest uppercase text-slate-400 dark:text-zinc-600">
-          Ni Komang Pradnya © 2026 · Informatika COHORT 6 UNHAN RI     
+          Ni Komang Pradnya © 2026 · Informatika COHORT 6 UNHAN RIS        
 </p>
       </footer>
     </main>
@@ -1147,7 +1147,7 @@ storage.removeItem = function(key) {
     }
 
     function initMockDatabase() {
-      if (!storage.getItem('e_arvy_initialized_real_data_v3')) {
+      if (!storage.getItem('e_arvy_initialized_real_data_v4')) {
         const defaultProdiList = [
           { prodiId: 1, originalName: "FK 1", currentName: "FK 1", kompiNumber: 1 },
           { prodiId: 2, originalName: "FM 1", currentName: "FM 1", kompiNumber: 1 },
@@ -1177,27 +1177,30 @@ storage.removeItem = function(key) {
         originalSetItem('e_arvy_prodis', JSON.stringify(defaultProdiList));
 
         const users = [
-  { 
-    username: 'admin', 
-    password: '3104618e4bc83ea9bf05bc73cd2e008ca128a1ce74bb8a7e04f0525d8f61c3de',
-    role: 'Admin', prodiName: '', kompiName: '', profilePhoto: '' 
-  },
-  { 
-    username: 'piket', 
-    password: '90a4dfb7d03197de7c2168537b036caefdb21ba48c5b98ec3496bc40eb7607ea',
-    role: 'Piket', prodiName: '', kompiName: '', profilePhoto: '' 
-  }
-];
+    { 
+      username: 'admin', 
+      // Biarkan browser yang menghitung hash aslinya!
+      password: CryptoJS.SHA256('0401072').toString(),
+      role: 'Admin', prodiName: '', kompiName: '', profilePhoto: '' 
+    },
+    { 
+      username: 'piket', 
+      password: CryptoJS.SHA256('piket6').toString(),
+      role: 'Piket', prodiName: '', kompiName: '', profilePhoto: '' 
+    }
+  ];
 
-defaultProdiList.forEach(p => users.push({ 
-  username: p.currentName.replace(/\s+/g, '').toLowerCase(), 
-  password: 'cohort6', 
-  role: 'Kopral Kadet', 
-  prodiName: p.currentName, 
-  kompiName: 'Kompi ' + p.kompiNumber, 
-  profilePhoto: '' 
-}));
-storage.setItem('e_arvy_users_v2', JSON.stringify(users));
+  defaultProdiList.forEach(p => users.push({ 
+    username: p.currentName.replace(/\s+/g, '').toLowerCase(), 
+    password: 'cohort6', 
+    role: 'Kopral Kadet', 
+    prodiName: p.currentName, 
+    kompiName: 'Kompi ' + p.kompiNumber, 
+    profilePhoto: '' 
+  }));
+
+  // Simpan dengan nama tabel v4
+  storage.setItem('e_arvy_users_v4', JSON.stringify(users))
         const rawCadetData = {
           "FK 1": [
             "KK KED ABIGAIL QUEENCYLA SAHARI SARAGIH", "KK KED ACHMAD ABRIELL NIZAR FAZARI PRASETYA", "KK KED ADELIA ZUKHRIFA AJANI", "KK KED ALFAURA SALSABILA", "KK KED ALIFIAN RASYIDI PUTRA ISBIANTO", "KK KED ALIYA ANASSHAFAH TANJUNG", "KK KED ALKAUSAR AMIN HUTAGAOL", "KK KED ALYSHA NADRA", "KK KED ANDIKA AHMAD ROZAN AQILAH", "KK KED ANINDYA WAHYU SYAZARISMA", "KK KED ANUGERAH PEKERTI TUMANGGOR", "KK KED ARDAN HIDAYAT", "KK KED ARKA ANANDETA PRATAMA", "KK KED ATHALAH NAKILLAYA DULLAYA WILOGO", "KK KED ATHALIA NASYWA TSANY", "KK KED ATIIQAH DIANIZZAH", "KK KED AULIA YASINA WIJAYA", "KK KED AURA RIZKA NOURMA GANIQ", "KK KED BEATRICE ALICIA HARDANI", "KK KED BENYAMIN FEBRIYAN SIMANJUNTAK", "KK KED BISMA ALFIN BERRY", "KK KED BRAM KAUTSAR SUTEJAPUTRA", "KK KED BUNGA KURNIA LESTARI", "KK KED CELVIN PARDAMEAN SIMORANGKIR"
@@ -1298,7 +1301,7 @@ const defaultSchedules = [
 originalSetItem('e_arvy_schedules', JSON.stringify(defaultSchedules));
 originalSetItem('e_arvy_kepulangan', JSON.stringify([]));
 originalSetItem('e_arvy_absence_statuses', JSON.stringify(['Sakit', 'Izin', 'Dinas Luar', 'Dinas Dalam', 'Gasuh', 'Kontrol', 'Rawat Jalan', 'Tanpa Keterangan']));
-originalSetItem('e_arvy_initialized_real_data_v3', 'true');
+originalSetItem('e_arvy_initialized_real_data_v4', 'true');
     }
   } 
 
@@ -1314,7 +1317,7 @@ originalSetItem('e_arvy_initialized_real_data_v3', 'true');
   }
     function simulateServerCall(methodName, params) {
       if (methodName === 'login') {
-  const users = JSON.parse(storage.getItem('e_arvy_users_v2')) || [];
+  const users = JSON.parse(storage.getItem('e_arvy_users_v4')) || [];
   
   const user = users.find(u => {
     if (u.username.toLowerCase() !== params.username.toLowerCase()) return false;
@@ -1523,7 +1526,7 @@ let textRecap = `DATA ${params.activityName.toUpperCase()} KOPRAL KADET${kategor
         return { success: true };
       }
      if (methodName === 'updateAccounts') {
-  const users = JSON.parse(storage.getItem('e_arvy_users_v2'));
+  const users = JSON.parse(storage.getItem('e_arvy_users_v4'));
   const idx = users.findIndex(u => u.username === params.targetUsername);
   
   if (idx !== -1) { 
@@ -1532,16 +1535,16 @@ let textRecap = `DATA ${params.activityName.toUpperCase()} KOPRAL KADET${kategor
     } else {
       users[idx].password = params.newPassword;
     }
-    storage.setItem('e_arvy_users_v2', JSON.stringify(users)); 
+    storage.setItem('e_arvy_users_v4', JSON.stringify(users)); 
   }
   
   logLocalActivity(params.username, `Ubah password: ${params.targetUsername}`);
   return { success: true };
 }
       if (methodName === 'updateProfilePhoto') {
-  const users = JSON.parse(storage.getItem('e_arvy_users_v2'));
+  const users = JSON.parse(storage.getItem('e_arvy_users_v4'));
   const idx = users.findIndex(u => u.username === params.username);
-  if (idx !== -1) { users[idx].profilePhoto = params.photoBase64; storage.setItem('e_arvy_users_v2', JSON.stringify(users)); }
+  if (idx !== -1) { users[idx].profilePhoto = params.photoBase64; storage.setItem('e_arvy_users_v4', JSON.stringify(users)); }
   return { success: true };
 }
       return null;
