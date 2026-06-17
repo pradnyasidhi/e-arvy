@@ -3901,8 +3901,7 @@ function updatePendataanCountdowns() {
         } else {
           const diffHrs = Math.floor(diffMs / 3600000);
           const diffMins = Math.floor((diffMs % 3600000) / 60000);
-          const diffSecs = Math.floor((diffMs % 60000) / 1000);
-          el.innerText = `${diffHrs}j ${diffMins}m ${diffSecs}d`;
+          el.innerText = `${diffHrs}j ${diffMins}m`;
           el.className = "text-[9px] font-black uppercase px-2 py-0.5 rounded bg-amber-100 text-ios-orange font-mono whitespace-nowrap border border-amber-200 animate-pulse";
         }
       };
