@@ -1636,6 +1636,11 @@ storage.removeItem('e_arvy_session');
     }
 
     function setupUserInterface() {
+if ('Notification' in window && Notification.permission !== 'granted') {
+        Notification.requestPermission().then(permission => {
+          if (permission === 'granted') console.log('Izin notifikasi diberikan!');
+        });
+      }
       document.getElementById('userHeaderName').innerText = currentUser.username;
       document.getElementById('userHeaderRole').innerText = currentUser.role;
       document.getElementById('userInfoHeader').classList.remove('hidden');
@@ -4203,7 +4208,7 @@ const logResults = await logQuery.find();
              }
            });
          }
-      }, 10000); 
+      }, 30000); 
     } catch (e) {
       console.error("Error saat inisialisasi:", e);
       setTimeout(() => document.getElementById('app-preloader')?.classList.add('preloader-hidden'), 200);
