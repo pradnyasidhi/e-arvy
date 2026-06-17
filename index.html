@@ -667,6 +667,21 @@
             <div class="flex-1 relative w-full h-full"><canvas id="pieChart"></canvas></div>
           </div>
         </div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg shadow-lg flex flex-col gap-4 min-h-[320px]">
+            <h4 class="font-extrabold text-base tracking-tight">Tren Kehadiran (30 Hari Terakhir)</h4>
+            <div class="flex-1 relative w-full h-full"><canvas id="lineChart"></canvas></div>
+          </div>
+          <div class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg shadow-lg flex flex-col gap-4 min-h-[320px]">
+            <h4 class="font-extrabold text-base tracking-tight">Proporsi Ketidakhadiran</h4>
+            <div class="flex-1 relative w-full h-full"><canvas id="pieChart"></canvas></div>
+          </div>
+          
+          <div class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg shadow-lg flex flex-col gap-4 min-h-[320px] lg:col-span-2">
+            <h4 class="font-extrabold text-base tracking-tight">Tren Ketidakhadiran (30 Hari Terakhir)</h4>
+            <div class="flex-1 relative w-full h-full"><canvas id="absenceLineChart"></canvas></div>
+          </div>
+          </div>
 
         <div class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg shadow-lg flex flex-col gap-4">
           <div class="flex justify-between items-center pb-2 border-b border-slate-100 dark:border-zinc-800/60">
@@ -1108,6 +1123,7 @@ let lastPendataanIds = [];
     let activeCategory = 'Batalyon';
     let lineChartInstance = null;
     let pieChartInstance = null;
+    let absenceLineChartInstance = null;
     let nextEventInterval = null;
 
     const storage = {
@@ -3181,13 +3197,21 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
 
       const days = Array.from({length: 30}, (_, i) => i + 1);
       const dataHadir = new Array(30).fill(100);
+      const dataAbsen = new Array(30).fill(0); // Tambahan: Array menyimpan jumlah absen
 
       days.forEach(day => {
         const dateStr = `2026-06-${day < 10 ? '0'+day : day}`;
         const log = appData.historyAttendance.find(l => l.date === dateStr && (act === 'semua' || l.activityName === act));
         if (log) {
-          if (lvl === 'Batalyon') dataHadir[day - 1] = (log.presentCount / log.totalCadets) * 100;
-          else if (lvl === 'Prodi') dataHadir[day - 1] = ((25 - log.absents.filter(a => a.prodiName === pd).length) / 25) * 100;
+          if (lvl === 'Batalyon') {
+            dataHadir[day - 1] = (log.presentCount / log.totalCadets) * 100;
+            dataAbsen[day - 1] = log.absentCount; // Tangkap jumlah orang absen
+          }
+          else if (lvl === 'Prodi') {
+            const absentCnt = log.absents.filter(a => a.prodiName === pd).length;
+            dataHadir[day - 1] = ((25 - absentCnt) / 25) * 100;
+            dataAbsen[day - 1] = absentCnt; // Tangkap jumlah orang absen
+          }
           else if (lvl === 'Putra' || lvl === 'Putri') {
             const isPa = lvl === 'Putra';
             const total = isPa ? appData.settings.total_putra : appData.settings.total_putri;
@@ -3196,6 +3220,7 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
               return c && c.gender === (isPa ? 'Laki-Laki' : 'Perempuan');
             }).length;
             dataHadir[day - 1] = ((total - absentCnt) / total) * 100;
+            dataAbsen[day - 1] = absentCnt; // Tangkap jumlah orang absen
           }
         }
       });
@@ -3209,6 +3234,25 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
         });
       }
 
+           const absenceLineEl = document.getElementById('absenceLineChart');
+      if (absenceLineChartInstance && absenceLineEl) absenceLineChartInstance.destroy();
+      if (absenceLineEl) {
+        absenceLineChartInstance = new Chart(absenceLineEl.getContext('2d'), {
+          type: 'bar', // Menggunakan bar agar kontras dengan persentase kehadiran
+          data: { 
+            labels: days.map(d => `${d} Jun`), 
+            datasets: [{ 
+              label: 'Jumlah Anggota Kurang/Absen', 
+              data: dataAbsen, 
+              borderColor: '#ff3b30', 
+              backgroundColor: 'rgba(255, 59, 48, 0.4)', 
+              borderWidth: 2, 
+              borderRadius: 4 
+            }] 
+          },
+          options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, ticks: { stepSize: 1 } } } }
+        });
+      }
 
       let statusCounts = { 'Hadir': 0 };
       absenceStatuses.forEach(st => statusCounts[st] = 0);
@@ -3220,7 +3264,6 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
           if (lvl === 'Prodi') items = items.filter(a => a.prodiName === pd);
           else if (lvl === 'Putra' || lvl === 'Putri') items = items.filter(a => { const c = (appData.cadets[a.prodiName] || []).find(x => x.no === a.cadetNo); return c && c.gender === (lvl === 'Putra' ? 'Laki-Laki' : 'Perempuan'); });
           
-       
           statusCounts['Hadir'] += (log.totalCadets - items.length);
 
           items.forEach(a => {
@@ -4298,6 +4341,26 @@ if ('serviceWorker' in navigator) {
 
   // Minta izin notifikasi saat tombol login ditekan (Bisa diletakkan di dalam handleLogin nanti)
   document.getElementById('loginSubmitBtn')?.addEventListener('click', requestNotificationPermission);
+<script>
+  // Fungsi untuk meminta mode Fullscreen
+  function autoFullscreen() {
+    const elem = document.documentElement; // Seluruh halaman web
+    
+    if (!document.fullscreenElement) {
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen().catch(err => console.log(err));
+      } else if (elem.webkitRequestFullscreen) { /* Safari */
+        elem.webkitRequestFullscreen().catch(err => console.log(err));
+      } else if (elem.msRequestFullscreen) { /* IE11 */
+        elem.msRequestFullscreen().catch(err => console.log(err));
+      }
+    }
+  }
+
+  // Pasang event listener: Saat pengguna pertama kali klik/tap layar di mana saja,
+  // aplikasi akan otomatis masuk ke mode layar penuh.
+  document.addEventListener('click', autoFullscreen, { once: true });
+  document.addEventListener('touchstart', autoFullscreen, { once: true });
 </script>
 </body>
 </html>

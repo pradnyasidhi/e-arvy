@@ -1,19 +1,20 @@
 {
-  "name": "e-Arvy Nara Arvyaksa #6",
+  "name": "e-Arvy - Nara Arvyaksa #6",
   "short_name": "e-Arvy",
   "start_url": "./index.html",
-  "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#007aff",
-  "description": "Sistem Interoperabilitas & Presensi Terpadu Batalyon",
+  "display": "fullscreen", 
+"display_override": ["fullscreen", "standalone"]
+  "theme_color": "#ffffff", 
+  "background_color": "#f4f4f5",
+  "run_on_os_login": "runWindowed",
   "icons": [
     {
-      "src": "https://www.image2url.com/r2/default/images/1781409226493-1bc2a13a-36c6-4972-9a1c-6114ed273acc.png",
+      "src": "icon-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "https://www.image2url.com/r2/default/images/1781409226493-1bc2a13a-36c6-4972-9a1c-6114ed273acc.png",
+      "src": "icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
