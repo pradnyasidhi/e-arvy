@@ -4340,25 +4340,6 @@ if ('serviceWorker' in navigator) {
 
   // Minta izin notifikasi saat tombol login ditekan (Bisa diletakkan di dalam handleLogin nanti)
   document.getElementById('loginSubmitBtn')?.addEventListener('click', requestNotificationPermission);
-  // Fungsi untuk meminta mode Fullscreen
-  function autoFullscreen() {
-    const elem = document.documentElement; // Seluruh halaman web
-    
-    if (!document.fullscreenElement) {
-      if (elem.requestFullscreen) {
-        elem.requestFullscreen().catch(err => console.log(err));
-      } else if (elem.webkitRequestFullscreen) { /* Safari */
-        elem.webkitRequestFullscreen().catch(err => console.log(err));
-      } else if (elem.msRequestFullscreen) { /* IE11 */
-        elem.msRequestFullscreen().catch(err => console.log(err));
-      }
-    }
-  }
-
-  // Pasang event listener: Saat pengguna pertama kali klik/tap layar di mana saja,
-  // aplikasi akan otomatis masuk ke mode layar penuh.
-  document.addEventListener('click', autoFullscreen, { once: true });
-  document.addEventListener('touchstart', autoFullscreen, { once: true });
 </script>
 </body>
 </html>
