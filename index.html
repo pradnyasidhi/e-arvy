@@ -1382,23 +1382,26 @@ originalSetItem('e_arvy_initialized_real_data_v4', 'true');
       }
       if (methodName === 'saveAttendance') {
         const histories = JSON.parse(storage.getItem('e_arvy_history_attendance') || '[]');
-        const logId = "L_" + new Date().getTime();
+        
+        // CEK: Apakah sudah ada log presensi untuk tanggal, nama kegiatan, dan kategori ini?
+        const existingIdx = histories.findIndex(h => h.date === params.date && h.activityName === params.activityName && h.category === params.category);
+        
+        // Jika sudah ada, gunakan logId lama untuk ditimpa. Jika belum, buat logId baru.
+        const logId = existingIdx !== -1 ? histories[existingIdx].logId : "L_" + new Date().getTime();
         const absentCount = params.absents.length;
         const presentCount = params.totalCadets - absentCount;
         
-     
         const dateObj = new Date(params.date);
         const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
         const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
         const formattedDate = `${days[dateObj.getDay()]}, ${dateObj.getDate()} ${months[dateObj.getMonth()]} ${dateObj.getFullYear()}`;
 
         let kategoriStr = params.category === 'Batalyon' ? '' : ` ${params.category.toUpperCase()}`;
-let textRecap = `DATA ${params.activityName.toUpperCase()} KOPRAL KADET${kategoriStr} (${formattedDate.toUpperCase()})\n\n`;
+        let textRecap = `DATA ${params.activityName.toUpperCase()} KOPRAL KADET${kategoriStr} (${formattedDate.toUpperCase()})\n\n`;
         textRecap += `JUMLAH   : ${params.totalCadets}\n`;
         textRecap += `KURANG   : ${absentCount}\n`;
         textRecap += `HADIR    : ${presentCount}\n\n`;
         
-
         textRecap += `KETERANGAN:\n`;
         
         if (absentCount === 0) {
@@ -1414,9 +1417,8 @@ let textRecap = `DATA ${params.activityName.toUpperCase()} KOPRAL KADET${kategor
                 groupedStatus[st].forEach(a => {
                     textRecap += `- ${a.cadetName} ${a.reason ? '(' + a.reason.toUpperCase() + ')' : ''}\n`;
                 });
-
                 textRecap += `\n`;
-        }
+            }
         }
         
         textRecap += `REKAPITULASI PRODI:\n\n`;
@@ -1445,7 +1447,6 @@ let textRecap = `DATA ${params.activityName.toUpperCase()} KOPRAL KADET${kategor
                     textRecap += `LENGKAP\n\n\n`;
                 } else {
                     const allSameReasonAndStatus = pKurang === pTotal && pAbsents.every(a => a.status === pAbsents[0].status && a.reason === pAbsents[0].reason);
-                    
                     if (allSameReasonAndStatus) {
                         textRecap += `SELURUH ${p.currentName} ${pAbsents[0].status.toUpperCase()}${pAbsents[0].reason ? ' (' + pAbsents[0].reason.toUpperCase() + ')' : ''}\n\n\n`;
                     } else {
@@ -1459,9 +1460,16 @@ let textRecap = `DATA ${params.activityName.toUpperCase()} KOPRAL KADET${kategor
         });
 
         const logEntry = { logId, date: params.date, activityName: params.activityName, category: params.category, totalCadets: params.totalCadets, absentCount, presentCount, verifier: params.verifier, verifiedAt: new Date().toISOString(), absents: params.absents, recapText: textRecap };
-        histories.push(logEntry);
+        
+        if (existingIdx !== -1) {
+            histories[existingIdx] = logEntry; // Timpa data lama
+        } else {
+            histories.push(logEntry); // Buat data baru
+        }
+        
         storage.setItem('e_arvy_history_attendance', JSON.stringify(histories));
         logLocalActivity(params.verifier, `Verifikasi presensi permanen: ${params.activityName}`);
+        
         if (window.savePresensiKeCloud) {
            window.savePresensiKeCloud(logEntry);
         }
@@ -4094,8 +4102,20 @@ function updateDashboardPendataan() {
 
   window.savePresensiKeCloud = async function(dataPresensi) {
     try {
-      const logBaru = new LogPresensi();
-      logBaru.set("logId", dataPresensi.logId);
+      const LogPresensi = Parse.Object.extend("LogPresensi");
+      const query = new Parse.Query(LogPresensi);
+      query.equalTo("logId", dataPresensi.logId);
+      
+      // Cari apakah log ini sudah ada di Cloud
+      let logBaru = await query.first();
+      
+      // Jika belum ada, buat objek Parse baru
+      if (!logBaru) {
+        logBaru = new LogPresensi();
+        logBaru.set("logId", dataPresensi.logId);
+      }
+      
+      // Update atau Set field
       logBaru.set("tanggal", dataPresensi.date);
       logBaru.set("namaKegiatan", dataPresensi.activityName);
       logBaru.set("kategori", dataPresensi.category);
