@@ -1,4 +1,5 @@
 {
+"name": "e-Arvy",
   "short_name": "e-Arvy",
   "start_url": "./index.html",
   "display": "standalone",
