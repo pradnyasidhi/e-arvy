@@ -1197,8 +1197,7 @@ defaultProdiList.forEach(p => users.push({
   kompiName: 'Kompi ' + p.kompiNumber, 
   profilePhoto: '' 
 }));
-originalSetItem('e_arvy_users', JSON.stringify(users));
-
+storage.setItem('e_arvy_users_v2', JSON.stringify(users));
         const rawCadetData = {
           "FK 1": [
             "KK KED ABIGAIL QUEENCYLA SAHARI SARAGIH", "KK KED ACHMAD ABRIELL NIZAR FAZARI PRASETYA", "KK KED ADELIA ZUKHRIFA AJANI", "KK KED ALFAURA SALSABILA", "KK KED ALIFIAN RASYIDI PUTRA ISBIANTO", "KK KED ALIYA ANASSHAFAH TANJUNG", "KK KED ALKAUSAR AMIN HUTAGAOL", "KK KED ALYSHA NADRA", "KK KED ANDIKA AHMAD ROZAN AQILAH", "KK KED ANINDYA WAHYU SYAZARISMA", "KK KED ANUGERAH PEKERTI TUMANGGOR", "KK KED ARDAN HIDAYAT", "KK KED ARKA ANANDETA PRATAMA", "KK KED ATHALAH NAKILLAYA DULLAYA WILOGO", "KK KED ATHALIA NASYWA TSANY", "KK KED ATIIQAH DIANIZZAH", "KK KED AULIA YASINA WIJAYA", "KK KED AURA RIZKA NOURMA GANIQ", "KK KED BEATRICE ALICIA HARDANI", "KK KED BENYAMIN FEBRIYAN SIMANJUNTAK", "KK KED BISMA ALFIN BERRY", "KK KED BRAM KAUTSAR SUTEJAPUTRA", "KK KED BUNGA KURNIA LESTARI", "KK KED CELVIN PARDAMEAN SIMORANGKIR"
@@ -1234,7 +1233,7 @@ originalSetItem('e_arvy_users', JSON.stringify(users));
             "KK BIO ANNISA DELINA PUTRI SIREGAR", "KK BIO AWANG BANYUSELO AGNI", "KK BIO DENIDA PUTRI MAHARANI", "KK BIO DIARRA FAIRUZ MIRQUIZHAL ROHIM", "KK BIO DIONELA NAJWA AZKA", "KK BIO EZRA RAVELINA TAMBUNAN", "KK BIO FARAH AULIA AGHNIA NURUL ARIFAH", "KK BIO GIJKA BR SITEPU", "KK BIO INTAN PASARIBU", "KK BIO JANNICKA PUTRI SOLEHA", "KK BIO MUHAMMAD AIZAR NASYAH", "KK BIO MUHAMMAD SHEVCHENKO PUTRA RAVIKHASHA", "KK BIO NAUFAL BIFAQIH", "KK BIO NAZWA PRIMA TIARA", "KK BIO NUNA SAPTA NINGRUM", "KK BIO RAISA HASNA PUTRI CANTIKA", "KK BIO REBEKKA PUTRI NATALIA SINAGA", "KK BIO RIJAL WIDYA UTAMA", "KK BIO RINDA AULIA RAHMADHANI", "KK BIO SEAN FARESKY KARAENG", "KK BIO THEODOR NATHANAEL MANIHURUK", "KK BIO UMU KULTSUM NUR AZIZATIN SOE CITRANING RATU", "KK BIO VANESSA T.B. JAHE", "KK BIO VIOLA ANJANI", "KK BIO ZEIN DWIGUSVITHA LINTIN"
           ],
           "RSDA": [
-            "KK RSDA ADHITYA DWI FEBRIAN", "KK RSDA ALVINE ARYA PUTRA PURNAMA", "KK RSDA AZZAHRA BANAFSAJ CALISTA", "KK RSDA BAGAS HADI PRASETYA", "KK RSDA CHRISTIAN MOSES PURBA", "KK RSDA FADIA NURBAITHA RAHMA", "KK RSDA FARID GHAISAN AMARTA", "KK RSDA FARRAS JAMHARI MAHARDIKA", "KK RSDA FELICIA JENYTA DE ANDRADE", "KK RSDA FERDY NAUFAL IYANANDA", "KK RSDA FITRAH RAMADHANI", "KK RSDA GRACE SEPTAYUNI SIAHAAN", "KK RSDA GRACELIA NAOMI PANDIANGAN", "KK RSDA HERMON VALENT FAHUWUSA HULU", "KK RSDA IQBAL PUTRA RAMADHAN", "KK RSDA JARIS YAFIK WIRZA", "KK RSDA JOSEPH FAREL NAPITUPULU", "KK RSDA MAREL REVELINO", "KK RSDA MARETA TRICAHYA RESNA", "KK RSDA MORA ARDINA MARGARET SILALAHI", "KK RSDA MUHAMMAD BINTANG CAHAYA NEGARA", "KK RSDA NAYLA ILMATYA KHAWASI", "KK RSDA RIBKA ADELINA LUBIS", "KK RSDA SATYA FAREL ABYANTORO", "KK RSDA STEVEN IMANUEL SITANGGANG"
+            "KK RSDA ADHITYA DWI FEBRIAN", "KK RSDA ALVINE ARYA PUTRA PURNAMA", "KK RSDA AZZAHRA BANAFSAJ CALISTA", "KK RSDA BAGAS HADI PRASETYA", "KK RSDA CHRISTIAN MOSES PURBA", "KK RSDA FADIA NURBAITHA RAHMA", "KK RSDA FARID GHAISAN AMARTA", "KK RSDA FARRAS JAMHARI MAHARDIKA", "KK RSDA FELICIA JENYTA DE ANDRADE", "KK RSDA FERDY NAUFAL IYANANDA", "KK RSDA FITRAH RAMADHANI", "KK RSDA GRACE SEPTAYUNI SIAHAAN", "KK RSDA GRACELIA NAOMI PANDIANGAN", "KK RSDA HERMON VALENT FAHUWUSA HULU", "KK RSDA IQBAL PUTRA RAMADHAN", "KK RSDA JARIS YAFIK WIRZA", "KK RSDA JOSEPH FAREL NAPITUPULU", "KK RSDA MAREL REVELINO", "KK RSDA MARETA TRICAHYA RESNA", "KK RSDA MORA ARDINA MARGARET SILALAHI", "KK RSDA MUHAMMAD BINTANG CAHAYA NEGARA", "KK RSDA NAYLA ILMATYA KHAWASI", "KK RSDA RIBKA ADELINA LUBIS", "KK RSDA SATYA FAREL ABYANTORO", "KK RSDA STEVEN IMANUEL SITANGGANG", "SK RSDA UMI LATHIFATUL AZKIYYAH" 
           ],
           "FK 4": [
             "KK KED MAUREZIO RICHARD WILSON", "KK KED MERCY AUREL JALLA BING", "KK KED METAMICHELLE TABITHA LISTIARINI SEMBIRING", "KK KED MGS.M.FAHRI AL-FATIH", "KK KED MIFTAHUL JANNAH", "KK KED MISYA ISAURA ROHMAT", "KK KED MOHAMMAD BAYU RIZQI SAPUTRA", "KK KED MORLI ZAHRAWANI", "KK KED MUH. NABIL FIRDAUS SABIR", "KK KED MUHAMAD KALEVI PRATAMA", "KK KED MUHAMMAD DEAPAMA MIRZA MAREFA", "KK KED MUHAMMAD FAUZAN NAWAWI", "KK KED MUHAMMAD FERDIANSYAH DWI SAPUTRA", "KK KED MUHAMMAD GADING AL FARISH", "KK KED MUHAMMAD HAZIQ ATHIR LUBIS", "KK KED MUHAMMAD NAUVAL RASPATI", "KK KED MUHAMMAD RADI", "KK KED MUHAMMAD RAFFIUDIN", "KK KED MUHAMMAD RAFIE KAMAL", "KK KED MUHAMMAD TSAQIF ANARGYA PHALOSA YULIANTO", "KK KED MUTHIA ERWIN", "KK KED MUTHIA SALYA RASYID", "KK KED MUTHIAH SALSABILA AZ-ZAHRA", "KK KED NAADHIR FIRAS AMRULLAH", "KK KED NAFFARA ZIVANA LETISSA"
@@ -1270,7 +1269,7 @@ originalSetItem('e_arvy_users', JSON.stringify(users));
             "KK MESIN AHMADI ZAKY FAZA HARAHAP", "KK MESIN ANDHIKA BAYU WIDIANTO", "KK MESIN ARKAN PUTRA AJI", "KK MESIN ATHA HAFIZH LUTHFIRESTA", "KK MESIN BLESSING YUDA PUTRA SIALLAGAN", "KK MESIN DEKO STIAWAN", "KK MESIN FADANI DWI PUTRA", "KK MESIN FARREL ADIKA FIRDAUS PRATAMA", "KK MESIN FERDINAND MARULI TUA MANURUNG", "KK MESIN GLENN LIBERTY PARDEDE", "KK MESIN GUMAYANG FITRI ANNISA", "KK MESIN HARSA RASYID", "KK MESIN HOT BAYU HAPOSAN SINAGA", "KK MESIN KRISTOFORUS MICHAEL KISLEW SAPUTRO", "KK MESIN LAURENSIUS ABINAWA PRADIPTA", "KK MESIN MUHAMMAD FARREL DAVIAN", "KK MESIN MUHAMMAD HAIKAL HANAFI", "KK MESIN MUHAMMAD PASHA AZZUHRI DAULAY", "KK MESIN MUHAMMAD ZALVI NUR", "KK MESIN NAJIHAN ABIYYU AMMARSYAH", "KK MESIN NICHOLAS PEDRO NEHEMIA PANGARIBUAN", "KK MESIN TORNANDA SIREGAR", "KK MESIN VANDEL PUTRA CAKRA BHIRAWA", "KK MESIN WANDANIEL PURBA", "KK MESIN YOSUA DWI NOBERTUS EDITYA"
           ],
           "FIS": [
-            "KK FIS ALDO ZAKY PUTRA SANDI", "KK FIS DAVINA NAZWA ZAHRA DALIMUNTHE", "KK FIS EFRUAN ADJI FACHREZA", "KK FIS ELENA DESTI NUGRAHA", "KK FIS ELSADAY BUTAR BUTAR", "KK FIS EMAILDA ROMAITO SIANTURI", "KK FIS FARHAN AZZUHRI", "KK FIS FARRAH AMELIA TARA", "KK FIS FARREL AKBAR FERDINAL", "KK FIS FARSYA IKMAL RA’UF", "KK FIS HAIKAL THIHAL RIZKI", "KK FIS JALUNG ADHWA PANJI WIJANARKO", "KK FIS JUNDY ISLAMI FASYA", "KK FIS M ARVAN YEFRI NASUTION", "KK FIS MIRHAM RISKI PRATAMA", "KK FIS NABILA EKA RAMADHANI", "KK FIS NIA SASTRI CANDRA MAHARAJA", "KK FIS NISRINA ADHI UFAIROH", "KK FIS NUR INDAH IRIANI", "KK FIS PUTRI AYU PALUPI", "KK FIS RESYA AURELIA SAFITRI", "KK FIS TUNGGA PRAWIRA MAULAWARMAN", "KK FIS VIVIANA FARADILLA ANGESTI", "KK FIS ZAIN ALTHAF DEDIANDRA", "KK FIS ZUYYINA BRILLIANTY BAROROH"
+            "KK FIS ALDO ZAKY PUTRA SANDI", "KK FIS DAVINA NAZWA ZAHRA DALIMUNTHE", "KK FIS EFRUAN ADJI FACHREZA", "KK FIS ELENA DESTI NUGRAHA", "KK FIS ELSADAY BUTAR BUTAR", "KK FIS EMAILDA ROMAITO SIANTURI", "KK FIS FARHAN AZZUHRI", "KK FIS FARRAH AMELIA TARA", "KK FIS FARREL AKBAR FERDINAL", "KK FIS FARSYA IKMAL RA’UF", "KK FIS HAIKAL THIHAL RIZKI", "KK FIS JALUNG ADHWA PANJI WIJANARKO", "KK FIS JUNDY ISLAMI FASYA", "KK FIS M ARVAN YEFRI NASUTION", "KK FIS MIRHAM RISKI PRATAMA", "KK FIS NABILA EKA RAMADHANI", "KK FIS NIA SASTRI CANDRA MAHARAJA", "KK FIS NISRINA ADHI UFAIROH", "KK FIS NUR INDAH IRIANI", "KK FIS PUTRI AYU PALUPI", "KK FIS RESYA AURELIA SAFITRI", "KK FIS TUNGGA PRAWIRA MAULAWARMAN", "KK FIS VIVIANA FARADILLA ANGESTI", "KK FIS ZAIN ALTHAF DEDIANDRA", "KK FIS ZUYYINA BRILLIANTY BAROROH", "SK FIS ALYSSA TRIHAPSARI INAYA"
           ]
         };
 
@@ -1315,7 +1314,7 @@ originalSetItem('e_arvy_initialized_real_data', 'true');
   }
     function simulateServerCall(methodName, params) {
       if (methodName === 'login') {
-  const users = JSON.parse(storage.getItem('e_arvy_users'));
+  const users = JSON.parse(storage.getItem('e_arvy_users_v2'));
   
   const user = users.find(u => {
     if (u.username.toLowerCase() !== params.username.toLowerCase()) return false;
@@ -1524,7 +1523,7 @@ let textRecap = `DATA ${params.activityName.toUpperCase()} KOPRAL KADET${kategor
         return { success: true };
       }
      if (methodName === 'updateAccounts') {
-  const users = JSON.parse(storage.getItem('e_arvy_users'));
+  const users = JSON.parse(storage.getItem('e_arvy_users_v2'));
   const idx = users.findIndex(u => u.username === params.targetUsername);
   
   if (idx !== -1) { 
@@ -1533,18 +1532,18 @@ let textRecap = `DATA ${params.activityName.toUpperCase()} KOPRAL KADET${kategor
     } else {
       users[idx].password = params.newPassword;
     }
-    storage.setItem('e_arvy_users', JSON.stringify(users)); 
+    storage.setItem('e_arvy_users_v2', JSON.stringify(users)); 
   }
   
   logLocalActivity(params.username, `Ubah password: ${params.targetUsername}`);
   return { success: true };
 }
       if (methodName === 'updateProfilePhoto') {
-        const users = JSON.parse(storage.getItem('e_arvy_users'));
-        const idx = users.findIndex(u => u.username === params.username);
-        if (idx !== -1) { users[idx].profilePhoto = params.photoBase64; storage.setItem('e_arvy_users', JSON.stringify(users)); }
-        return { success: true };
-      }
+  const users = JSON.parse(storage.getItem('e_arvy_users_v2'));
+  const idx = users.findIndex(u => u.username === params.username);
+  if (idx !== -1) { users[idx].profilePhoto = params.photoBase64; storage.setItem('e_arvy_users_v2', JSON.stringify(users)); }
+  return { success: true };
+}
       return null;
     }
 
@@ -4070,8 +4069,6 @@ const logResults = await logQuery.find();
 <script>
   const originalOnload = window.onload;
   window.onload = function() {
-localStorage.removeItem('e_arvy_initialized_real_data');
-    localStorage.removeItem('e_arvy_users');
     try {
       if (typeof renderApplicationLogos === 'function') renderApplicationLogos();
       const icon = document.getElementById('localRefreshIcon');
@@ -4103,7 +4100,12 @@ localStorage.removeItem('e_arvy_initialized_real_data');
 
       setInterval(() => {
          if (window.fetchDatabaseFromCloud && typeof currentUser !== 'undefined' && currentUser) {
-           window.fetchDatabaseFromCloud().then(() => { if (typeof loadDashboardAndAppData === 'function') loadDashboardAndAppData(); });
+           window.fetchDatabaseFromCloud().then(() => { 
+             const activeTab = storage.getItem('e_arvy_active_tab') || 'dashboard';
+                   if (['dashboard', 'statistik', 'profile'].includes(activeTab)) {
+                 if (typeof loadDashboardAndAppData === 'function') loadDashboardAndAppData(); 
+             }
+           });
          }
       }, 30000); 
     } catch (e) {
@@ -4118,7 +4120,10 @@ localStorage.removeItem('e_arvy_initialized_real_data');
       if (icon) icon.classList.add('animate-spin');
       
       window.fetchDatabaseFromCloud().then(() => {
-        loadDashboardAndAppData();
+        const activeTab = storage.getItem('e_arvy_active_tab') || 'dashboard';
+                if (['dashboard', 'statistik', 'profile'].includes(activeTab)) {
+            loadDashboardAndAppData();
+        }
         if (icon) icon.classList.remove('animate-spin');
       }).catch(() => {
         if (icon) icon.classList.remove('animate-spin');
