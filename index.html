@@ -10,14 +10,13 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
   
-  <!-- Lucide Icons CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  
-  <!-- Chart.js CDN -->
+
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 
   <script>
     tailwind.config = {
@@ -219,7 +218,6 @@
 </div>
 <script>
     window.addEventListener('DOMContentLoaded', () => {
-        // 'headerLogoContainer' adalah ID dari div logo yang ada di header
         const mainLogo = document.getElementById('headerLogoContainer'); 
         if (mainLogo) {
             const container = document.getElementById('preloader-logo-container');
@@ -335,9 +333,9 @@
           <div class="py-3 px-4 bg-slate-100/60 dark:bg-zinc-800/40 rounded-ios-md text-[11px] leading-relaxed text-slate-500 dark:text-zinc-400 border border-slate-200/50 dark:border-zinc-800/40">
             <strong class="text-slate-700 dark:text-zinc-200 block mb-0.5">Akun & Password</strong>
             <div class="font-mono flex flex-col gap-0.5">
-              <span>IF 1: <code class="bg-slate-200/50 dark:bg-zinc-700 px-1 rounded font-bold text-slate-800 dark:text-zinc-200">if1</code> / <code class="bg-slate-200/50 dark:bg-zinc-700 px-1 rounded font-bold text-slate-800 dark:text-zinc-200">kadet123</code></span>
-              <span>FK 2: <code class="bg-slate-200/50 dark:bg-zinc-700 px-1 rounded font-bold text-slate-800 dark:text-zinc-200">fk2</code> / <code class="bg-slate-200/50 dark:bg-zinc-700 px-1 rounded font-bold text-slate-800 dark:text-zinc-200">kadet123</code></span>
-<span>Piket: <code class="bg-slate-200/50 dark:bg-zinc-700 px-1 rounded font-bold text-slate-800 dark:text-zinc-200">piket</code> / <code class="bg-slate-200/50 dark:bg-zinc-700 px-1 rounded font-bold text-slate-800 dark:text-zinc-200">piket123</code></span>
+              <span>IF 1: <code class="bg-slate-200/50 dark:bg-zinc-700 px-1 rounded font-bold text-slate-800 dark:text-zinc-200">if1</code> / <code class="bg-slate-200/50 dark:bg-zinc-700 px-1 rounded font-bold text-slate-800 dark:text-zinc-200">cohort6</code></span>
+              <span>FK 2: <code class="bg-slate-200/50 dark:bg-zinc-700 px-1 rounded font-bold text-slate-800 dark:text-zinc-200">fk2</code> / <code class="bg-slate-200/50 dark:bg-zinc-700 px-1 rounded font-bold text-slate-800 dark:text-zinc-200">cohort6</code></span>
+<span>Piket: <code class="bg-slate-200/50 dark:bg-zinc-700 px-1 rounded font-bold text-slate-800 dark:text-zinc-200">piket</code> / <code class="bg-slate-200/50 dark:bg-zinc-700 px-1 rounded font-bold text-slate-800 dark:text-zinc-200">piket6</code></span>
             </div>
           </div>
 
@@ -612,9 +610,8 @@
           </div>
         </div>
 
-        <div id="kompiGroupWrapper" class="flex flex-col gap-4">
-          <!-- Rendered by JS -->
-        </div>
+        <div id="kompiGroupWrapper" class="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+          </div>
 
         <div id="verificationPanel" class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg shadow-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4 transition-all-300">
           <div class="flex flex-col gap-1">
@@ -957,7 +954,7 @@
       </section>
 <footer class="mt-auto pt-8 pb-4 text-center w-full">
         <p class="text-[10px] font-bold tracking-widest uppercase text-slate-400 dark:text-zinc-600">
-          Ni Komang Pradnya © 2026 · Informatika UNHAN RI         
+          Ni Komang Pradnya © 2026 · Informatika COHORT 6 UNHAN RIS        
 </p>
       </footer>
     </main>
@@ -1102,21 +1099,16 @@
       getItem(key) { try { return window.localStorage.getItem(key); } catch(e) { return this._data[key] || null; } },
       setItem(key, val) { try { window.localStorage.setItem(key, val); } catch(e) { this._data[key] = String(val); } },
       removeItem(key) { try { window.localStorage.removeItem(key); } catch(e) { delete this._data[key]; } }
-    };
-// --- TAMBAHKAN KODE INI TEPAT DI BAWAH DEFINISI const storage ---
+    }
 
-// Simpan fungsi setItem dan removeItem bawaan
 const originalSetItem = storage.setItem.bind(storage);
 const originalRemoveItem = storage.removeItem.bind(storage);
 
-// Timpa setItem agar setiap ada perubahan, langsung dikirim ke Cloud
 storage.setItem = function(key, val) {
   originalSetItem(key, val);
 
-  // Daftar kunci yang MURNI LOKAL (hanya untuk HP ini) dan tidak boleh bocor ke Cloud
   const localOnlyKeys = ['e_arvy_session', 'e_arvy_active_tab', 'e_arvy_initialized_real_data'];
 
-  // Jangan sync data ketikan sementara (draft) dan data lokal
   if (window.syncLocalStorageToCloud && !key.startsWith('draft_') && !localOnlyKeys.includes(key)) {
     setTimeout(() => {
       window.syncLocalStorageToCloud(key);
@@ -1124,7 +1116,7 @@ storage.setItem = function(key, val) {
   }
 };
 
-// Timpa removeItem agar data yang dihapus di lokal juga terhapus di Cloud
+
 storage.removeItem = function(key) {
   originalRemoveItem(key);
   
@@ -1162,8 +1154,6 @@ storage.removeItem = function(key) {
     }
 
     function initMockDatabase() {
-      // NOTE: Key storage diubah ke 'e_arvy_initialized_real_data' 
-      // agar browser otomatis me-reset data lama dan memasukkan data nama yang baru.
       if (!storage.getItem('e_arvy_initialized_real_data')) {
         const defaultProdiList = [
           { prodiId: 1, originalName: "FK 1", currentName: "FK 1", kompiNumber: 1 },
@@ -1194,20 +1184,28 @@ storage.removeItem = function(key) {
         originalSetItem('e_arvy_prodis', JSON.stringify(defaultProdiList));
 
         const users = [
-          { username: 'admin', password: 'admin123', role: 'Admin', prodiName: '', kompiName: '', profilePhoto: '' },
-          { username: 'piket', password: 'piket123', role: 'Piket', prodiName: '', kompiName: '', profilePhoto: '' }
-        ];
-        defaultProdiList.forEach(p => users.push({ 
-          username: p.currentName.replace(/\s+/g, '').toLowerCase(), 
-          password: 'kadet123', 
-          role: 'Kopral Kadet', 
-          prodiName: p.currentName, 
-          kompiName: 'Kompi ' + p.kompiNumber, 
-          profilePhoto: '' 
-        }));
-        originalSetItem('e_arvy_users', JSON.stringify(users));
+  { 
+    username: 'admin', 
+    password: '3104618e4bc83ea9bf05bc73cd2e008ca128a1ce74bb8a7e04f0525d8f61c3de',
+    role: 'Admin', prodiName: '', kompiName: '', profilePhoto: '' 
+  },
+  { 
+    username: 'piket', 
+    password: '90a4dfb7d03197de7c2168537b036caefdb21ba48c5b98ec3496bc40eb7607ea',
+    role: 'Piket', prodiName: '', kompiName: '', profilePhoto: '' 
+  }
+];
 
-        // Database Nama Anggota
+defaultProdiList.forEach(p => users.push({ 
+  username: p.currentName.replace(/\s+/g, '').toLowerCase(), 
+  password: 'cohort6', 
+  role: 'Kopral Kadet', 
+  prodiName: p.currentName, 
+  kompiName: 'Kompi ' + p.kompiNumber, 
+  profilePhoto: '' 
+}));
+originalSetItem('e_arvy_users', JSON.stringify(users));
+
         const rawCadetData = {
           "FK 1": [
             "KK KED ABIGAIL QUEENCYLA SAHARI SARAGIH", "KK KED ACHMAD ABRIELL NIZAR FAZARI PRASETYA", "KK KED ADELIA ZUKHRIFA AJANI", "KK KED ALFAURA SALSABILA", "KK KED ALIFIAN RASYIDI PUTRA ISBIANTO", "KK KED ALIYA ANASSHAFAH TANJUNG", "KK KED ALKAUSAR AMIN HUTAGAOL", "KK KED ALYSHA NADRA", "KK KED ANDIKA AHMAD ROZAN AQILAH", "KK KED ANINDYA WAHYU SYAZARISMA", "KK KED ANUGERAH PEKERTI TUMANGGOR", "KK KED ARDAN HIDAYAT", "KK KED ARKA ANANDETA PRATAMA", "KK KED ATHALAH NAKILLAYA DULLAYA WILOGO", "KK KED ATHALIA NASYWA TSANY", "KK KED ATIIQAH DIANIZZAH", "KK KED AULIA YASINA WIJAYA", "KK KED AURA RIZKA NOURMA GANIQ", "KK KED BEATRICE ALICIA HARDANI", "KK KED BENYAMIN FEBRIYAN SIMANJUNTAK", "KK KED BISMA ALFIN BERRY", "KK KED BRAM KAUTSAR SUTEJAPUTRA", "KK KED BUNGA KURNIA LESTARI", "KK KED CELVIN PARDAMEAN SIMORANGKIR"
@@ -1284,7 +1282,6 @@ storage.removeItem = function(key) {
         };
 
         const cadets = {};
-        // Deteksi gender otomatis sederhana (bisa diperbaiki lagi nanti di Panel Admin)
         const femaleKeywords = ['PUTRI', 'AURA', 'AYLA', 'AZAHRA', 'CANTIK', 'NAJWA', 'NISA', 'SITI', 'AYU', 'SALSA', 'ALIA', 'THERESIA', 'GRACE', 'MUTHIA', 'NAYLA', 'ANGEL', 'DITA', 'ELSA', 'CINDY', 'ZAHRA'];
         
         defaultProdiList.forEach(p => {
@@ -1325,11 +1322,21 @@ originalSetItem('e_arvy_initialized_real_data', 'true');
   }
     function simulateServerCall(methodName, params) {
       if (methodName === 'login') {
-        const users = JSON.parse(storage.getItem('e_arvy_users'));
-        const user = users.find(u => u.username.toLowerCase() === params.username.toLowerCase() && u.password === params.password);
-        if (user) { logLocalActivity(user.username, "Login ke sistem e-Arvy"); return user; }
-        return null;
-      }
+  const users = JSON.parse(storage.getItem('e_arvy_users'));
+  
+  const user = users.find(u => {
+    if (u.username.toLowerCase() !== params.username.toLowerCase()) return false;
+    
+    if (u.role === 'Admin' || u.role === 'Piket') {
+      return u.password === CryptoJS.SHA256(params.password).toString();
+    } else {
+      return u.password === params.password;
+    }
+  });
+  
+  if (user) { logLocalActivity(user.username, "Login ke sistem e-Arvy"); return user; }
+  return null;
+}
       if (methodName === 'getInitialData') {
         const data = {};
         data.settings = JSON.parse(storage.getItem('e_arvy_settings'));
@@ -1349,24 +1356,23 @@ originalSetItem('e_arvy_initialized_real_data', 'true');
         const absentCount = params.absents.length;
         const presentCount = params.totalCadets - absentCount;
         
-        // Memformat Tanggal
+     
         const dateObj = new Date(params.date);
         const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
         const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
         const formattedDate = `${days[dateObj.getDay()]}, ${dateObj.getDate()} ${months[dateObj.getMonth()]} ${dateObj.getFullYear()}`;
 
-        // Menyusun Teks Rekap
         let kategoriStr = params.category === 'Batalyon' ? '' : ` ${params.category.toUpperCase()}`;
 let textRecap = `DATA ${params.activityName.toUpperCase()} KOPRAL KADET${kategoriStr} (${formattedDate.toUpperCase()})\n\n`;
         textRecap += `JUMLAH   : ${params.totalCadets}\n`;
         textRecap += `KURANG   : ${absentCount}\n`;
         textRecap += `HADIR    : ${presentCount}\n\n`;
         
+
         textRecap += `KETERANGAN:\n`;
         
-        // Daftar Absen Keseluruhan per Status
         if (absentCount === 0) {
-            textRecap += `LENGKAP\n`;
+            textRecap += `LENGKAP\n\n`;
         } else {
             const groupedStatus = {};
             params.absents.forEach(a => {
@@ -1376,27 +1382,25 @@ let textRecap = `DATA ${params.activityName.toUpperCase()} KOPRAL KADET${kategor
             for (let st in groupedStatus) {
                 textRecap += `${st.toUpperCase()} (${groupedStatus[st].length})\n`;
                 groupedStatus[st].forEach(a => {
-                    textRecap += `- ${a.cadetName} ${a.reason ? '(' + a.reason + ')' : ''}\n`;
+                    textRecap += `- ${a.cadetName} ${a.reason ? '(' + a.reason.toUpperCase() + ')' : ''}\n`;
+                });
 
-                    });
-                    textRecap += `\n`;
-            }
+                textRecap += `\n`;
+        }
         }
         
         textRecap += `REKAPITULASI PRODI:\n\n`;
         
-        // Kalkulasi Presensi per Prodi
         const cadetsData = JSON.parse(storage.getItem('e_arvy_cadets') || '{}');
         const prodisData = JSON.parse(storage.getItem('e_arvy_prodis') || '[]');
         
         prodisData.forEach(p => {
             let pCadets = cadetsData[p.currentName] || [];
-            // Filter berdasarkan kategori yang dipilih saat presensi (Batalyon/Putra/Putri)
             if (params.category === 'Putra') pCadets = pCadets.filter(c => c.gender === 'Laki-Laki');
             if (params.category === 'Putri') pCadets = pCadets.filter(c => c.gender === 'Perempuan');
             
             const pTotal = pCadets.length;
-            if (pTotal > 0) { // Hanya tampilkan prodi jika ada anggotanya sesuai kategori
+            if (pTotal > 0) { 
                 const pAbsents = params.absents.filter(a => a.prodiName === p.currentName);
                 const pKurang = pAbsents.length;
                 const pHadir = pTotal - pKurang;
@@ -1410,10 +1414,16 @@ let textRecap = `DATA ${params.activityName.toUpperCase()} KOPRAL KADET${kategor
                 if (pKurang === 0) {
                     textRecap += `LENGKAP\n\n\n`;
                 } else {
-                    pAbsents.forEach(a => {
-                        textRecap += `- ${a.cadetName} (${a.status}${a.reason ? ': ' + a.reason : ''})\n`;
-                    });
-                    textRecap += `\n`;
+                    const allSameReasonAndStatus = pKurang === pTotal && pAbsents.every(a => a.status === pAbsents[0].status && a.reason === pAbsents[0].reason);
+                    
+                    if (allSameReasonAndStatus) {
+                        textRecap += `SELURUH ${p.currentName} ${pAbsents[0].status.toUpperCase()}${pAbsents[0].reason ? ' (' + pAbsents[0].reason + ')' : ''}\n\n\n`;
+                    } else {
+                        pAbsents.forEach(a => {
+                            textRecap += `- ${a.cadetName} (${a.status}${a.reason ? ': ' + a.reason : ''})\n`;
+                        });
+                        textRecap += `\n\n`;
+                    }
                 }
             }
         });
@@ -1470,7 +1480,6 @@ let textRecap = `DATA ${params.activityName.toUpperCase()} KOPRAL KADET${kategor
       if (methodName === 'updateTotalCadets') {
         const settings = JSON.parse(storage.getItem('e_arvy_settings') || '{}');
         
-        // Memperbaiki pembacaan parameter yang tidak sinkron (mengatasi bug Quota & Logo)
         if (params.total_batalyon !== undefined) settings.total_batalyon = params.total_batalyon;
         else if (params.batalyon !== undefined) settings.total_batalyon = params.batalyon;
 
@@ -1483,7 +1492,6 @@ let textRecap = `DATA ${params.activityName.toUpperCase()} KOPRAL KADET${kategor
         if (params.generalAnnouncement !== undefined) settings.general_announcement = params.generalAnnouncement;
         else if (params.general_announcement !== undefined) settings.general_announcement = params.general_announcement;
         
-        // Perbaikan BUG Custom Logo
         if (params.customLogo !== undefined) settings.custom_logo = params.customLogo;
         else if (params.custom_logo !== undefined) settings.custom_logo = params.custom_logo;
         
@@ -1502,7 +1510,6 @@ let textRecap = `DATA ${params.activityName.toUpperCase()} KOPRAL KADET${kategor
           cadets[params.newName] = cadets[params.oldName];
           delete cadets[params.oldName];
           storage.setItem('e_arvy_cadets', JSON.stringify(cadets));
-          // Paksa update ke Cloud
           if (window.syncLocalStorageToCloud) window.syncLocalStorageToCloud('e_arvy_cadets');
         }
 
@@ -1517,19 +1524,28 @@ let textRecap = `DATA ${params.activityName.toUpperCase()} KOPRAL KADET${kategor
         cadets[params.prodiName] = params.cadetsList;
         storage.setItem('e_arvy_cadets', JSON.stringify(cadets));
         
-        // Paksa update data Kadet terbaru ke Cloud
+       
         if (window.syncLocalStorageToCloud) window.syncLocalStorageToCloud('e_arvy_cadets');
         
         logLocalActivity(params.username, `Ubah roster prodi ${params.prodiName}`);
         return { success: true };
       }
-      if (methodName === 'updateAccounts') {
-        const users = JSON.parse(storage.getItem('e_arvy_users'));
-        const idx = users.findIndex(u => u.username === params.targetUsername);
-        if (idx !== -1) { users[idx].password = params.newPassword; storage.setItem('e_arvy_users', JSON.stringify(users)); }
-        logLocalActivity(params.username, `Ubah password: ${params.targetUsername}`);
-        return { success: true };
-      }
+     if (methodName === 'updateAccounts') {
+  const users = JSON.parse(storage.getItem('e_arvy_users'));
+  const idx = users.findIndex(u => u.username === params.targetUsername);
+  
+  if (idx !== -1) { 
+    if (users[idx].role === 'Admin' || users[idx].role === 'Piket') {
+      users[idx].password = CryptoJS.SHA256(params.newPassword).toString();
+    } else {
+      users[idx].password = params.newPassword;
+    }
+    storage.setItem('e_arvy_users', JSON.stringify(users)); 
+  }
+  
+  logLocalActivity(params.username, `Ubah password: ${params.targetUsername}`);
+  return { success: true };
+}
       if (methodName === 'updateProfilePhoto') {
         const users = JSON.parse(storage.getItem('e_arvy_users'));
         const idx = users.findIndex(u => u.username === params.username);
@@ -1559,11 +1575,10 @@ let textRecap = `DATA ${params.activityName.toUpperCase()} KOPRAL KADET${kategor
   const storedUser = storage.getItem('e_arvy_session');
   if (storedUser) { 
     currentUser = JSON.parse(storedUser); 
-    document.body.classList.add('is-logged-in'); // Tambahkan baris ini
+    document.body.classList.add('is-logged-in');
     setupUserInterface(); 
   } else { 
     renderApplicationLogos(); 
-    // Hapus kode: document.getElementById('loginWrapper').classList.remove('hidden');
   }
 }
 
@@ -1575,7 +1590,7 @@ let textRecap = `DATA ${params.activityName.toUpperCase()} KOPRAL KADET${kategor
     if (res) {
       currentUser = res; storage.setItem('e_arvy_session', JSON.stringify(res));
       
-      document.body.classList.add('is-logged-in'); // Tambahkan baris ini
+      document.body.classList.add('is-logged-in');
       document.getElementById('loginErrorMsg').classList.add('hidden');
       document.getElementById('loginForm').reset();
       
@@ -1594,25 +1609,22 @@ function togglePassword() {
   
   if (passwordInput.type === 'password') {
     passwordInput.type = 'text';
-    eyeIcon.setAttribute('data-lucide', 'eye-off'); // Ubah ikon jadi mata dicoret
+    eyeIcon.setAttribute('data-lucide', 'eye-off'); 
   } else {
     passwordInput.type = 'password';
-    eyeIcon.setAttribute('data-lucide', 'eye'); // Kembalikan ikon mata normal
+    eyeIcon.setAttribute('data-lucide', 'eye'); 
   }
   
-  // Render ulang ikon Lucide agar perubahannya terlihat
+
   lucide.createIcons();
 }
 
     function logout() {
   if(confirm('Keluar sistem?')) {
-    // Hapus data sesi dan memori tab dari perangkat ini
+   
     storage.removeItem('e_arvy_session'); 
     storage.removeItem('e_arvy_active_tab');
     currentUser = null;
-
-    // Segarkan ulang (refresh) seluruh halaman agar memori UI benar-benar bersih dan kembali ke layar Login
-    window.location.reload();
   }
 }
 
@@ -1638,13 +1650,12 @@ function togglePassword() {
         document.getElementById('announceConfigViewer').classList.remove('hidden');
       }
 
-      // --- KODE TAMBAHAN UNTUK MENGUNCI INPUT SERAGAM UNTUK KADET ---
-      const announcePakaianInput = document.getElementById('announcePakaian');
+            const announcePakaianInput = document.getElementById('announcePakaian');
       if (announcePakaianInput) {
         if (['Admin', 'Piket', 'Pokdo', 'Pengasuh'].includes(currentUser.role)) {
-          announcePakaianInput.removeAttribute('disabled'); // Bisa diketik oleh Admin/Piket
+          announcePakaianInput.removeAttribute('disabled'); 
         } else {
-          announcePakaianInput.setAttribute('disabled', 'true'); // Dikunci (Read-Only) untuk Kadet
+          announcePakaianInput.setAttribute('disabled', 'true'); 
         }
       }
 
@@ -1654,7 +1665,6 @@ const lastActiveTab = storage.getItem('e_arvy_active_tab') || 'dashboard';
     }
 
     function renderApplicationLogos() {
-      // Intip data storage sebelum login untuk mencari logo kustom
       let customLogo = "";
       try {
         const settingsStr = storage.getItem('e_arvy_settings');
@@ -1674,7 +1684,6 @@ const lastActiveTab = storage.getItem('e_arvy_active_tab') || 'dashboard';
 
       if (hContainer) hContainer.innerHTML = customLogo ? `<img src="${customLogo}" class="w-10 h-10 object-contain rounded filter drop-shadow-md">` : DEFAULT_SVG_LOGO;
       
-      // Menerapkan logo kustom ke laman Login
       if (lContainer) lContainer.innerHTML = customLogo ? `<img src="${customLogo}" class="w-14 h-14 object-contain rounded drop-shadow-lg">` : DEFAULT_SVG_LOGO_LOGIN;
       
       if (aContainer) aContainer.innerHTML = customLogo ? `<img src="${customLogo}" class="w-full h-full object-contain rounded">` : DEFAULT_SVG_LOGO;
@@ -1691,13 +1700,10 @@ const lastActiveTab = storage.getItem('e_arvy_active_tab') || 'dashboard';
       showToast('Mengunggah...', 'Mengirim logo ke Cloud Storage...', 'info');
       
       try {
-        // 1. Unggah file Base64 ke Cloud dan dapatkan URL publiknya
         const cloudUrl = await window.uploadFileToCloudStorage(evt.target.result, 'logo_aplikasi', 'custom_app_logo');
         
-        // 2. Simpan URL cloud tersebut (bukan Base64) ke dalam pengaturan
         appData.settings.custom_logo = cloudUrl;
         
-        // 3. Perbarui pengaturan ke database/lokal
         callServer('updateTotalCadets', { ...appData.settings, username: currentUser.username }, () => {
           renderApplicationLogos(); 
           showToast('Selesai', 'Logo kustom berhasil diperbarui.', 'success');
@@ -1741,7 +1747,6 @@ const lastActiveTab = storage.getItem('e_arvy_active_tab') || 'dashboard';
         const secs = String(now.getSeconds()).padStart(2, '0');
         document.getElementById('realTimeClock').innerText = `${hrs}:${mins}:${secs}`;
         
-        // Auto reset kepulangan at 03:00:00
         if (hrs === "03" && mins === "00" && secs === "00" && !isKepulanganResetToday) {
           appData.kepulangan = [];
           storage.setItem('e_arvy_kepulangan', JSON.stringify([]));
@@ -2099,26 +2104,22 @@ updateDashboardPendataan();
     }
 
     function executeSearchAction(kompiNum, prodiId, cadetNo, cadetName) {
-      // 1. Sembunyikan kotak pop-up dan kembalikan teks input ke nama yang dipilih
+    
       const box = document.getElementById('searchSuggestionsBox');
       box.classList.add('hidden'); box.classList.remove('flex');
       document.getElementById('searchCadetInput').value = cadetName;
 
-      // 2. Ubah kategori ke Batalyon (agar Kadet PA/PI tetap terlihat)
       activeCategory = 'Batalyon';
       setCategory('Batalyon');
 
-      // 3. Jeda sedikit untuk menunggu DOM selesai merender sebelum Scroll
+      
       setTimeout(() => {
-        // Buka Tab Kompi jika sedang tertutup
         const kompiBody = document.getElementById(`company-body-${kompiNum}`);
         if (kompiBody && kompiBody.classList.contains('hidden')) toggleCompanySection(kompiNum);
 
-        // Buka Tab Prodi jika sedang tertutup
         const prodiBody = document.getElementById(`prodi-body-${prodiId}`);
         if (prodiBody && prodiBody.classList.contains('hidden')) toggleProdiSection(prodiId);
 
-        // Scroll (Gulir) ke baris Kadet dan berikan efek Highlight
         const row = document.getElementById(`cadet-row-${prodiId}-${cadetNo}`);
         if (row) {
           row.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -2128,8 +2129,7 @@ updateDashboardPendataan();
       }, 150);
     }
 
-    // Menutup Pop-up Suggestion jika mengklik sembarang tempat di luar kotak pencarian
-    document.addEventListener('click', function(event) {
+      document.addEventListener('click', function(event) {
       const box = document.getElementById('searchSuggestionsBox');
       const searchInput = document.getElementById('searchCadetInput');
       if (box && searchInput && event.target !== searchInput && !box.contains(event.target)) {
@@ -2137,9 +2137,7 @@ updateDashboardPendataan();
          box.classList.remove('flex');
       }
     });
-    // --- AKHIR FITUR AUTO-SUGGEST PENCARIAN KADET ---
 
-    // Bulk Select Actions Array
     let bulkSelection = {};
 
     function toggleBulkCheck(prodiId, cadetNo, checked) {
@@ -2154,12 +2152,44 @@ updateDashboardPendataan();
       } else {
         toolbar.classList.add('hidden');
       }
+      const selectAllCb = document.getElementById(`select-all-cb-${prodiId}`);
+      if (selectAllCb) {
+        const totalCb = document.querySelectorAll(`.bulk-cb-${prodiId}`).length;
+        selectAllCb.checked = (totalCb > 0 && bulkSelection[prodiId].size === totalCb);
+      }
+    }
+
+function toggleSelectAll(prodiId, isChecked) {
+      if (!bulkSelection[prodiId]) bulkSelection[prodiId] = new Set();
+      
+      const checkboxes = document.querySelectorAll(`.bulk-cb-${prodiId}`);
+      
+      checkboxes.forEach(cb => {
+        cb.checked = isChecked;
+        const cadetNo = parseInt(cb.getAttribute('data-no'));
+        
+        if (isChecked) {
+          bulkSelection[prodiId].add(cadetNo);
+        } else {
+          bulkSelection[prodiId].delete(cadetNo);
+        }
+      });
+
+      // Munculkan atau sembunyikan toolbar masal
+      const toolbar = document.getElementById(`bulk-toolbar-${prodiId}`);
+      if (bulkSelection[prodiId].size > 0) {
+        toolbar.classList.remove('hidden');
+        document.getElementById(`bulk-count-${prodiId}`).innerText = `${bulkSelection[prodiId].size} Terpilih`;
+      } else {
+        toolbar.classList.add('hidden');
+      }
     }
 
     function applyBulkAction(prodiId) {
       if (!bulkSelection[prodiId] || bulkSelection[prodiId].size === 0) return;
       
       const status = document.getElementById(`bulk-status-${prodiId}`).value;
+      const reasonText = document.getElementById(`bulk-reason-${prodiId}`).value; // Menarik teks alasan
       const fileInput = document.getElementById(`bulk-file-${prodiId}`);
       
       const dateStr = document.getElementById('presensiDate').value;
@@ -2174,6 +2204,16 @@ updateDashboardPendataan();
           if (status !== 'Hadir') {
             document.getElementById(`absence-detail-${prodiId}-${no}`).classList.remove('hidden');
             document.getElementById(`absence-detail-${prodiId}-${no}`).classList.add('flex');
+            
+            // Terapkan Alasan Jika Ada
+            if (reasonText) {
+                const reasonInput = document.getElementById(`absence-reason-${prodiId}-${no}`);
+                if (reasonInput) {
+                    reasonInput.value = reasonText;
+                    storage.setItem(`draft_reason_${dateStr}_${activityName}_${prodiId}_${no}`, reasonText);
+                }
+            }
+
             if (base64) {
               storage.setItem(`draft_proof_${dateStr}_${activityName}_${prodiId}_${no}`, base64);
               const img = document.getElementById(`proof-preview-${prodiId}-${no}`);
@@ -2189,13 +2229,24 @@ updateDashboardPendataan();
 
         // Uncheck all
         document.querySelectorAll(`.bulk-cb-${prodiId}`).forEach(cb => cb.checked = false);
+        const selectAllCb = document.getElementById(`select-all-cb-${prodiId}`);
+        if (selectAllCb) selectAllCb.checked = false;
         bulkSelection[prodiId].clear();
         document.getElementById(`bulk-toolbar-${prodiId}`).classList.add('hidden');
         
+        // Reset tampilan input toolbar masal
+        document.getElementById(`bulk-reason-${prodiId}`).value = '';
+        const fileLbl = document.getElementById(`bulk-file-lbl-${prodiId}`);
+        const fileTxt = document.getElementById(`bulk-file-txt-${prodiId}`);
+        if (fileLbl && fileTxt) {
+          fileTxt.innerText = 'Foto';
+          fileLbl.classList.remove('text-ios-blue', 'border-blue-300');
+        }
+
         updateProdiSummary(prodiId);
         updateAllKompisCumulativeAbsents();
-markAsUnsaved(prodiId);
-        showToast('Terapkan Masal', `Berhasil menerapkan status ke kadet yang dipilih.`, 'success');
+        markAsUnsaved(prodiId);
+        showToast('Terapkan Masal', `Berhasil menerapkan status dan alasan.`, 'success');
       };
 
       if (fileInput.files && fileInput.files[0]) {
@@ -2235,10 +2286,10 @@ markAsUnsaved(prodiId);
       const isLocked = storage.getItem(`locked_presensi_${dateStr}_${activityName}`) === 'true';
       const isAdmin = ['Admin', 'Piket', 'Pokdo', 'Pengasuh'].includes(currentUser.role);
       
-      let lockBannerHtml = '';
+     let lockBannerHtml = '';
       if (isLocked) {
          lockBannerHtml = `
-           <div class="flex justify-between items-center p-4 mb-2 bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900 rounded-ios-md transition-all">
+           <div class="col-span-full flex justify-between items-center p-4 mb-2 bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900 rounded-ios-md transition-all">
              <div class="flex items-center gap-3 text-ios-red">
                <i data-lucide="lock" class="w-5 h-5"></i>
                <div class="flex flex-col">
@@ -2251,7 +2302,7 @@ markAsUnsaved(prodiId);
          `;
       } else if (isAdmin) {
          lockBannerHtml = `
-           <div class="flex justify-between items-center p-4 mb-2 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900 rounded-ios-md transition-all">
+           <div class="col-span-full flex justify-between items-center p-4 mb-2 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900 rounded-ios-md transition-all">
              <div class="flex items-center gap-3 text-ios-green">
                <i data-lucide="unlock" class="w-5 h-5"></i>
                <div class="flex flex-col">
@@ -2276,21 +2327,21 @@ markAsUnsaved(prodiId);
         if (!kompis[k]) continue;
 
         const compCard = document.createElement('div');
-        compCard.className = 'p-5 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-md rounded-ios-lg border border-slate-200/60 shadow-lg flex flex-col gap-3.5';
+              compCard.className = 'p-3 sm:p-4 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-md rounded-ios-lg border border-slate-200/60 shadow-lg flex flex-col gap-2.5';
         
         compCard.innerHTML = `
-          <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 py-3 px-4 bg-slate-100/80 dark:bg-zinc-800/80 rounded-ios-md cursor-pointer hover:opacity-95 transition-all" onclick="toggleCompanySection(${k})">
-  <div class="flex items-center gap-2.5"><i data-lucide="users" class="w-4.5 h-4.5 text-ios-blue"></i><span class="font-extrabold text-sm text-slate-900 dark:text-white">KOMPI ${k}</span></div>
-            <div class="flex items-center gap-3">
+          <div class="flex flex-wrap justify-between items-center gap-2 py-2.5 px-3 bg-slate-100/80 dark:bg-zinc-800/80 rounded-ios-md cursor-pointer hover:opacity-95 transition-all" onclick="toggleCompanySection(${k})">
+            <div class="flex items-center gap-2.5"><i data-lucide="users" class="w-4.5 h-4.5 text-ios-blue"></i><span class="font-extrabold text-sm text-slate-900 dark:text-white">KOMPI ${k}</span></div>
+            <div class="flex items-center gap-3 ml-auto">
               <div class="flex items-center gap-1.5 shrink-0">
-                <span id="kompi-hdr-present-${k}" class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-ios-green border border-emerald-500/20">Hadir: 0</span>
-                <span id="kompi-hdr-absent-${k}" class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-rose-500/10 text-ios-red border border-rose-500/20 font-mono">Kurang: 0</span>
-                <span id="kompi-hdr-total-${k}" class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-500 font-mono">Total: 0</span>
+                <span id="kompi-hdr-present-${k}" class="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-500/10 text-ios-green border border-emerald-500/20">Hadir: 0</span>
+                <span id="kompi-hdr-absent-${k}" class="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-rose-500/10 text-ios-red border border-rose-500/20 font-mono">Kurang: 0</span>
+                <span id="kompi-hdr-total-${k}" class="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 font-mono hidden xl:inline-block">Total: 0</span>
               </div>
-              <i data-lucide="chevron-down" class="w-4.5 h-4.5 text-slate-400"></i>
+              <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400"></i>
             </div>
           </div>
-          <div class="flex flex-col gap-4 mt-1" id="company-body-${k}"></div>
+          <div class="flex flex-col gap-3 mt-1" id="company-body-${k}"></div>
         `;
 
         const compBody = compCard.querySelector(`#company-body-${k}`);
@@ -2316,19 +2367,38 @@ markAsUnsaved(prodiId);
             // BULK TOOLBAR
             if (isEditable) {
               cadetRowsHtml += `
-                <div id="bulk-toolbar-${prodi.prodiId}" class="hidden bg-blue-50 dark:bg-blue-900/30 p-3 rounded flex flex-col items-start justify-between mb-3 border border-blue-200 dark:border-blue-800 gap-3">
-                   <span class="text-xs font-bold text-ios-blue" id="bulk-count-${prodi.prodiId}">0 Terpilih</span>
-                   <div class="flex flex-col md:flex-row items-stretch md:items-center gap-2 w-full">
-                  <select id="bulk-status-${prodi.prodiId}" class="w-full md:w-auto text-xs px-3 py-2 rounded border dark:bg-zinc-800 dark:border-zinc-700 dark:text-white outline-none">
-                    ${statusOptionsHtml}
-                  </select>
-                      <input type="file" id="bulk-file-${prodi.prodiId}" accept="image/*" class="w-full md:w-auto text-[10px] bg-white border rounded p-1.5 text-slate-500">
-                      <button onclick="applyBulkAction(${prodi.prodiId})" class="w-full md:w-auto px-4 py-2 bg-ios-blue text-white rounded text-xs font-bold">Terapkan Masal</button>
+                <div id="bulk-toolbar-${prodi.prodiId}" class="hidden bg-blue-50/60 dark:bg-blue-900/20 p-2.5 rounded-ios-md flex-col gap-2 mb-2 border border-blue-200/60 dark:border-blue-800/50 transition-all">
+                   <span class="text-[10px] font-black uppercase tracking-wider text-ios-blue" id="bulk-count-${prodi.prodiId}">0 Terpilih</span>
+                   
+                   <div class="flex flex-col gap-2 w-full">
+                      <div class="flex items-center gap-2 w-full">
+                        <select id="bulk-status-${prodi.prodiId}" class="w-1/3 min-w-0 text-xs px-2 py-1.5 rounded border bg-white dark:bg-zinc-800 dark:border-zinc-700 dark:text-white outline-none focus:border-ios-blue cursor-pointer">
+                          ${statusOptionsHtml}
+                        </select>
+                        <input type="text" id="bulk-reason-${prodi.prodiId}" placeholder="Tulis alasan..." onblur="this.value = this.value.toUpperCase();" class="flex-1 min-w-0 text-xs px-2 py-1.5 rounded border bg-white dark:bg-zinc-800 dark:border-zinc-700 dark:text-white outline-none focus:border-ios-blue">
+                      </div>
+                      
+                      <div class="flex items-center justify-end gap-2 w-full">
+                        <label id="bulk-file-lbl-${prodi.prodiId}" class="shrink-0 px-2.5 py-1.5 rounded bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-[10px] font-bold text-slate-600 dark:text-zinc-300 cursor-pointer hover:bg-slate-50 transition-colors">
+                           <i data-lucide="image" class="w-3.5 h-3.5 inline"></i> <span id="bulk-file-txt-${prodi.prodiId}">Foto</span>
+                           <input type="file" id="bulk-file-${prodi.prodiId}" accept="image/*" class="hidden" onchange="document.getElementById('bulk-file-txt-${prodi.prodiId}').innerText='1 File'; this.parentElement.classList.add('text-ios-blue', 'border-blue-300');">
+                        </label>
+                        
+                        <button type="button" onclick="applyBulkAction(${prodi.prodiId})" class="shrink-0 px-4 py-1.5 bg-ios-blue text-white rounded text-[10px] font-black shadow-sm hover:opacity-90 active:scale-95 transition-all">Terapkan Masal</button>
+                      </div>
                    </div>
                 </div>
               `;
             }
-
+if (isEditable) {
+              cadetRowsHtml += `
+                <!-- KODE BARU: TOMBOL SELECT ALL -->
+                <div class="flex items-center gap-2 px-2 py-2 mb-1 border-b border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800/50 rounded-t cursor-pointer hover:bg-slate-100 dark:hover:bg-zinc-800/70 transition-colors" onclick="document.getElementById('select-all-cb-${prodi.prodiId}').click()">
+                  <input type="checkbox" id="select-all-cb-${prodi.prodiId}" class="w-3.5 h-3.5 rounded border-gray-300 text-ios-blue focus:ring-ios-blue cursor-pointer" onclick="event.stopPropagation()" onchange="toggleSelectAll(${prodi.prodiId}, this.checked)">
+                  <label class="text-[10px] font-bold text-slate-700 dark:text-zinc-200 cursor-pointer select-none">Pilih Semua (${cadetsList.length} Kadet)</label>
+                </div>
+              `;
+            }
             cadetsList.forEach(c => {
               const draftStatus = storage.getItem(`draft_status_${dateStr}_${activityName}_${prodi.prodiId}_${c.no}`) || 'Hadir';
               const draftReason = storage.getItem(`draft_reason_${dateStr}_${activityName}_${prodi.prodiId}_${c.no}`) || '';
@@ -2337,34 +2407,35 @@ markAsUnsaved(prodiId);
               let selectOptionsSpecific = `<option value="Hadir" ${draftStatus === 'Hadir' ? 'selected' : ''}>Hadir</option>`;
               absenceStatuses.forEach(st => selectOptionsSpecific += `<option value="${st}" ${draftStatus === st ? 'selected' : ''}>${st}</option>`);
 
-              const checkboxHtml = isEditable ? `<input type="checkbox" class="bulk-cb-${prodi.prodiId} w-3.5 h-3.5 rounded border-gray-300 text-ios-blue focus:ring-ios-blue" onchange="toggleBulkCheck(${prodi.prodiId}, ${c.no}, this.checked)">` : '';
+              const checkboxHtml = isEditable ? `<input type="checkbox" data-no="${c.no}" class="bulk-cb-${prodi.prodiId} w-3.5 h-3.5 rounded border-gray-300 text-ios-blue focus:ring-ios-blue cursor-pointer" onchange="toggleBulkCheck(${prodi.prodiId}, ${c.no}, this.checked)">` : '';
 
-              cadetRowsHtml += `
-                <div id="cadet-row-${prodi.prodiId}-${c.no}" class="grid grid-cols-1 md:grid-cols-4 gap-3 items-center py-2.5 border-b border-slate-100 dark:border-zinc-800 last:border-0 rounded p-1 transition-colors">
-                  <div class="flex items-center gap-2">
-                    ${checkboxHtml}
-                    <span class="text-xs font-extrabold text-slate-400">No. ${c.no}</span>
-                    <span class="text-[9px] font-black px-1.5 py-0.5 rounded ${c.gender === 'Laki-Laki' ? 'bg-blue-100 text-blue-700' : 'bg-pink-100 text-pink-700'}">${c.gender === 'Laki-Laki' ? 'PA' : 'PI'}</span>
+                          cadetRowsHtml += `
+                <div id="cadet-row-${prodi.prodiId}-${c.no}" class="flex flex-col py-1 border-b border-slate-100 dark:border-zinc-800/60 last:border-0 hover:bg-slate-50 dark:hover:bg-zinc-800/30 px-1 transition-colors">
+                  <div class="flex flex-row items-center gap-2 w-full">
+                    <div class="flex items-center gap-1.5 shrink-0 min-w-[75px]">
+                      ${checkboxHtml}
+                      <span class="text-[9px] font-extrabold text-slate-400 w-5">#${c.no}</span>
+                      <span class="text-[8px] font-black px-1 py-0.5 rounded ${c.gender === 'Laki-Laki' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400' : 'bg-pink-100 text-pink-700 dark:bg-pink-900/40 dark:text-pink-400'}">${c.gender === 'Laki-Laki' ? 'PA' : 'PI'}</span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <span class="text-[11px] font-bold text-slate-800 dark:text-zinc-200 truncate block cursor-default" title="${c.name}">${c.name}</span>
+                    </div>
+                    <div class="w-24 shrink-0">
+                      <select class="w-full px-1.5 py-0.5 rounded border bg-white dark:bg-zinc-900 dark:border-zinc-700 dark:text-white text-[10px] font-semibold focus:outline-none cursor-pointer" id="cadet-status-${prodi.prodiId}-${c.no}" onchange="handleCadetStatusChange(${prodi.prodiId}, ${c.no})" ${isEditable ? '' : 'disabled'}>
+                        ${selectOptionsSpecific}
+                      </select>
+                    </div>
                   </div>
-                  <div class="md:col-span-2">
-                    <input type="text" class="w-full px-2 py-1 rounded border-0 bg-transparent text-sm font-bold focus:bg-slate-100 dark:focus:bg-zinc-800 dark:text-white focus:outline-none" value="${c.name}" id="cadet-name-${prodi.prodiId}-${c.no}" readonly>
-                  </div>
-                  <div>
-                    <select class="w-full px-2 py-1.5 rounded-ios-sm border bg-slate-50 dark:bg-zinc-800 dark:border-zinc-700 dark:text-white text-xs font-semibold focus:outline-none" id="cadet-status-${prodi.prodiId}-${c.no}" onchange="handleCadetStatusChange(${prodi.prodiId}, ${c.no})" ${isEditable ? '' : 'disabled'}>
-                      ${selectOptionsSpecific}
-                    </select>
-                  </div>
-                  <div id="absence-detail-${prodi.prodiId}-${c.no}" class="${(draftStatus !== 'Hadir' && (isEditable || draftReason || draftProof)) ? 'flex' : 'hidden'} col-span-1 md:col-span-4 flex-col gap-3 p-3 bg-rose-50/50 dark:bg-rose-950/20 rounded-ios-md border border-dashed border-rose-200 dark:border-rose-900 mt-1 transition-all">
-                    
+                  
+                  <div id="absence-detail-${prodi.prodiId}-${c.no}" class="${(draftStatus !== 'Hadir' && (isEditable || draftReason || draftProof)) ? 'flex' : 'hidden'} mt-1 flex-row items-center gap-2 p-1.5 bg-rose-50/50 dark:bg-rose-950/20 rounded border border-dashed border-rose-200 dark:border-rose-900">
                     ${isEditable ? 
-                      `<input type="text" class="w-full px-3 py-2 rounded bg-white dark:bg-zinc-800 dark:border-zinc-700 dark:text-white border text-xs focus:ring-1 focus:ring-ios-blue outline-none" placeholder="Sebutkan alasan (opsional)..." id="absence-reason-${prodi.prodiId}-${c.no}" value="${draftReason}" onblur="this.value = standardizeEYD(this.value); syncDraftReason(${prodi.prodiId}, ${c.no});">` 
+                      `<input type="text" class="flex-1 px-2 py-0.5 rounded bg-white dark:bg-zinc-800 dark:border-zinc-700 dark:text-white border text-[10px] focus:ring-1 focus:ring-ios-blue outline-none" placeholder="Tulis alasan..." id="absence-reason-${prodi.prodiId}-${c.no}" value="${draftReason}" onblur="this.value = this.value.toUpperCase(); syncDraftReason(${prodi.prodiId}, ${c.no});">`
                     : 
-                      (draftReason ? `<div class="text-xs font-bold text-rose-700 dark:text-rose-400 bg-rose-100/60 dark:bg-rose-950/40 px-3 py-2 rounded border border-rose-200 dark:border-rose-900 shadow-sm">Keterangan: ${draftReason}</div><input type="hidden" id="absence-reason-${prodi.prodiId}-${c.no}" value="${draftReason}">` : `<input type="hidden" id="absence-reason-${prodi.prodiId}-${c.no}" value="">`)
+                      (draftReason ? `<div class="text-[10px] font-bold text-rose-700 dark:text-rose-400 flex-1 px-1 truncate">Ket: ${draftReason}</div><input type="hidden" id="absence-reason-${prodi.prodiId}-${c.no}" value="${draftReason}">` : `<input type="hidden" id="absence-reason-${prodi.prodiId}-${c.no}" value="">`)
                     }
-
-                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-                      ${isEditable ? `<label class="w-full sm:w-auto text-center px-4 py-2 rounded bg-white dark:bg-zinc-800 dark:border-zinc-700 dark:text-white border border-slate-200 text-xs font-bold cursor-pointer hover:bg-slate-50 dark:hover:bg-zinc-700 block"><i data-lucide="upload" class="w-3.5 h-3.5 inline"></i> Unggah Bukti <input type="file" accept="image/*" class="hidden" onchange="handleProofPhotoUpload(event, ${prodi.prodiId}, ${c.no})"></label>` : ''}
-                      <img id="proof-preview-${prodi.prodiId}-${c.no}" src="${draftProof}" class="h-12 w-20 object-cover rounded border shadow-sm ${draftProof ? '' : 'hidden'} cursor-zoom-in" onclick="if('${draftProof}') viewDocumentedPhoto('${c.name}', '${draftProof}')">
+                    <div class="flex items-center gap-1.5 shrink-0">
+                      ${isEditable ? `<label class="px-2 py-0.5 rounded bg-white dark:bg-zinc-800 dark:border-zinc-700 dark:text-white border border-slate-200 text-[9px] font-bold cursor-pointer hover:bg-slate-50 dark:hover:bg-zinc-700"><i data-lucide="upload" class="w-3 h-3 inline"></i> <input type="file" accept="image/*" class="hidden" onchange="handleProofPhotoUpload(event, ${prodi.prodiId}, ${c.no})"></label>` : ''}
+                      <img id="proof-preview-${prodi.prodiId}-${c.no}" src="${draftProof}" class="h-5 w-8 object-cover rounded border shadow-sm ${draftProof ? '' : 'hidden'} cursor-zoom-in" onclick="if('${draftProof}') viewDocumentedPhoto('${c.name}', '${draftProof}')">
                     </div>
                     <input type="hidden" id="proof-base64-${prodi.prodiId}-${c.no}" value="${draftProof}">
                   </div>
@@ -2374,35 +2445,37 @@ markAsUnsaved(prodiId);
           }
 
           prodiBox.innerHTML = `
-            <div class="flex flex-wrap sm:flex-nowrap justify-between items-center px-4 py-3 bg-slate-50/50 dark:bg-zinc-800/50 border-b dark:border-zinc-700/60 cursor-pointer hover:bg-slate-50 dark:hover:bg-zinc-700/50 gap-2" onclick="toggleProdiSection(${prodi.prodiId})">
-  <div class="flex items-center flex-wrap gap-2">
-    <span class="font-extrabold text-sm text-slate-900 dark:text-white">${prodi.currentName}</span>
-                <span id="prodi-badge-${prodi.prodiId}" class="text-[9px] font-black uppercase px-2.5 py-0.5 rounded-full border ${badgeClass} whitespace-nowrap">${badgeText}</span>
+            <div class="flex flex-wrap justify-between items-center px-3 py-2 bg-slate-50/50 dark:bg-zinc-800/50 border-b dark:border-zinc-700/60 cursor-pointer hover:bg-slate-50 dark:hover:bg-zinc-700/50 gap-2" onclick="toggleProdiSection(${prodi.prodiId})">
+              <div class="flex items-center flex-wrap gap-2">
+                <span class="font-extrabold text-sm text-slate-900 dark:text-white">${prodi.currentName}</span>
+                <span id="prodi-badge-${prodi.prodiId}" class="text-[9px] font-black uppercase px-2 py-0.5 rounded-full border ${badgeClass} whitespace-nowrap">${badgeText}</span>
               </div>
-              <div class="flex items-center gap-2 ml-auto"><span id="prodi-lbl-stat-${prodi.prodiId}" class="text-xs font-extrabold text-slate-400 whitespace-nowrap">Hadir: ${draftPresentCount}/${cadetsList.length}</span><i data-lucide="chevron-down" id="prodi-chevron-${prodi.prodiId}" class="w-4.5 h-4.5 text-slate-400 transition-transform shrink-0"></i></div>
+              <div class="flex items-center gap-2 ml-auto"><span id="prodi-lbl-stat-${prodi.prodiId}" class="text-[11px] font-extrabold text-slate-400 whitespace-nowrap">Hadir: ${draftPresentCount}/${cadetsList.length}</span><i data-lucide="chevron-down" id="prodi-chevron-${prodi.prodiId}" class="w-4 h-4 text-slate-400 transition-transform shrink-0"></i></div>
             </div>
             <div class="p-4 hidden flex-col gap-4 border-t" id="prodi-body-${prodi.prodiId}">
               ${cadetRowsHtml}
-              <div class="p-4 bg-slate-50 dark:bg-zinc-800/40 dark:border-zinc-700/60 rounded-ios-md border flex flex-col gap-3 mt-3">
-                <div class="grid grid-cols-3 gap-2 text-center">
-                  <div><h4 class="text-base font-extrabold text-slate-900 dark:text-white">${cadetsList.length}</h4><p class="text-[9px] text-slate-400 uppercase font-bold">Total</p></div>
-                  <div><h4 id="prodi-sum-present-${prodi.prodiId}" class="text-base font-extrabold text-ios-green">${draftPresentCount}</h4><p class="text-[9px] text-slate-400 uppercase font-bold">Hadir</p></div>
-                  <div><h4 id="prodi-sum-absent-${prodi.prodiId}" class="text-base font-extrabold text-slate-500">${cadetsList.length - draftPresentCount}</h4><p class="text-[9px] text-slate-400 uppercase font-bold">Kurang</p></div>
+              <div class="p-2.5 bg-slate-50 dark:bg-zinc-800/40 dark:border-zinc-700/60 rounded-ios-md border flex flex-col gap-1 mt-2 shadow-sm">
+                <div class="flex justify-around items-center text-center border-b border-slate-200/60 dark:border-zinc-700 pb-1.5">
+                  <div><h4 class="text-sm font-extrabold text-slate-900 dark:text-white leading-none">${cadetsList.length}</h4><p class="text-[8px] text-slate-400 uppercase font-bold mt-1">Total</p></div>
+                  <div><h4 id="prodi-sum-present-${prodi.prodiId}" class="text-sm font-extrabold text-ios-green leading-none">${draftPresentCount}</h4><p class="text-[8px] text-slate-400 uppercase font-bold mt-1">Hadir</p></div>
+                  <div><h4 id="prodi-sum-absent-${prodi.prodiId}" class="text-sm font-extrabold text-ios-red leading-none">${cadetsList.length - draftPresentCount}</h4><p class="text-[8px] text-slate-400 uppercase font-bold mt-1">Kurang</p></div>
                 </div>
-                <div class="text-xs pt-2 border-t dark:border-zinc-700" id="prodi-sum-detail-${prodi.prodiId}"></div>
-                ${isEditable ? `
-  <!-- BAGIAN YANG DIUBAH 2: Menambahkan id="prodi-action-btns-..." -->
-  <div id="prodi-action-btns-${prodi.prodiId}" class="pt-3 flex flex-col sm:flex-row justify-end gap-2.5">
-    ${isSaved ? `
-      <button type="button" onclick="resetSingleProdiAttendance(${prodi.prodiId}, '${prodi.currentName}')" class="w-full sm:w-auto px-4 py-2.5 bg-ios-red text-white rounded text-xs font-black shadow-sm hover:opacity-90 active:scale-95 transition-all">
-        Reset Kehadiran
-      </button>
-    ` : ''}
-    <button type="button" onclick="saveSingleProdiAttendance(${prodi.prodiId}, '${prodi.currentName}')" class="w-full sm:w-auto px-4 py-2.5 bg-ios-blue text-white rounded text-xs font-black shadow-sm hover:opacity-90 active:scale-95 transition-all">
-      Simpan Sementara
-    </button>
-  </div>
-` : ''}
+                
+                <div class="flex flex-col 2xl:flex-row justify-between items-start 2xl:items-end gap-2 pt-1">
+                  <div class="text-[10px] flex-1 w-full" id="prodi-sum-detail-${prodi.prodiId}"></div>
+                  ${isEditable ? `
+                    <div id="prodi-action-btns-${prodi.prodiId}" class="flex gap-1.5 w-full 2xl:w-auto shrink-0 justify-end mt-1 2xl:mt-0">
+                      ${isSaved ? `
+                        <button type="button" onclick="resetSingleProdiAttendance(${prodi.prodiId}, '${prodi.currentName}')" class="px-3 py-1.5 bg-rose-100 text-ios-red border border-rose-200 dark:border-rose-900 rounded text-[10px] font-bold shadow-sm hover:opacity-90 active:scale-95 transition-all">
+                          Reset
+                        </button>
+                      ` : ''}
+                      <button type="button" onclick="saveSingleProdiAttendance(${prodi.prodiId}, '${prodi.currentName}')" class="px-3 py-1.5 bg-ios-blue text-white rounded text-[10px] font-bold shadow-sm hover:opacity-90 active:scale-95 transition-all">
+                        Simpan
+                      </button>
+                    </div>
+                  ` : ''}
+                </div>
               </div>
             </div>
           `;
@@ -2509,7 +2582,7 @@ markAsUnsaved(prodiId);
       let activityName = document.getElementById('presensiActivitySelect').value;
       if (activityName === 'kustom') activityName = document.getElementById('customActivityName').value || 'Kegiatan Kustom';
       const reasonInput = document.getElementById(`absence-reason-${prodiId}-${cadetNo}`);
-      reasonInput.value = standardizeEYD(reasonInput.value);
+      reasonInput.value = reasonInput.value.toUpperCase();
       storage.setItem(`draft_reason_${dateStr}_${activityName}_${prodiId}_${cadetNo}`, reasonInput.value);
       updateProdiSummary(prodiId);
 markAsUnsaved(prodiId);
@@ -2541,7 +2614,7 @@ markAsUnsaved(prodiId);
       if (act === 'kustom') act = document.getElementById('customActivityName').value || 'Kegiatan Kustom';
 
       const cadets = (appData.cadets[prodi.currentName] || []).filter(c => activeCategory === 'Batalyon' || (activeCategory === 'Putra' && c.gender === 'Laki-Laki') || (activeCategory === 'Putri' && c.gender === 'Perempuan'));
-      let present = 0, absent = 0; const details = [];
+      let present = 0, absent = 0; const absentList = [];
 
       cadets.forEach(c => {
         const status = storage.getItem(`draft_status_${dateStr}_${act}_${prodiId}_${c.no}`) || 'Hadir';
@@ -2549,19 +2622,30 @@ markAsUnsaved(prodiId);
         else { 
           absent++; 
           const reason = storage.getItem(`draft_reason_${dateStr}_${act}_${prodiId}_${c.no}`) || ''; 
-          
-          // FORMAT BARU: Nama (Status: alasan)
-          const reasonFormatted = reason ? `: ${reason}` : '';
-          details.push(`• ${c.name} (${status}${reasonFormatted})`); 
+          absentList.push({ name: c.name, status: status, reason: reason });
         }
       });
+
+      // --- LOGIKA RINGKASAN KETERANGAN UI ---
+      let detailsHtml = 'Lengkap';
+      if (absent > 0) {
+        // Cek apakah seluruh kadet di prodi tersebut tidak hadir dengan status dan alasan yang persis sama
+        const allSameReasonAndStatus = absent === cadets.length && absentList.every(a => a.status === absentList[0].status && a.reason === absentList[0].reason);
+
+        if (allSameReasonAndStatus) {
+            detailsHtml = `SELURUH ${prodi.currentName} ${absentList[0].status.toUpperCase()}${absentList[0].reason ? ' (' + absentList[0].reason.toUpperCase() + ')' : ''}`;
+        } else {
+            detailsHtml = absentList.map(a => `• ${a.name} (${a.status}${a.reason ? ': ' + a.reason.toUpperCase() : ''})`).join('<br>');
+        }
+       }
 
       const lblStat = document.getElementById(`prodi-lbl-stat-${prodiId}`);
       if (lblStat) lblStat.innerText = `Hadir: ${present}/${cadets.length}`;
       const sumP = document.getElementById(`prodi-sum-present-${prodiId}`); if(sumP) sumP.innerText = present;
       const sumA = document.getElementById(`prodi-sum-absent-${prodiId}`); if(sumA) sumA.innerText = absent;
+      
       const det = document.getElementById(`prodi-sum-detail-${prodiId}`);
-      if (det) det.innerHTML = `<strong>Keterangan:</strong><p class="${absent > 0 ? 'text-ios-red' : 'text-slate-400 italic'} mt-1 text-xs">${absent > 0 ? details.join('<br>') : 'Lengkap'}</p>`;
+      if (det) det.innerHTML = `<strong class="text-[9px] uppercase tracking-wider text-slate-500">Keterangan:</strong><p class="${absent > 0 ? 'text-ios-red font-semibold' : 'text-slate-400 italic'} mt-0.5 text-[10px] leading-snug">${detailsHtml}</p>`;
     }
 
 function markAsUnsaved(prodiId) {
@@ -2591,7 +2675,7 @@ function markAsUnsaved(prodiId) {
         const btnContainer = document.getElementById(`prodi-action-btns-${prodiId}`);
         if (btnContainer) {
           btnContainer.innerHTML = `
-            <button type="button" onclick="saveSingleProdiAttendance(${prodiId}, '${prodi.currentName}')" class="w-full sm:w-auto px-4 py-2.5 bg-ios-blue text-white rounded text-xs font-black shadow-sm hover:opacity-90 active:scale-95 transition-all">
+            <button type="button" onclick="saveSingleProdiAttendance(${prodiId}, '${prodi.currentName}')" class="px-3 py-1.5 bg-ios-blue text-white rounded text-[10px] font-bold shadow-sm hover:opacity-90 active:scale-95 transition-all">
               Simpan Perubahan
             </button>
           `;
@@ -2867,6 +2951,7 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
       text += `JUMLAH   : ${totalQuota}\n`;
       text += `KURANG   : ${absentCount}\n`;
       text += `HADIR    : ${presentCount}\n\n`;
+      // --- BAGIAN 1: KETERANGAN GLOBAL (TETAP TAMPILKAN SEMUA NAMA) ---
       text += `KETERANGAN:\n`;
 
       if (absentCount === 0) {
@@ -2878,11 +2963,11 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
             groupedStatus[a.status].push(a);
         });
         for (let st in groupedStatus) {
-            text += `${st.toUpperCase()} (${groupedStatus[st].length})\n`;
-            groupedStatus[st].forEach(a => {
-                text += `- ${a.cadetName} ${a.reason ? '(' + a.reason + ')' : ''}\n`;
-});
-            text += `\n`;
+                text += `${st.toUpperCase()} (${groupedStatus[st].length})\n`;
+                groupedStatus[st].forEach(a => {
+                    text += `- ${a.cadetName} ${a.reason ? '(' + a.reason.toUpperCase() + ')' : ''}\n`;
+                });
+                text += `\n`;
         }
       }
 
@@ -2906,10 +2991,16 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
           if (pKurang === 0) {
             text += `LENGKAP\n\n\n`;
           } else {
-            pAbsents.forEach(a => {
-              text += `- ${a.cadetName} (${a.status}${a.reason ? ': ' + a.reason : ''})\n`;
-            });
-            text += `\n`;
+            const allSameReasonAndStatus = pKurang === pTotal && pAbsents.every(a => a.status === pAbsents[0].status && a.reason === pAbsents[0].reason);
+            
+            if (allSameReasonAndStatus) {
+                        textRecap += `SELURUH ${p.currentName} ${pAbsents[0].status.toUpperCase()}${pAbsents[0].reason ? ' (' + pAbsents[0].reason.toUpperCase() + ')' : ''}\n\n\n`;
+                    } else {
+                        pAbsents.forEach(a => {
+                            textRecap += `- ${a.cadetName} (${a.status}${a.reason ? ': ' + a.reason.toUpperCase() : ''})\n`;
+                        });
+                        textRecap += `\n\n`;
+                    }
           }
         }
       });
@@ -2926,7 +3017,7 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
     if (currentViewedLog.category === 'Batalyon') filterEl.classList.remove('hidden');
     else filterEl.classList.add('hidden');
 
-    // Tampilkan tombol "Kumpulan Bukti" HANYA JIKA user berwenang
+  
     const isAuthorized = ['Admin', 'Piket', 'Pokdo', 'Pengasuh'].includes(currentUser.role);
     const evidenceBtn = document.getElementById('recapTabBtnEvidence');
     if (evidenceBtn) {
@@ -2982,7 +3073,7 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
         s.innerHTML = ''; 
         appData.prodis.forEach(p => s.innerHTML += `<option value="${p.currentName}">${p.currentName}</option>`); 
         
-        // Kembalikan memori pilihan
+    
         if (currentVal) s.value = currentVal;
       }
     }
@@ -3028,7 +3119,7 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
         });
       }
 
-      // Dynamic Pie Chart based on all statuses
+
       let statusCounts = { 'Hadir': 0 };
       absenceStatuses.forEach(st => statusCounts[st] = 0);
 
@@ -3039,12 +3130,12 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
           if (lvl === 'Prodi') items = items.filter(a => a.prodiName === pd);
           else if (lvl === 'Putra' || lvl === 'Putri') items = items.filter(a => { const c = (appData.cadets[a.prodiName] || []).find(x => x.no === a.cadetNo); return c && c.gender === (lvl === 'Putra' ? 'Laki-Laki' : 'Perempuan'); });
           
-          // count presents (rough estimate for pie context relative to absents)
+       
           statusCounts['Hadir'] += (log.totalCadets - items.length);
 
           items.forEach(a => {
              if(statusCounts[a.status] !== undefined) statusCounts[a.status]++;
-             else statusCounts[a.status] = 1; // fallback
+             else statusCounts[a.status] = 1;
           });
         }
       });
@@ -3202,7 +3293,7 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
       selectedHistoryLogs.clear();
       updateBulkDeleteHistoryBtn();
       
-      // Kembalikan teks asli tombol
+    
       btn.innerHTML = '<i data-lucide="trash-2" class="w-3.5 h-3.5 inline mr-1"></i>Hapus (<span id="bulkDeleteCount">0</span>)';
       
       loadDashboardAndAppData();
@@ -3215,7 +3306,7 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
       const content = document.getElementById('detailAbsModalContent'); content.innerHTML = '';
       if (!item.absents || item.absents.length === 0) { content.innerHTML = `<div class="text-center py-8 text-slate-400 italic">Hadir Lengkap.</div>`; openModal('detailAbsentsModal'); return; }
 
-      // 1. Cek apakah user adalah Piket/Admin/Pokdo
+     
       const isAuthorized = ['Admin', 'Piket', 'Pokdo', 'Pengasuh'].includes(currentUser.role);
 
       const grouped = {}; item.absents.forEach(a => { if(!grouped[a.status]) grouped[a.status] = []; grouped[a.status].push(a); });
@@ -3223,10 +3314,10 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
         let listHtml = '';
           grouped[status].forEach(cad => {
             
-            // 2. Hanya render gambar/foto JIKA user memiliki otorisasi
+          
             const imgHtml = (cad.attachmentBase64 && isAuthorized) ? `<div class="mt-2 w-36 h-20 border dark:border-zinc-700 rounded cursor-zoom-in" onclick="viewDocumentedPhoto('${cad.cadetName}', '${cad.attachmentBase64}')"><img src="${cad.attachmentBase64}" class="w-full h-full object-cover"></div>` : '';
             
-            // 3. PERBAIKAN FINAL: Cek spasi kosong, string "undefined", atau "null"
+          
             const cleanReason = (cad.reason && typeof cad.reason === 'string' && cad.reason.trim() !== '' && cad.reason !== 'undefined' && cad.reason !== 'null') ? cad.reason.trim() : null;
             
             const reasonHtml = cleanReason ? `<span class="text-[10px] text-slate-500 block mt-0.5">Keterangan: ${cleanReason}</span>` : '';
@@ -3256,7 +3347,7 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
 
       const filtered = appData.kepulangan.filter(k => k.date === selectedDate);
       
-      let listHtml = ''; // VAR PENAMPUNG STRING
+      let listHtml = ''; 
       
       filtered.forEach((k) => {
         if (k.videoUrl) sudahCount++; else belumCount++;
@@ -3290,7 +3381,7 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
         `;
       });
       
-      wrapper.innerHTML = listHtml; // RENDER DOM SEKALI
+      wrapper.innerHTML = listHtml; 
       document.getElementById('depCountSudah').innerText = `${sudahCount} Prodi`;
       document.getElementById('depCountBelum').innerText = `${belumCount} Prodi`;
       lucide.createIcons();
@@ -3332,7 +3423,7 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
         logs = logs.filter(l => !(l.date === date && l.prodiName === prodiName));
         storage.setItem('e_arvy_departure_logs', JSON.stringify(logs));
         
-        // Also remove from appData.kepulangan if it exists
+      
         const idx = appData.kepulangan.findIndex(k => k.date === date && k.prodiName === prodiName);
         if (idx !== -1) { appData.kepulangan[idx].videoUrl = ""; appData.kepulangan[idx].status = "Belum Pulang"; }
         storage.setItem('e_arvy_kepulangan', JSON.stringify(appData.kepulangan));
@@ -3424,7 +3515,7 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
         `;
       });
       
-      container.innerHTML = schedulesHtml; // RENDER DOM SEKALI
+      container.innerHTML = schedulesHtml;
       
       const adminPiket = document.querySelectorAll('.admin-piket-only');
       if (['Admin', 'Piket', 'Pokdo', 'Pengasuh'].includes(currentUser.role)) adminPiket.forEach(el => { el.classList.remove('hidden'); el.classList.add('inline-flex'); });
@@ -3523,7 +3614,7 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
         prodiListHtml += `
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 p-4 bg-slate-50 dark:bg-zinc-800/50 dark:border-zinc-700/80 rounded-ios-md border text-sm">
             <div><div class="font-bold text-slate-900 dark:text-white">${p.currentName}</div><div class="text-xs text-slate-400">Kompi: ${p.kompiNumber} | User: ${uName}</div></div>
-            <div class="flex flex-col gap-2"><input type="text" value="${p.currentName}" id="adm-prodi-name-${p.prodiId}" class="px-3 py-1.5 rounded border dark:bg-zinc-800 dark:border-zinc-700 dark:text-white text-xs"><input type="password" value="kadet123" id="adm-prodi-pass-${p.prodiId}" class="px-3 py-1.5 rounded border dark:bg-zinc-800 dark:border-zinc-700 dark:text-white text-xs"></div>
+            <div class="flex flex-col gap-2"><input type="text" value="${p.currentName}" id="adm-prodi-name-${p.prodiId}" class="px-3 py-1.5 rounded border dark:bg-zinc-800 dark:border-zinc-700 dark:text-white text-xs"><input type="password" value="cohort6 id="adm-prodi-pass-${p.prodiId}" class="px-3 py-1.5 rounded border dark:bg-zinc-800 dark:border-zinc-700 dark:text-white text-xs"></div>
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 lg:justify-end mt-2 lg:mt-0">
                <button onclick="saveAdminProdiRow(${p.prodiId}, '${p.currentName}')" class="w-full sm:w-auto px-4 py-2 bg-ios-blue text-white rounded text-xs font-bold">Simpan Nama</button>
                <button onclick="saveAdminProdiPass('${uName}', ${p.prodiId})" class="w-full sm:w-auto px-4 py-2 bg-slate-200 dark:bg-zinc-700 text-slate-800 dark:text-zinc-200 rounded text-xs font-bold transition-colors">Ubah Sandi</button>
