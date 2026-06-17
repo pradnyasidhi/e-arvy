@@ -473,9 +473,9 @@
                 <button onclick="switchTab('announce')" class="text-xs font-bold text-ios-blue hover:underline">Lihat Jadwal Penuh</button>
               </div>
               <div id="dashScheduleFlowWrapper" class="flex flex-col gap-4"></div>
-            div class="pt-4 border-t border-slate-100 dark:border-zinc-800/60">
+            <div class="pt-4 border-t border-slate-100 dark:border-zinc-800/60">
     <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Seragam Dinas Hari Ini:</span>
-    <p id="dashPakaianText" class="font-extrabold text-sm text-slate-900 dark:text-white">Pakaian Dinas Lapangan (PDL) + Baret</p>
+    <p id="dashPakaianText" class="font-extrabold text-sm text-slate-900 dark:text-white"> Seragam hari ini </p>
   </div>
 </div>
 
@@ -1147,7 +1147,7 @@ storage.removeItem = function(key) {
     }
 
     function initMockDatabase() {
-      if (!storage.getItem('e_arvy_initialized_real_data')) {
+      if (!storage.getItem('e_arvy_initialized_real_data_v3')) {
         const defaultProdiList = [
           { prodiId: 1, originalName: "FK 1", currentName: "FK 1", kompiNumber: 1 },
           { prodiId: 2, originalName: "FM 1", currentName: "FM 1", kompiNumber: 1 },
@@ -1298,7 +1298,7 @@ const defaultSchedules = [
 originalSetItem('e_arvy_schedules', JSON.stringify(defaultSchedules));
 originalSetItem('e_arvy_kepulangan', JSON.stringify([]));
 originalSetItem('e_arvy_absence_statuses', JSON.stringify(['Sakit', 'Izin', 'Dinas Luar', 'Dinas Dalam', 'Gasuh', 'Kontrol', 'Rawat Jalan', 'Tanpa Keterangan']));
-originalSetItem('e_arvy_initialized_real_data', 'true');
+originalSetItem('e_arvy_initialized_real_data_v3', 'true');
     }
   } 
 
@@ -1314,7 +1314,7 @@ originalSetItem('e_arvy_initialized_real_data', 'true');
   }
     function simulateServerCall(methodName, params) {
       if (methodName === 'login') {
-  const users = JSON.parse(storage.getItem('e_arvy_users_v2'));
+  const users = JSON.parse(storage.getItem('e_arvy_users_v2')) || [];
   
   const user = users.find(u => {
     if (u.username.toLowerCase() !== params.username.toLowerCase()) return false;
