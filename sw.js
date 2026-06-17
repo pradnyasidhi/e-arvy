@@ -78,6 +78,10 @@ self.addEventListener('fetch', event => {
         // Jika sedang offline dan file tidak ada di cache, Anda bisa merender halaman fallback offline di sini.
         console.log('[Service Worker] Jaringan terputus dan tidak ada cache.');
       })
+  ); // <-- KURUNG INI YANG SEBELUMNYA HILANG
+}); // <-- DAN KURUNG INI YANG SEBELUMNYA HILANG
+
+
 // --- EVENT KLIK NOTIFIKASI PWA ---
 self.addEventListener('notificationclick', function(event) {
   // 1. Tutup notifikasi setelah diklik
