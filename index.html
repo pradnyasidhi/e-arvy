@@ -1417,10 +1417,10 @@ let textRecap = `DATA ${params.activityName.toUpperCase()} KOPRAL KADET${kategor
                     const allSameReasonAndStatus = pKurang === pTotal && pAbsents.every(a => a.status === pAbsents[0].status && a.reason === pAbsents[0].reason);
                     
                     if (allSameReasonAndStatus) {
-                        textRecap += `SELURUH ${p.currentName} ${pAbsents[0].status.toUpperCase()}${pAbsents[0].reason ? ' (' + pAbsents[0].reason + ')' : ''}\n\n\n`;
+                        textRecap += `SELURUH ${p.currentName} ${pAbsents[0].status.toUpperCase()}${pAbsents[0].reason ? ' (' + pAbsents[0].reason.toUpperCase() + ')' : ''}\n\n\n`;
                     } else {
                         pAbsents.forEach(a => {
-                            textRecap += `- ${a.cadetName} (${a.status}${a.reason ? ': ' + a.reason : ''})\n`;
+                            textRecap += `- ${a.cadetName} (${a.status.toUpperCase()}${a.reason ? ': ' + a.reason.toUpperCase() : ''})\n`;
                         });
                         textRecap += `\n\n`;
                     }
