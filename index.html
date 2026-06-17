@@ -1626,13 +1626,14 @@ function togglePassword() {
 }
 
     function logout() {
-  if(confirm('Keluar sistem?')) {
-   
-    storage.removeItem('e_arvy_session'); 
-    storage.removeItem('e_arvy_active_tab');
-    currentUser = null;
-  }
-}
+      if(confirm('Keluar sistem?')) {
+storage.removeItem('e_arvy_session'); 
+        storage.removeItem('e_arvy_active_tab');
+        currentUser = null;
+        // 2. Tambahkan baris ini untuk me-refresh halaman otomatis!
+        window.location.reload();
+      }
+    }
 
     function setupUserInterface() {
       document.getElementById('userHeaderName').innerText = currentUser.username;
