@@ -1063,11 +1063,27 @@
   </div>
 
   <script>
-    let currentUser = null;
-    let scheduleModalMode = 'add';
-    let editingOldDate = '';
-    let editingOldTime = '';
-    let editingOldTitle = '';
+   let currentUser = null;
+let scheduleModalMode = 'add';
+let editingOldDate = '';
+let editingOldTime = '';
+let editingOldTitle = '';
+
+// --- 1. VARIABEL & FUNGSI NOTIFIKASI ---
+let notifiedSchedules = { date: '', events: [] };
+let initialDataLoaded = false;
+let lastAnnouncementText = "";
+let lastPendataanIds = [];
+
+function sendDesktopNotification(title, message) {
+  if ('Notification' in window && Notification.permission === 'granted') {
+    new Notification(title, {
+      body: message,
+      icon: 'https://www.image2url.com/r2/default/images/1781409226493-1bc2a13a-36c6-4972-9a1c-6114ed273acc.png'
+    });
+  }
+}
+// ---------------------------------------
 
     const DEFAULT_SVG_LOGO_LOGIN = `<img src="https://www.image2url.com/r2/default/images/1781409226493-1bc2a13a-36c6-4972-9a1c-6114ed273acc.png" class="w-14 h-14 object-contain rounded drop-shadow-lg" alt="Logo Login">`;
     const DEFAULT_SVG_LOGO = `<img src="https://www.image2url.com/r2/default/images/1781409226493-1bc2a13a-36c6-4972-9a1c-6114ed273acc.png" class="w-14 h-14 object-contain rounded drop-shadow-lg" alt="Logo Header">`;
@@ -1726,6 +1742,51 @@ const lastActiveTab = storage.getItem('e_arvy_active_tab') || 'dashboard';
       });
     }
 
+    function checkNotificationsForUpdates() {
+      // Jangan kirim notifikasi saat pertama kali login/buka web
+      if (!initialDataLoaded) {
+        lastAnnouncementText = appData.settings.general_announcement || "";
+        const items = JSON.parse(storage.getItem('e_arvy_pendataan') || '[]');
+        lastPendataanIds = items.map(i => i.id);
+        initialDataLoaded = true;
+        return;
+      }
+
+      // Cek apakah ada perubahan teks Pengumuman
+      const currentAnnouncement = appData.settings.general_announcement || "";
+      if (currentAnnouncement !== lastAnnouncementText && currentAnnouncement !== "") {
+        sendDesktopNotification("Pengumuman Diperbarui", currentAnnouncement);
+        lastAnnouncementText = currentAnnouncement; // Update memori
+      }
+
+      // Cek apakah ada item Pendataan baru
+      const currentItems = JSON.parse(storage.getItem('e_arvy_pendataan') || '[]');
+      const currentIds = currentItems.map(i => i.id);
+      
+      const newItems = currentItems.filter(i => !lastPendataanIds.includes(i.id));
+      if (newItems.length > 0) {
+        newItems.forEach(item => {
+          sendDesktopNotification("Pendataan Baru", `Formulir: ${item.title}`);
+        });
+        lastPendataanIds = currentIds; // Update memori
+      }
+    }
+ 
+
+    function loadDashboardAndAppData() {
+      callServer('getInitialData', null, (data) => {
+        appData = data;
+        renderApplicationLogos(); updateDashboardDetails(); populatePresensiActivities();
+        renderAttendanceList(); populateStatProdiOptions(); renderCharts(); renderHistoryTable();
+        renderKepulanganList(); renderDepartureLogs(); updateProfilePage();
+        
+        
+        checkNotificationsForUpdates();
+
+        if(currentUser.role === 'Admin') { renderAdminProdiList(); populateAdminProdiOptions(); renderAbsenceStatusManager(); }
+      });
+    }
+
     let isKepulanganResetToday = false;
 
     function startRealTimeClock() {
@@ -1746,8 +1807,44 @@ const lastActiveTab = storage.getItem('e_arvy_active_tab') || 'dashboard';
         if (hrs === "04") isKepulanganResetToday = false;
 
         renderDashboardSchedules(now);
-	updatePendataanCountdowns();
-      }, 1000);
+	    updatePendataanCountdowns();
+
+        if (currentUser && appData.schedules) {
+          const todayStr = now.toISOString().split('T')[0];
+          
+          // Reset memori pelacak jika berganti hari
+          if (notifiedSchedules.date !== todayStr) {
+            notifiedSchedules = { date: todayStr, events: [] };
+          }
+
+          const todaySchedules = appData.schedules.filter(s => s.date === todayStr || s.date);
+
+          todaySchedules.forEach(s => {
+            const eventKey = s.time + s.title;
+            // Jika sudah dikirimi notifikasi untuk acara ini, lewati
+            if (notifiedSchedules.events.includes(eventKey)) return;
+
+            const timeParts = s.time.split(':');
+            let eventTime = new Date(now);
+            eventTime.setHours(parseInt(timeParts[0]), parseInt(timeParts[1]), 0, 0);
+
+            const diffMs = eventTime - now;
+            const diffMins = Math.floor(diffMs / 60000);
+
+            // Jika selisih waktu persis 30 menit sebelumnya
+            if (diffMins === 30 && diffMs > 0) {
+              sendDesktopNotification(
+                "Persiapan Kegiatan!", 
+                `"${s.title}" akan dimulai 30 menit lagi (${s.time} WIB) di ${s.location || 'lokasi yang ditentukan'}.`
+              );
+              // Tandai agar tidak melakukan spam notifikasi setiap detik
+              notifiedSchedules.events.push(eventKey); 
+            }
+          });
+        }
+    
+
+      }, 1000); 
 
       const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
       const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
