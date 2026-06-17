@@ -387,14 +387,11 @@
       </button>
     </aside>
 
-    <!-- Main Content Area -->
     <main class="content-area flex-1 flex flex-col gap-6 min-w-0 mb-16 lg:mb-0">
 
-      <!-- View: Dashboard -->
-     <!-- View: Dashboard -->
       <section id="view-dashboard" class="view-screen active flex flex-col gap-6 transition-all-300">
         
-        <!-- Welcome Banner (Dikembalikan) -->
+       
         <div class="p-6 md:p-8 rounded-3xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-[0_8px_30px_rgb(0,122,255,0.2)]">
           <div class="flex flex-col gap-1.5">
             <h2 class="text-2xl sm:text-3xl font-black tracking-tight">Portal e-Arvy #6</h2>
@@ -407,10 +404,9 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
-          <!-- KIRI: KONTEN UTAMA (Span 2) -->
-          <div class="lg:col-span-2 flex flex-col gap-6">
+                   <div class="lg:col-span-2 flex flex-col gap-6">
             
-            <!-- Card 1: Rekap Presensi -->
+        
             <div class="p-6 bg-white dark:bg-zinc-900 rounded-3xl border border-slate-100 dark:border-zinc-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col gap-5">
               <div class="flex items-center justify-between mb-1">
                 <div class="flex items-center gap-2">
@@ -453,7 +449,7 @@
               </div>
             </div>
 
-            <!-- Card 2: Pendataan Terbaru -->
+      
             <div id="dashPendataanWrapper" class="hidden p-6 bg-[#f8f6ff] dark:bg-purple-900/10 rounded-3xl border border-purple-100/50 dark:border-purple-900/30 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col gap-5">
               <div class="flex items-center justify-between pb-2 border-b border-purple-100/50 dark:border-purple-800/50">
                 <div class="flex items-center gap-2">
@@ -477,11 +473,13 @@
                 <button onclick="switchTab('announce')" class="text-xs font-bold text-ios-blue hover:underline">Lihat Jadwal Penuh</button>
               </div>
               <div id="dashScheduleFlowWrapper" class="flex flex-col gap-4"></div>
-            </div>
+            div class="pt-4 border-t border-slate-100 dark:border-zinc-800/60">
+    <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Seragam Dinas Hari Ini:</span>
+    <p id="dashPakaianText" class="font-extrabold text-sm text-slate-900 dark:text-white">Pakaian Dinas Lapangan (PDL) + Baret</p>
+  </div>
+</div>
 
-          </div>
-
-          <!-- KANAN: SIDE PANEL (Span 1) -->
+          
           <div class="flex flex-col gap-6">
             
             <!-- Card 3: Clock (Dikembalikan ke mode Gelap/Dark) -->
@@ -491,7 +489,7 @@
               <p id="realTimeDate" class="text-[10px] text-slate-400 font-bold tracking-widest uppercase mt-1">Memuat...</p>
             </div>
 
-            <!-- Card 4: Pengumuman Umum -->
+        
             <div class="p-6 bg-white dark:bg-zinc-900 rounded-3xl border border-slate-100 dark:border-zinc-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col gap-4">
               <div class="flex items-center justify-between">
                 <h3 class="font-black text-lg tracking-tight text-slate-900 dark:text-white">Pengumuman Umum</h3>
@@ -504,54 +502,49 @@
               </div>
             </div>
 
-            <!-- Card 5: Gabungan Pakaian & Petugas Piket -->
-            <div class="p-6 bg-white dark:bg-zinc-900 rounded-3xl border border-slate-100 dark:border-zinc-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col gap-5">
-              <div class="flex items-center justify-between">
-                <h3 class="font-black text-lg tracking-tight text-slate-900 dark:text-white">Pakaian & Petugas Piket</h3>
-                <button onclick="switchTab('announce')" class="admin-piket-only hidden text-xs font-bold text-ios-blue hover:underline">Edit</button>
-              </div>
+          
+            
+<!-- Card 5: Khusus Petugas Piket -->
+<div class="p-6 bg-white dark:bg-zinc-900 rounded-3xl border border-slate-100 dark:border-zinc-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col gap-5">
+  <div class="flex items-center justify-between">
+    <h3 class="font-black text-lg tracking-tight text-slate-900 dark:text-white">Petugas Piket Batalyon</h3>
+    <button onclick="switchTab('announce')" class="admin-piket-only hidden text-xs font-bold text-ios-blue hover:underline">Edit</button>
+  </div>
 
-              <!-- Bagian Pakaian -->
-              <div class="bg-[#f8f9fa] dark:bg-zinc-800/40 p-4 rounded-2xl border border-slate-100 dark:border-zinc-800/60">
-                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Seragam Dinas Hari Ini:</span>
-                <p id="dashPakaianText" class="font-extrabold text-sm text-slate-900 dark:text-white">Pakaian Dinas Lapangan (PDL) + Baret</p>
-              </div>
+  <div class="flex flex-col gap-3">
+    <div class="p-3 bg-[#f8f9fa] dark:bg-zinc-800/40 rounded-2xl border border-slate-100 dark:border-zinc-800/60 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full border border-slate-200 overflow-hidden bg-slate-200 flex items-center justify-center text-slate-400 font-bold text-sm">
+          <img id="dashPiketPaAvatar" src="" class="w-full h-full object-cover hidden" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+          <span>Pa</span>
+        </div>
+        <div>
+          <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">Piket Batalyon Putra</span>
+          <h4 id="dashPiketBatPaName" class="text-xs font-black text-slate-900 dark:text-white">-</h4>
+        </div>
+      </div>
+      <a id="dashPiketBatPaTg" target="_blank" href="#" class="p-2 text-ios-blue hover:opacity-80 transition-colors">
+        <i data-lucide="send" class="w-4 h-4"></i>
+      </a>
+    </div>
 
-              <!-- Bagian Profil Petugas -->
-              <div class="flex flex-col gap-3">
-                <div class="p-3 bg-[#f8f9fa] dark:bg-zinc-800/40 rounded-2xl border border-slate-100 dark:border-zinc-800/60 flex justify-between items-center">
-                  <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full border border-slate-200 overflow-hidden bg-slate-200 flex items-center justify-center text-slate-400 font-bold text-sm">
-                      <img id="dashPiketPaAvatar" src="" class="w-full h-full object-cover hidden" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                      <span>Pa</span>
-                    </div>
-                    <div>
-                      <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">Piket Batalyon Putra</span>
-                      <h4 id="dashPiketBatPaName" class="text-xs font-black text-slate-900 dark:text-white">-</h4>
-                    </div>
-                  </div>
-                  <a id="dashPiketBatPaTg" target="_blank" href="#" class="p-2 text-ios-blue hover:opacity-80 transition-colors">
-                    <i data-lucide="send" class="w-4 h-4"></i>
-                  </a>
-                </div>
-
-                <div class="p-3 bg-[#f8f9fa] dark:bg-zinc-800/40 rounded-2xl border border-slate-100 dark:border-zinc-800/60 flex justify-between items-center">
-                  <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full border border-slate-200 overflow-hidden bg-slate-200 flex items-center justify-center text-slate-400 font-bold text-sm">
-                      <img id="dashPiketPiAvatar" src="" class="w-full h-full object-cover hidden" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                      <span>Pi</span>
-                    </div>
-                    <div>
-                      <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">Piket Batalyon Putri</span>
-                      <h4 id="dashPiketBatPiName" class="text-xs font-black text-slate-900 dark:text-white">-</h4>
-                    </div>
-                  </div>
-                  <a id="dashPiketBatPiTg" target="_blank" href="#" class="p-2 text-ios-blue hover:opacity-80 transition-colors">
-                    <i data-lucide="send" class="w-4 h-4"></i>
-                  </a>
-                </div>
-              </div>
-            </div>
+    <div class="p-3 bg-[#f8f9fa] dark:bg-zinc-800/40 rounded-2xl border border-slate-100 dark:border-zinc-800/60 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full border border-slate-200 overflow-hidden bg-slate-200 flex items-center justify-center text-slate-400 font-bold text-sm">
+          <img id="dashPiketPiAvatar" src="" class="w-full h-full object-cover hidden" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+          <span>Pi</span>
+        </div>
+        <div>
+          <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">Piket Batalyon Putri</span>
+          <h4 id="dashPiketBatPiName" class="text-xs font-black text-slate-900 dark:text-white">-</h4>
+        </div>
+      </div>
+      <a id="dashPiketBatPiTg" target="_blank" href="#" class="p-2 text-ios-blue hover:opacity-80 transition-colors">
+        <i data-lucide="send" class="w-4 h-4"></i>
+      </a>
+    </div>
+  </div>
+</div>
 
           </div>
         </div>
@@ -4077,6 +4070,8 @@ const logResults = await logQuery.find();
 <script>
   const originalOnload = window.onload;
   window.onload = function() {
+localStorage.removeItem('e_arvy_initialized_real_data');
+    localStorage.removeItem('e_arvy_users');
     try {
       if (typeof renderApplicationLogos === 'function') renderApplicationLogos();
       const icon = document.getElementById('localRefreshIcon');
