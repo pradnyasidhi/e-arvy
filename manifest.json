@@ -4,7 +4,7 @@
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#007aff",
+  "theme_color": "#ffffff
   "description": "Sistem Interoperabilitas & Presensi Terpadu Batalyon",
   "icons": [
     {
