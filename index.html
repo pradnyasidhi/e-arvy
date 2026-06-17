@@ -1694,9 +1694,8 @@ const lastActiveTab = storage.getItem('e_arvy_active_tab') || 'dashboard';
   if (file) {
     const reader = new FileReader();
     
-    // Ubah fungsi menjadi async agar bisa menunggu proses upload selesai
     reader.onload = async function(evt) {
-      // Tampilkan notifikasi loading agar pengguna tahu proses sedang berjalan
+      
       showToast('Mengunggah...', 'Mengirim logo ke Cloud Storage...', 'info');
       
       try {
@@ -1766,7 +1765,7 @@ const lastActiveTab = storage.getItem('e_arvy_active_tab') || 'dashboard';
       document.getElementById('realTimeDate').innerText = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
     }
 
-    // Dashboard Schedule - Active & Next Event Logic
+ 
     function renderDashboardSchedules(now = new Date()) {
       const flowWrapper = document.getElementById('dashScheduleFlowWrapper');
       if (!flowWrapper) return;
@@ -1869,7 +1868,7 @@ const lastActiveTab = storage.getItem('e_arvy_active_tab') || 'dashboard';
         document.getElementById('announcePiketBatPiName').value = ann.piketBatalyonPutriName || "";
         document.getElementById('announcePiketBatPiTg').value = ann.piketBatalyonPutriTelegram || "";
 
-        // Tampilan viewer piket di Laman Announce agar sama persis dengan Dashboard
+        
         document.getElementById('announceConfigViewer').innerHTML = `
           <div class="flex flex-col gap-3">
             <div class="p-3.5 bg-slate-50 dark:bg-zinc-800/40 rounded-ios-md border border-slate-100 dark:border-zinc-800/60 flex justify-between items-center">
@@ -1955,10 +1954,10 @@ updateDashboardPendataan();
   const icon = document.getElementById('localRefreshIcon');
   if (icon) icon.classList.add('animate-spin');
   
-  // Tarik data terbaru dari Cloud terlebih dahulu
+ 
   if (window.fetchDatabaseFromCloud) {
     window.fetchDatabaseFromCloud().then(() => {
-      // Setelah data cloud masuk ke lokal, muat ulang tampilan
+     
       loadDashboardAndAppData();
       setTimeout(() => { 
         if (icon) icon.classList.remove('animate-spin'); 
@@ -1979,7 +1978,7 @@ updateDashboardPendataan();
       const statSelect = document.getElementById('statActivitySelect');
       if (!select) return;
 
-      // 1. Simpan pilihan user saat ini sebelum daftar di-refresh
+ 
       const currentAct = select.value;
       const currentStatAct = statSelect.value;
 
@@ -1992,7 +1991,6 @@ updateDashboardPendataan();
       statSelect.innerHTML += `<option value="semua" selected>Semua Kegiatan</option>`;
       activities.forEach(act => statSelect.innerHTML += `<option value="${act}">${act}</option>`);
       
-      // 2. Kembalikan sistem ke pilihan semula
       if (currentAct) select.value = currentAct;
       if (currentStatAct) statSelect.value = currentStatAct;
 
@@ -2020,7 +2018,6 @@ updateDashboardPendataan();
       ['batalyon', 'putra', 'putri'].forEach(b => {
         const btn = document.getElementById(`cat-btn-${b}`);
         if (btn) {
-          // Perbaikan: Menambahkan warna text-slate-800 khusus tombol terang agar tidak putih-putih, dan text gelap untuk tombol inaktif
           btn.className = b === cat.toLowerCase() 
             ? "flex-1 text-center py-2.5 rounded-ios-sm text-xs font-bold bg-white text-slate-800 dark:bg-zinc-700 dark:text-white shadow-sm" 
             : "flex-1 text-center py-2.5 rounded-ios-sm text-xs font-bold text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-zinc-200";
@@ -2051,13 +2048,10 @@ updateDashboardPendataan();
       else customWrapper.classList.add('hidden');
     }
 
-    // Interactive Search Logic
-    // --- FITUR AUTO-SUGGEST PENCARIAN KADET ---
     function handleSearchInput() {
       const query = document.getElementById('searchCadetInput').value.toLowerCase().trim();
       const box = document.getElementById('searchSuggestionsBox');
 
-      // Sembunyikan pop-up jika ketikan kurang dari 2 huruf
       if (query.length < 2) {
         box.classList.add('hidden');
         box.classList.remove('flex');
@@ -2066,14 +2060,12 @@ updateDashboardPendataan();
       }
 
       let results = [];
-      // Cari kecocokan nama di semua prodi
       for (const prodi of appData.prodis) {
         const cadets = appData.cadets[prodi.currentName] || [];
         for (const c of cadets) {
           if (c.name.toLowerCase().includes(query)) {
             results.push({ cadet: c, prodi: prodi });
-            if (results.length >= 10) break; // Batasi maksimal 10 hasil agar tidak nge-lag
-          }
+            if (results.length >= 10) break;           }
         }
         if (results.length >= 10) break;
       }
@@ -2086,7 +2078,6 @@ updateDashboardPendataan();
 
       let html = '';
       results.forEach(res => {
-        // Efek teks tebal biru pada huruf yang diketik
         const regex = new RegExp(`(${query})`, "gi");
         const highlightedName = res.cadet.name.replace(regex, "<span class='text-ios-blue font-black'>$1</span>");
 
@@ -2175,7 +2166,6 @@ function toggleSelectAll(prodiId, isChecked) {
         }
       });
 
-      // Munculkan atau sembunyikan toolbar masal
       const toolbar = document.getElementById(`bulk-toolbar-${prodiId}`);
       if (bulkSelection[prodiId].size > 0) {
         toolbar.classList.remove('hidden');
@@ -2189,7 +2179,7 @@ function toggleSelectAll(prodiId, isChecked) {
       if (!bulkSelection[prodiId] || bulkSelection[prodiId].size === 0) return;
       
       const status = document.getElementById(`bulk-status-${prodiId}`).value;
-      const reasonText = document.getElementById(`bulk-reason-${prodiId}`).value; // Menarik teks alasan
+      const reasonText = document.getElementById(`bulk-reason-${prodiId}`).value; 
       const fileInput = document.getElementById(`bulk-file-${prodiId}`);
       
       const dateStr = document.getElementById('presensiDate').value;
@@ -2205,7 +2195,6 @@ function toggleSelectAll(prodiId, isChecked) {
             document.getElementById(`absence-detail-${prodiId}-${no}`).classList.remove('hidden');
             document.getElementById(`absence-detail-${prodiId}-${no}`).classList.add('flex');
             
-            // Terapkan Alasan Jika Ada
             if (reasonText) {
                 const reasonInput = document.getElementById(`absence-reason-${prodiId}-${no}`);
                 if (reasonInput) {
@@ -2227,14 +2216,12 @@ function toggleSelectAll(prodiId, isChecked) {
           }
         });
 
-        // Uncheck all
         document.querySelectorAll(`.bulk-cb-${prodiId}`).forEach(cb => cb.checked = false);
         const selectAllCb = document.getElementById(`select-all-cb-${prodiId}`);
         if (selectAllCb) selectAllCb.checked = false;
         bulkSelection[prodiId].clear();
         document.getElementById(`bulk-toolbar-${prodiId}`).classList.add('hidden');
         
-        // Reset tampilan input toolbar masal
         document.getElementById(`bulk-reason-${prodiId}`).value = '';
         const fileLbl = document.getElementById(`bulk-file-lbl-${prodiId}`);
         const fileTxt = document.getElementById(`bulk-file-txt-${prodiId}`);
@@ -2263,7 +2250,6 @@ function toggleSelectAll(prodiId, isChecked) {
       const container = document.getElementById('kompiGroupWrapper');
       if (!container) return;
 
-      // 1. SIMPAN POSISI SCROLL & DAFTAR KOMPI/PRODI YANG SEDANG DIBUKA
       const scrollPos = window.scrollY;
       const openKompis = [];
       for (let k = 1; k <= 6; k++) {
@@ -2480,22 +2466,18 @@ if (isEditable) {
             </div>
           `;
           compBody.appendChild(prodiBox);
-          // Hapus pemanggilan updateProdiSummary di baris ini
         });
 
         container.appendChild(compCard);
         updateSingleKompiCumulativeHdr(k);
       }
       
-      // TAMBAHKAN DI SINI: 
-      // Update rekap SETELAH semua elemen selesai dirender di layar
       appData.prodis.forEach(p => {
         updateProdiSummary(p.prodiId);
       });
 
       lucide.createIcons();
 
-      // 2. KEMBALIKAN TAMPILAN KOMPI/PRODI YANG TERBUKA & POSISI SCROLL TERAKHIR
       openKompis.forEach(k => {
         const el = document.getElementById(`company-body-${k}`);
         if (el) el.classList.remove('hidden');
@@ -2507,7 +2489,6 @@ if (isEditable) {
         if (chev) chev.classList.add('rotate-180');
       });
 
-      // Kembalikan posisi layar tanpa jeda
       setTimeout(() => {
         window.scrollTo(0, scrollPos);
       }, 10);
@@ -2518,13 +2499,11 @@ if (isEditable) {
       let act = document.getElementById('presensiActivitySelect').value;
       if (act === 'kustom') act = document.getElementById('customActivityName').value;
       
-      // Cek apakah presensi ini sudah dikunci
       const isLocked = storage.getItem(`locked_presensi_${dateStr}_${act}`) === 'true';
 
-      // Admin, Piket, Pokdo selalu bisa edit meskipun terkunci
       if (['Admin', 'Piket', 'Pokdo', 'Pengasuh'].includes(currentUser.role)) return true;
       
-      // Untuk Kadet, akses ditutup jika sudah terkunci
+    
       if (currentUser.role === 'Kopral Kadet') {
         if (isLocked) return false; 
         return currentUser.kompiName === 'Kompi ' + prodi.kompiNumber;
@@ -2626,11 +2605,10 @@ markAsUnsaved(prodiId);
         }
       });
 
-      // --- LOGIKA RINGKASAN KETERANGAN UI ---
+   
       let detailsHtml = 'Lengkap';
       if (absent > 0) {
-        // Cek apakah seluruh kadet di prodi tersebut tidak hadir dengan status dan alasan yang persis sama
-        const allSameReasonAndStatus = absent === cadets.length && absentList.every(a => a.status === absentList[0].status && a.reason === absentList[0].reason);
+              const allSameReasonAndStatus = absent === cadets.length && absentList.every(a => a.status === absentList[0].status && a.reason === absentList[0].reason);
 
         if (allSameReasonAndStatus) {
             detailsHtml = `SELURUH ${prodi.currentName} ${absentList[0].status.toUpperCase()}${absentList[0].reason ? ' (' + absentList[0].reason.toUpperCase() + ')' : ''}`;
@@ -2661,18 +2639,16 @@ function markAsUnsaved(prodiId) {
       const isSaved = storage.getItem(savedKey) === 'true';
 
       if (isSaved) {
-        // Hapus status tersimpan
+   
         storage.removeItem(savedKey);
 
-        // Ubah badge menjadi oranye
         const badge = document.getElementById(`prodi-badge-${prodiId}`);
         if (badge) {
           badge.className = "text-[9px] font-black uppercase px-2.5 py-0.5 rounded-full border bg-amber-50 text-ios-orange border-amber-500/30 whitespace-nowrap";
           badge.innerText = "Perlu Disimpan (Diedit)";
         }
 
-        // Sisakan hanya tombol simpan
-        const btnContainer = document.getElementById(`prodi-action-btns-${prodiId}`);
+                const btnContainer = document.getElementById(`prodi-action-btns-${prodiId}`);
         if (btnContainer) {
           btnContainer.innerHTML = `
             <button type="button" onclick="saveSingleProdiAttendance(${prodiId}, '${prodi.currentName}')" class="px-3 py-1.5 bg-ios-blue text-white rounded text-[10px] font-bold shadow-sm hover:opacity-90 active:scale-95 transition-all">
@@ -2715,7 +2691,7 @@ function markAsUnsaved(prodiId) {
       const cadets = (appData.cadets[prodiName] || []).filter(c => activeCategory === 'Batalyon' || (activeCategory === 'Putra' && c.gender === 'Laki-Laki') || (activeCategory === 'Putri' && c.gender === 'Perempuan'));
       let presentCnt = 0, absentCnt = 0;
       
-      // Array menampung detail status draft kadet untuk dibundle
+ 
       const cadetsDraftData = [];
 
       cadets.forEach(c => { 
@@ -2733,13 +2709,11 @@ function markAsUnsaved(prodiId) {
         });
       });
 
-      // 1. Simpan ke Local Storage Device Ini
-      storage.setItem(`saved_present_cnt_${dateStr}_${act}_${prodiId}`, presentCnt);
+         storage.setItem(`saved_present_cnt_${dateStr}_${act}_${prodiId}`, presentCnt);
       storage.setItem(`saved_absent_cnt_${dateStr}_${act}_${prodiId}`, absentCnt);
       storage.setItem(`saved_total_cnt_${dateStr}_${act}_${prodiId}`, cadets.length);
       storage.setItem(`saved_${dateStr}_${act}_${prodiName}`, 'true');
 
-      // 2. --- PROSES BUNDLING & UPLOAD KE CLOUD ---
       const bundleKey = `saved_bundle_${dateStr}_${act}_${prodiId}`;
       const bundleData = {
         dateStr,
@@ -2776,26 +2750,22 @@ function markAsUnsaved(prodiId) {
 
       const cadets = appData.cadets[prodiName] || []; 
 
-      // Hapus data lokal individu
       cadets.forEach(c => {
         storage.removeItem(`draft_status_${dateStr}_${act}_${prodiId}_${c.no}`); 
         storage.removeItem(`draft_reason_${dateStr}_${act}_${prodiId}_${c.no}`); 
         storage.removeItem(`draft_proof_${dateStr}_${act}_${prodiId}_${c.no}`); 
       });
 
-      // Hapus rekap lokal prodi
       storage.removeItem(`saved_present_cnt_${dateStr}_${act}_${prodiId}`); 
       storage.removeItem(`saved_absent_cnt_${dateStr}_${act}_${prodiId}`); 
       storage.removeItem(`saved_total_cnt_${dateStr}_${act}_${prodiId}`); 
       storage.removeItem(`saved_${dateStr}_${act}_${prodiName}`); 
 
-      // --- HAPUS BUNDLE DI LOKAL & UPDATE CLOUD JADI KOSONG ---
       const bundleKey = `saved_bundle_${dateStr}_${act}_${prodiId}`;
       storage.removeItem(bundleKey);
       
       if (window.syncLocalStorageToCloud) {
-        localStorage.setItem(bundleKey, "{}"); // Di-set kosong agar cloud tertimpa kosong
-        window.syncLocalStorageToCloud(bundleKey).then(() => {
+        localStorage.setItem(bundleKey, "{}");         window.syncLocalStorageToCloud(bundleKey).then(() => {
            localStorage.removeItem(bundleKey); 
         });
       }
@@ -2827,27 +2797,44 @@ function markAsUnsaved(prodiId) {
       const btn = document.querySelector('#verificationPanel button');
       btn.innerHTML = '<i data-lucide="loader" class="animate-spin w-4.5 h-4.5"></i> Memproses...';
       callServer('saveAttendance', { date: dateStr, activityName: act, category: activeCategory, totalCadets: totalQuota, absents, verifier: currentUser.username }, (res) => {
-        btn.innerHTML = '<i data-lucide="check-circle2" class="w-4.5 h-4.5"></i> Verifikasi & Simpan';
-        appData.prodis.forEach(p => storage.setItem(`saved_${dateStr}_${act}_${p.currentName}`, 'true'));
-        
-        // --- TAMBAHAN: Kunci akses kadet secara otomatis ---
-        storage.setItem(`locked_presensi_${dateStr}_${act}`, 'true');
-        if (window.syncLocalStorageToCloud) window.syncLocalStorageToCloud(`locked_presensi_${dateStr}_${act}`);
-        // ---------------------------------------------------
+      btn.innerHTML = '<i data-lucide="check-circle2" class="w-4.5 h-4.5"></i> Verifikasi & Simpan';
+      appData.prodis.forEach(p => storage.setItem(`saved_${dateStr}_${act}_${p.currentName}`, 'true'));
+      
+      storage.setItem(`locked_presensi_${dateStr}_${act}`, 'true');
+      if (window.syncLocalStorageToCloud) window.syncLocalStorageToCloud(`locked_presensi_${dateStr}_${act}`);
 
-        document.getElementById('recapTextarea').value = res.recapText; 
-        renderEvidenceGallery(absents);
-        switchRecapTab('text');
-        openModal('recapModal');
-        loadDashboardAndAppData(); showToast('Verifikasi Permanen', 'Selesai dan Akses Dikunci.', 'success');
-      }, () => { btn.innerHTML = '<i data-lucide="check-circle2" class="w-4.5 h-4.5"></i> Verifikasi'; showToast('Gagal', 'Terjadi kesalahan.', 'error'); });
-    }
+      const histories = JSON.parse(storage.getItem('e_arvy_history_attendance') || '[]');
+      currentViewedLog = histories.find(h => h.logId === res.logId);
 
-    // === FUNGSI TAB & GALERI REKAP BUKTI ===
+      const filterEl = document.getElementById('recapFilterOptions');
+      if (activeCategory === 'Batalyon') {
+        filterEl.classList.remove('hidden');
+
+        ['batalyon', 'putra', 'putri'].forEach(b => {
+          const fBtn = document.getElementById(`recap-filter-${b}`);
+          if (fBtn) fBtn.className = b === 'batalyon' 
+            ? "flex-1 text-center py-2 rounded-ios-sm text-xs font-bold bg-white text-slate-800 dark:bg-zinc-700 dark:text-white shadow-sm transition-all" 
+            : "flex-1 text-center py-2 rounded-ios-sm text-xs font-bold text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-zinc-200 transition-all";
+        });
+      } else {
+        filterEl.classList.add('hidden');
+      }
+
+      document.getElementById('recapTextarea').value = res.recapText; 
+      renderEvidenceGallery(absents);
+      switchRecapTab('text');
+      openModal('recapModal');
+      
+      loadDashboardAndAppData(); 
+      showToast('Verifikasi Permanen', 'Selesai dan Akses Dikunci.', 'success');
+    }, () => { 
+      btn.innerHTML = '<i data-lucide="check-circle2" class="w-4.5 h-4.5"></i> Verifikasi Semua & Simpan Permanen'; 
+      showToast('Gagal', 'Terjadi kesalahan saat menyimpan.', 'error'); 
+    });
+}
 let currentViewedLog = null; 
 
 function switchRecapTab(tab) {
-  // Cek otorisasi user
   const isAuthorized = ['Admin', 'Piket', 'Pokdo', 'Pengasuh'].includes(currentUser.role);
   
   if (tab === 'evidence' && !isAuthorized) {
@@ -2865,8 +2852,7 @@ function switchRecapTab(tab) {
 
   if (tab === 'text') {
     btnText.className = activeClass; 
-    if (isAuthorized) btnEvidence.className = inactiveClass; // Hanya ubah class jika memiliki akses
-    
+    if (isAuthorized) btnEvidence.className = inactiveClass;     
     contentText.classList.remove('hidden'); contentText.classList.add('flex');
     contentEvidence.classList.add('hidden'); contentEvidence.classList.remove('flex');
   } else if (tab === 'evidence' && isAuthorized) {
@@ -2925,7 +2911,7 @@ function switchRecapTab(tab) {
     }
 
     function buildDynamicRecapText(log, mode) {
-      // Jika mode Batalyon, panggil langsung data aslinya
+     
       if (mode === 'Batalyon') return log.recapText;
 
       const isPutra = mode === 'Putra';
@@ -2951,7 +2937,6 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
       text += `JUMLAH   : ${totalQuota}\n`;
       text += `KURANG   : ${absentCount}\n`;
       text += `HADIR    : ${presentCount}\n\n`;
-      // --- BAGIAN 1: KETERANGAN GLOBAL (TETAP TAMPILKAN SEMUA NAMA) ---
       text += `KETERANGAN:\n`;
 
       if (absentCount === 0) {
@@ -3044,7 +3029,7 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
     if (currentViewedLog.category === 'Batalyon') filterEl.classList.remove('hidden');
     else filterEl.classList.add('hidden');
 
-    // Tampilkan tombol "Kumpulan Bukti" HANYA JIKA user berwenang
+   
     const isAuthorized = ['Admin', 'Piket', 'Pokdo', 'Pengasuh'].includes(currentUser.role);
     const evidenceBtn = document.getElementById('recapTabBtnEvidence');
     if (evidenceBtn) {
@@ -3067,7 +3052,7 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
     function populateStatProdiOptions() {
       const s = document.getElementById('statProdiSelect');
       if (s) { 
-        // Simpan memori pilihan
+ 
         const currentVal = s.value;
         
         s.innerHTML = ''; 
@@ -3462,13 +3447,13 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
       if (!wrapper) return; 
       
       const statuses = JSON.parse(storage.getItem('e_arvy_absence_statuses') || '["Sakit", "Izin", "Alpa", "Dinas"]');
-      let statusHtml = ''; // VAR PENAMPUNG
+      let statusHtml = ''; 
       
       statuses.forEach(st => {
          statusHtml += `<div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-200 text-xs font-bold border"><span>${st}</span><button onclick="deleteAbsenceStatus('${st}')" class="text-ios-red font-black text-xs">&times;</button></div>`;
       });
       
-      wrapper.innerHTML = statusHtml; // RENDER DOM SEKALI
+      wrapper.innerHTML = statusHtml;
     }
 
     function addNewAbsenceStatus() {
@@ -3496,8 +3481,8 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
       const list = appData.schedules.filter(s => s.date === date || s.date);
       if (list.length === 0) { container.innerHTML = '<p class="text-slate-400 text-xs italic text-center py-4">Tidak ada jadwal.</p>'; return; }
 
-      let schedulesHtml = ''; // VAR PENAMPUNG
-      
+      let schedulesHtml = ''; 
+
       list.forEach(s => {
         const pBtn = s.photoUrl ? `<button onclick="viewDocumentedPhoto('${s.title}', '${s.photoUrl}')" class="flex-1 md:flex-none px-3 py-2 bg-emerald-100 text-ios-green rounded text-xs font-bold">Foto</button>` : '';
         schedulesHtml += `
@@ -3593,28 +3578,28 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
 
         if (filteredLogs.length === 0) { container.innerHTML = '<p class="text-slate-400 text-xs italic py-4">Belum ada aktivitas tercatat.</p>'; return; }
         
-        let logsHtml = ''; // VAR PENAMPUNG
+        let logsHtml = ''; 
         
         filteredLogs.forEach(l => {
           const t = new Date(l.timestamp);
           logsHtml += `<div class="flex justify-between items-center p-2.5 bg-slate-50 dark:bg-zinc-800/60 dark:border-zinc-700/50 rounded border text-xs text-slate-700 dark:text-zinc-200"><span><strong class="text-slate-900 dark:text-white">${l.username}</strong>: ${l.action}</span><span class="text-[10px] text-slate-400 font-bold">${t.toLocaleTimeString()} ${t.toLocaleDateString()}</span></div>`;
         });
         
-        container.innerHTML = logsHtml; // RENDER DOM SEKALI
+        container.innerHTML = logsHtml;
       });
     }
 
     function renderAdminProdiList() {
       const wrapper = document.getElementById('adminProdiList'); if (!wrapper) return; 
       
-      let prodiListHtml = ''; // VAR PENAMPUNG
+      let prodiListHtml = ''; 
       
       appData.prodis.forEach(p => {
         const uName = p.currentName.replace(/\s+/g, '').toLowerCase();
         prodiListHtml += `
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 p-4 bg-slate-50 dark:bg-zinc-800/50 dark:border-zinc-700/80 rounded-ios-md border text-sm">
             <div><div class="font-bold text-slate-900 dark:text-white">${p.currentName}</div><div class="text-xs text-slate-400">Kompi: ${p.kompiNumber} | User: ${uName}</div></div>
-            <div class="flex flex-col gap-2"><input type="text" value="${p.currentName}" id="adm-prodi-name-${p.prodiId}" class="px-3 py-1.5 rounded border dark:bg-zinc-800 dark:border-zinc-700 dark:text-white text-xs"><input type="password" value="cohort6 id="adm-prodi-pass-${p.prodiId}" class="px-3 py-1.5 rounded border dark:bg-zinc-800 dark:border-zinc-700 dark:text-white text-xs"></div>
+            <div class="flex flex-col gap-2"><input type="text" value="${p.currentName}" id="adm-prodi-name-${p.prodiId}" class="px-3 py-1.5 rounded border dark:bg-zinc-800 dark:border-zinc-700 dark:text-white text-xs"><input type="password" value="cohort6" id="adm-prodi-pass-${p.prodiId}" class="px-3 py-1.5 rounded border dark:bg-zinc-800 dark:border-zinc-700 dark:text-white text-xs"></div>
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 lg:justify-end mt-2 lg:mt-0">
                <button onclick="saveAdminProdiRow(${p.prodiId}, '${p.currentName}')" class="w-full sm:w-auto px-4 py-2 bg-ios-blue text-white rounded text-xs font-bold">Simpan Nama</button>
                <button onclick="saveAdminProdiPass('${uName}', ${p.prodiId})" class="w-full sm:w-auto px-4 py-2 bg-slate-200 dark:bg-zinc-700 text-slate-800 dark:text-zinc-200 rounded text-xs font-bold transition-colors">Ubah Sandi</button>
@@ -3622,8 +3607,7 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
           </div>`;
       });
       
-      wrapper.innerHTML = prodiListHtml; // RENDER DOM SEKALI
-    }
+      wrapper.innerHTML = prodiListHtml;     }
 
     function saveAdminProdiRow(pId, oName) {
       const nName = standardizeEYD(document.getElementById(`adm-prodi-name-${pId}`).value);
@@ -3642,7 +3626,7 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
       const sel = document.getElementById('adminSelectProdi').value; const list = appData.cadets[sel] || [];
       const w = document.getElementById('adminCadetListWrapper'); if(!w) return; 
       
-      let cadetsHtml = ''; // VAR PENAMPUNG
+      let cadetsHtml = '';
       
       list.forEach(c => {
         cadetsHtml += `
@@ -3655,7 +3639,7 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
           </div>`;
       });
       
-      w.innerHTML = cadetsHtml; // RENDER DOM SEKALI
+      w.innerHTML = cadetsHtml; 
     }
 
     function addBlankCadetToSelectedProdi() {
@@ -3671,7 +3655,7 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
       (appData.cadets[p] || []).forEach(c => list.push({ no: c.no, name: standardizeEYD(document.getElementById(`adm-cadet-name-${c.no}`).value), gender: document.getElementById(`adm-cadet-gender-${c.no}`).value }));
       callServer('updateCadetNames', { prodiName: p, cadetsList: list, username: currentUser.username }, () => { showToast('Tersimpan', `Roster ${p} disimpan.`, 'success'); loadDashboardAndAppData(); });
     }
-// 1. FUNGSI RENDER UTAMA LIST PENDATAAN
+
     function renderPendataanList() {
   const container = document.getElementById('pendataanListContainer');
   if (!container) return;
@@ -3684,7 +3668,7 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
     return;
   }
 
-  let allPendataanHtml = ''; // Penampung string
+  let allPendataanHtml = ''; 
 
   items.forEach((item) => {
     let itemHtml = '';
@@ -3747,17 +3731,15 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
     allPendataanHtml += itemHtml;
   });
 
-  container.innerHTML = allPendataanHtml; // Render ke DOM cukup sekali
+  container.innerHTML = allPendataanHtml; 
   lucide.createIcons();
   updatePendataanCountdowns();
 }
 
-    // 2. TIMING COUNTDOWN REALTIME HITUNG MUNDUR (DIJALANKAN TIAP DETIK)
-    function updatePendataanCountdowns() {
+function updatePendataanCountdowns() {
       const items = JSON.parse(storage.getItem('e_arvy_pendataan') || '[]');
       
-      // Fungsi pembantu untuk mengupdate teks & warna jam berdasarkan ID elemen
-      const updateTimerEl = (elId, item) => {
+          const updateTimerEl = (elId, item) => {
         const el = document.getElementById(elId);
         if (!el) return;
         
@@ -3777,18 +3759,17 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
         }
       };
 
-      // 1. Update timer di halaman Announce (semua item)
       items.forEach(item => {
         updateTimerEl(`countdown-pendataan-${item.id}`, item);
       });
 
-      // 2. Update timer di Dashboard (hanya item terbaru / index 0)
+      
       if (items.length > 0) {
         updateTimerEl('countdown-dash-pendataan', items[0]);
       }
     }
 
-    // 3. SEBUT DATA FORM KOSONG BARU (UNTUK PIKET)
+   
     function addNewPendataanItem() {
       const items = JSON.parse(storage.getItem('e_arvy_pendataan') || '[]');
       const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
@@ -3803,7 +3784,7 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
         gformUrl: "https://forms.gle/"
       };
 
-      items.unshift(newItem); // Letakkan paling atas
+      items.unshift(newItem);
       storage.setItem('e_arvy_pendataan', JSON.stringify(items));
       
       triggerCloudSyncForPendataan();
@@ -3811,7 +3792,7 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
       showToast('Ditambahkan', 'Item kolom pendataan berhasil dibuat.', 'success');
     }
 
-    // 4. SIMPAN PERUBAHAN SATU FORM BARIS KE STORAGE & CLOUD
+  
     function savePendataanItem(id) {
       const items = JSON.parse(storage.getItem('e_arvy_pendataan') || '[]');
       const idx = items.findIndex(i => i.id === id);
@@ -3829,7 +3810,7 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
       showToast('Tersimpan', 'Perubahan judul, isi, deadline, dan tautan sinkron.', 'success');
     }
 
-    // 5. HAPUS DATA PENDATAAN
+    
     function deletePendataanItem(id) {
       if (!confirm('Hapus lembar pendataan ini secara permanen dari sistem?')) return;
       let items = JSON.parse(storage.getItem('e_arvy_pendataan') || '[]');
@@ -3841,7 +3822,7 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
       showToast('Terhapus', 'Lembar kuisioner pendataan dibersihkan.', 'info');
     }
 
-    // 6. SYNC SINKRONISASI BERSAMA BACK4APP CLOUD
+    
     function triggerCloudSyncForPendataan() {
       if (window.syncLocalStorageToCloud) {
         window.syncLocalStorageToCloud('e_arvy_pendataan');
@@ -3854,13 +3835,12 @@ function updateDashboardPendataan() {
 
       const items = JSON.parse(storage.getItem('e_arvy_pendataan') || '[]');
       
-      // Sembunyikan kartu jika tidak ada pendataan
       if (items.length === 0) {
         wrapper.classList.add('hidden');
         return;
       }
 
-      // Tampilkan kartu dan ambil item index 0 (yang paling baru)
+ 
       wrapper.classList.remove('hidden');
       const item = items[0]; 
 
@@ -3882,9 +3862,8 @@ function updateDashboardPendataan() {
    function switchTab(viewId) {
       if (viewId === 'admin-panel' && currentUser.role !== 'Admin') return switchTab('dashboard');
       
-      // --- TAMBAHAN: Simpan tab terakhir ke LocalStorage ---
-      storage.setItem('e_arvy_active_tab', viewId);
-      // -----------------------------------------------------
+            storage.setItem('e_arvy_active_tab', viewId);
+     
 
       document.querySelectorAll('.view-screen').forEach(s => { s.classList.add('hidden'); s.classList.remove('active'); });
       const target = document.getElementById(`view-${viewId}`); 
@@ -3894,7 +3873,7 @@ function updateDashboardPendataan() {
       
       document.querySelectorAll('.tabbar-item').forEach(i => i.className = i.id === `tab-${viewId}` ? "tabbar-item flex flex-col items-center gap-0.5 text-ios-blue font-bold text-[10px]" : "tabbar-item flex flex-col items-center gap-0.5 text-slate-400 font-semibold text-[10px]");
       
-      // Perbaikan logika IF/ELSE
+      
       if (viewId === 'statistik') { 
         renderCharts(); 
         renderHistoryTable(); 
@@ -3937,10 +3916,9 @@ function updateDashboardPendataan() {
   Parse.initialize("yrivktjbMxh6WkhSfNZHvNypSplAnlNVe1Za6NRT", "ZMb4e7MYUQH8TlMeO85Ym4I797Zpyw9InkY91jkJ");
   Parse.serverURL = 'https://parseapi.back4app.com/';
 
-  // Deklarasi Tabel Relasional
-  const LogPresensi = Parse.Object.extend("LogPresensi");
+    const LogPresensi = Parse.Object.extend("LogPresensi");
 
-// FUNGSI BARU: Menghapus data general (kunci DataArvy) dari Cloud
+
   window.deleteFromCloud = async function(key) {
     try {
       const CloudStorage = Parse.Object.extend("DataArvy");
@@ -3956,7 +3934,6 @@ function updateDashboardPendataan() {
     }
   };
 
-  // FUNGSI BARU: Menghapus log spesifik dari tabel relasional LogPresensi
   window.deletePresensiFromCloud = async function(logId) {
     try {
       const LogPresensi = Parse.Object.extend("LogPresensi");
@@ -3972,7 +3949,6 @@ function updateDashboardPendataan() {
     }
   };
 
-  // Fungsi BARU: Menyimpan Presensi sebagai Baris Tersendiri
   window.savePresensiKeCloud = async function(dataPresensi) {
     try {
       const logBaru = new LogPresensi();
@@ -4013,10 +3989,8 @@ window.syncLocalStorageToCloud = async function(key) {
     }
   };
 
-  // REVISI PENTING: Mencegah Overfetching
   window.fetchDatabaseFromCloud = async function() {
     try {
-      // 1. Ambil pengaturan umum seperti biasa
       const CloudStorage = Parse.Object.extend("DataArvy");
       const settingQuery = new Parse.Query(CloudStorage);
       settingQuery.limit(1000); 
@@ -4024,31 +3998,25 @@ window.syncLocalStorageToCloud = async function(key) {
       
       const results = await settingQuery.find();
       
-      // =================================================================
-      // PERBAIKAN: Gunakan Set untuk mencatat kunci yang sudah diperbarui 
-      // dengan data TERBARU (Index 0). Abaikan sisa data yang lebih lama.
-      // =================================================================
+     
       const processedKeys = new Set();
 
       for (let i = 0; i < results.length; i++) {
         const kunci = results[i].get("kunci");
         
-        // Abaikan key history lama dan key sesi agar tidak bocor antar perangkat
-        if(kunci !== 'e_arvy_history_attendance' && kunci !== 'e_arvy_session' && kunci !== 'e_arvy_active_tab') {
+               if(kunci !== 'e_arvy_history_attendance' && kunci !== 'e_arvy_session' && kunci !== 'e_arvy_active_tab') {
             
-            // JIKA kunci ini belum pernah diproses (berarti ini data paling baru)
-            if (!processedKeys.has(kunci)) {
+                        if (!processedKeys.has(kunci)) {
                 localStorage.setItem(kunci, results[i].get("jsonString"));
-                processedKeys.add(kunci); // Tandai bahwa kunci ini sudah mendapat data terbaru
-            }
+                processedKeys.add(kunci);             }
         }
       }
 
-      // 2. Ambil History Absensi dari Tabel Relasional (Tarik Semua Data)
+     
       const logQuery = new Parse.Query(LogPresensi);
       logQuery.descending("createdAt"); 
-      logQuery.limit(10000); // Ubah ke angka maksimal yang besar agar semua log ditarik
-      const logResults = await logQuery.find();
+      logQuery.limit(10000); 
+const logResults = await logQuery.find();
       
       const formattedLogs = logResults.map(parseObj => ({
         logId: parseObj.get("logId"),
@@ -4065,8 +4033,6 @@ window.syncLocalStorageToCloud = async function(key) {
       }));
 
       localStorage.setItem('e_arvy_history_attendance', JSON.stringify(formattedLogs));
-
-      // Unpack bundle draft logic (sama seperti kode Anda aslinya)
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
         if (key && key.startsWith("saved_bundle_")) {
@@ -4093,14 +4059,14 @@ window.syncLocalStorageToCloud = async function(key) {
     }
   };
 
-  // 4. UPLOAD FOTO BUKTI ABSENSI KE STORAGE CLOUD
+ 
   window.uploadFileToCloudStorage = async function(base64Data, folderPath, fileName) {
     if (!base64Data || !base64Data.startsWith("data:")) return base64Data;
     try {
       const bersihFileName = fileName.replace(/[^a-zA-Z0-9]/g, "_") + ".jpg";
       const parseFile = new Parse.File(bersihFileName, { base64: base64Data });
       await parseFile.save();
-      return parseFile.url(); // Mengembalikan link gambar HTTPS publik
+      return parseFile.url(); 
     } catch(err) {
       console.error("Gagal unggah foto ke cloud:", err);
       return base64Data;
@@ -4125,13 +4091,10 @@ window.syncLocalStorageToCloud = async function(key) {
       if (typeof checkLoginSession === 'function') checkLoginSession();
       if (typeof startRealTimeClock === 'function') startRealTimeClock();
 
-      // ==============================================================
-      // PERBAIKAN: SEMBUNYIKAN LAYAR LOADING SECARA INSTAN!
-      // Jangan tunggu Cloud selesai. Langsung buka layar dalam 0.2 detik
-      // ==============================================================
+   
       setTimeout(() => document.getElementById('app-preloader')?.classList.add('preloader-hidden'), 200);
 
-      // Proses sinkronisasi Cloud tetap berjalan di latar belakang
+     
       if (window.fetchDatabaseFromCloud) {
         window.fetchDatabaseFromCloud().then(() => {
           if (icon) icon.classList.remove('animate-spin');
@@ -4155,7 +4118,6 @@ window.syncLocalStorageToCloud = async function(key) {
   };
 
     document.addEventListener("visibilitychange", () => {
-    // Terpicu ketika user membuka kembali tab browser / menyalakan layar HP
     if (document.visibilityState === "visible" && currentUser && window.fetchDatabaseFromCloud) {
       const icon = document.getElementById('localRefreshIcon');
       if (icon) icon.classList.add('animate-spin');
