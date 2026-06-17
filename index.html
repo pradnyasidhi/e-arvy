@@ -4203,7 +4203,7 @@ const logResults = await logQuery.find();
              }
            });
          }
-      }, 5000); 
+      }, 10000); 
     } catch (e) {
       console.error("Error saat inisialisasi:", e);
       setTimeout(() => document.getElementById('app-preloader')?.classList.add('preloader-hidden'), 200);
