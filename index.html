@@ -1069,21 +1069,33 @@ let editingOldDate = '';
 let editingOldTime = '';
 let editingOldTitle = '';
 
-// --- 1. VARIABEL & FUNGSI NOTIFIKASI ---
 let notifiedSchedules = { date: '', events: [] };
 let initialDataLoaded = false;
 let lastAnnouncementText = "";
 let lastPendataanIds = [];
 
-function sendDesktopNotification(title, message) {
-  if ('Notification' in window && Notification.permission === 'granted') {
-    new Notification(title, {
-      body: message,
-      icon: 'https://www.image2url.com/r2/default/images/1781409226493-1bc2a13a-36c6-4972-9a1c-6114ed273acc.png'
-    });
-  }
-}
-// ---------------------------------------
+    function sendDesktopNotification(title, message) {
+      if ('Notification' in window && Notification.permission === 'granted') {
+        
+                if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+          navigator.serviceWorker.ready.then(function(registration) {
+            registration.showNotification(title, {
+              body: message,
+              icon: 'https://www.image2url.com/r2/default/images/1781409226493-1bc2a13a-36c6-4972-9a1c-6114ed273acc.png',
+              vibrate: [200, 100, 200], // Efek getar jika diinstal di HP
+              requireInteraction: true // Notif tidak akan hilang sebelum diklik/ditutup user
+            });
+          });
+        } 
+                else {
+          new Notification(title, {
+            body: message,
+            icon: 'https://www.image2url.com/r2/default/images/1781409226493-1bc2a13a-36c6-4972-9a1c-6114ed273acc.png'
+          });
+        }
+        
+      }
+    }
 
     const DEFAULT_SVG_LOGO_LOGIN = `<img src="https://www.image2url.com/r2/default/images/1781409226493-1bc2a13a-36c6-4972-9a1c-6114ed273acc.png" class="w-14 h-14 object-contain rounded drop-shadow-lg" alt="Logo Login">`;
     const DEFAULT_SVG_LOGO = `<img src="https://www.image2url.com/r2/default/images/1781409226493-1bc2a13a-36c6-4972-9a1c-6114ed273acc.png" class="w-14 h-14 object-contain rounded drop-shadow-lg" alt="Logo Header">`;
