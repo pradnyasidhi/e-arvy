@@ -78,5 +78,29 @@ self.addEventListener('fetch', event => {
         // Jika sedang offline dan file tidak ada di cache, Anda bisa merender halaman fallback offline di sini.
         console.log('[Service Worker] Jaringan terputus dan tidak ada cache.');
       })
+// --- EVENT KLIK NOTIFIKASI PWA ---
+self.addEventListener('notificationclick', function(event) {
+  // 1. Tutup notifikasi setelah diklik
+  event.notification.close();
+
+  // 2. Tentukan URL yang akan difokuskan/dibuka (root URL aplikasi Anda)
+  const targetUrl = self.location.origin + '/'; // Sesuaikan jika aplikasi ada di dalam sub-folder
+
+  event.waitUntil(
+    // Cari semua window/tab browser yang sedang terbuka
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(clientList) {
+      // Cek apakah aplikasi e-Arvy sudah terbuka di salah satu window/tab
+      for (let i = 0; i < clientList.length; i++) {
+        let client = clientList[i];
+        // Jika sudah terbuka, langsung fokuskan (jangan buka tab ganda)
+        if (client.url.includes(self.location.origin) && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      // Jika aplikasi sedang tertutup penuh, buka window baru
+      if (clients.openWindow) {
+        return clients.openWindow(targetUrl);
+      }
+    })
   );
 });

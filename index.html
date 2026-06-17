@@ -1082,21 +1082,27 @@ let lastPendataanIds = [];
     function sendDesktopNotification(title, message) {
       if ('Notification' in window && Notification.permission === 'granted') {
         
-                if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+        if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
           navigator.serviceWorker.ready.then(function(registration) {
             registration.showNotification(title, {
               body: message,
               icon: 'https://www.image2url.com/r2/default/images/1781409226493-1bc2a13a-36c6-4972-9a1c-6114ed273acc.png',
-              vibrate: [200, 100, 200], // Efek getar jika diinstal di HP
-              requireInteraction: true // Notif tidak akan hilang sebelum diklik/ditutup user
+              vibrate: [200, 100, 200], 
+              requireInteraction: true 
             });
           });
         } 
-                else {
-          new Notification(title, {
+        else {
+          const notif = new Notification(title, {
             body: message,
             icon: 'https://www.image2url.com/r2/default/images/1781409226493-1bc2a13a-36c6-4972-9a1c-6114ed273acc.png'
           });
+          
+          // Tambahkan aksi saat notifikasi diklik (Fallback)
+          notif.onclick = function() {
+            window.focus(); // Fokuskan jendela browser ini
+            this.close(); // Tutup notifikasi
+          };
         }
         
       }
