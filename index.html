@@ -4438,6 +4438,8 @@ if ('serviceWorker' in navigator) {
 
   // Minta izin notifikasi saat tombol login ditekan (Bisa diletakkan di dalam handleLogin nanti)
   document.getElementById('loginSubmitBtn')?.addEventListener('click', requestNotificationPermission);
+</script>
+
 <!-- Banner Izin Suara -->
   <div id="soundPermissionBanner" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 shadow-2xl rounded-ios-lg p-4 z-[9999] flex flex-col gap-3 transition-all">
     <div class="flex items-center gap-3">
@@ -4454,6 +4456,6 @@ if ('serviceWorker' in navigator) {
       <button onclick="enableSoundContext()" class="flex-1 py-2 bg-ios-blue text-white text-xs font-bold rounded-ios-md shadow-md hover:opacity-90 transition-all">Izinkan Suara</button>
     </div>
   </div>
-</script>
+
 </body>
 </html>
