@@ -1935,17 +1935,17 @@ setTimeout(checkSoundPermission, 1500); // Tunda 1.5 detik agar munculnya halus
 
             // Jika selisih waktu persis 30 menit sebelumnya
             if (diffMins === 30 && diffMs > 0) {
-              let jenisSuara = 'default';
+              let soundType = 'default';
               
               // Jika judul jadwal adalah Rukan Malam, gunakan suara khusus
               if (s.title.toUpperCase().includes("RUKAN MALAM")) {
-                jenisSuara = 'rukanmalam';
+                soundType = 'rukanmalam';
               }
 
               sendDesktopNotification(
                 "Persiapan Kegiatan!", 
                 `"${s.title}" akan dimulai 30 menit lagi (${s.time} WIB) di ${s.location || 'lokasi yang ditentukan'}.`,
-                jenisSuara
+                soundType
               );
               // Tandai agar tidak melakukan spam notifikasi setiap detik
               notifiedSchedules.events.push(eventKey); 
