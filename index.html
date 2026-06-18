@@ -4447,10 +4447,10 @@ const logResults = await logQuery.find();
       if (icon) icon.classList.add('animate-spin');
 
       initMockDatabase();
-      const todayStr = new Date().toISOString().split('T')[0];
-      const pDate = document.getElementById('presensiDate'); if(pDate) pDate.value = todayStr;
-      const kDate = document.getElementById('kepulanganFilterDate'); if(kDate) kDate.value = todayStr;
-      const aDate = document.getElementById('announceScheduleDate'); if(aDate) aDate.value = todayStr;
+      const todayStr = getLocalDateString(); 
+const pDate = document.getElementById('presensiDate'); if(pDate) pDate.value = todayStr;
+const kDate = document.getElementById('kepulanganFilterDate'); if(kDate) kDate.value = todayStr;
+const aDate = document.getElementById('announceScheduleDate'); if(aDate) aDate.value = todayStr;
       
       if (typeof checkLoginSession === 'function') checkLoginSession();
       if (typeof startRealTimeClock === 'function') startRealTimeClock();
@@ -4459,16 +4459,21 @@ const logResults = await logQuery.find();
       setTimeout(() => document.getElementById('app-preloader')?.classList.add('preloader-hidden'), 200);
 
      
-      if (window.fetchDatabaseFromCloud) {
-        window.fetchDatabaseFromCloud().then(() => {
-          if (icon) icon.classList.remove('animate-spin');
-          if (typeof currentUser !== 'undefined' && currentUser && typeof loadDashboardAndAppData === 'function') {
-            loadDashboardAndAppData();
-          }
-        }).catch(err => {
-          if (icon) icon.classList.remove('animate-spin');
-        });
+     if (window.fetchDatabaseFromCloud) {
+  window.fetchDatabaseFromCloud().then(() => {
+    if (icon) icon.classList.remove('animate-spin');
+    if (typeof currentUser !== 'undefined' && currentUser && typeof loadDashboardAndAppData === 'function') {
+      loadDashboardAndAppData();
+      
+          const activeTab = storage.getItem('e_arvy_active_tab') || 'dashboard';
+      if (activeTab === 'announce') {
+         loadAnnounceSchedules();
       }
+    }
+  }).catch(err => {
+    if (icon) icon.classList.remove('animate-spin');
+  });
+}
 
       setInterval(() => {
          if (window.fetchDatabaseFromCloud && typeof currentUser !== 'undefined' && currentUser) {
