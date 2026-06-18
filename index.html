@@ -788,6 +788,18 @@
             </button>
           </div>
           
+<!-- Kartu Jadwal Terbaru Berlangsung -->
+<div class="p-6 bg-white/85 dark:bg-zinc-900/85 backdrop-blur-md rounded-ios-lg shadow-xl flex flex-col gap-5">
+  <div class="pb-2 border-b border-slate-100 dark:border-zinc-800 flex items-center gap-2">
+    <i data-lucide="clock" class="w-5 h-5 text-ios-orange animate-pulse"></i>
+    <div>
+      <h3 class="font-black text-lg tracking-tight">Jadwal Berlangsung & Berikutnya</h3>
+    </div>
+  </div>
+  
+  <!-- Wrapper ini akan diisi secara otomatis oleh JavaScript -->
+  <div id="announceLatestScheduleWrapper" class="flex flex-col gap-3"></div>
+</div>
           <div class="flex flex-col gap-1.5 max-w-xs">
             <label class="text-[10px] font-black uppercase tracking-widest text-slate-400">Pilih Tanggal Roster</label>
             <input type="date" id="announceScheduleDate" onchange="loadAnnounceSchedules()" class="w-full px-4 py-2.5 rounded-ios-md glass-input text-sm text-slate-950 dark:text-white focus:outline-none">
@@ -1926,6 +1938,7 @@ setTimeout(checkSoundPermission, 1500); // Tunda 1.5 detik agar munculnya halus
 
         renderDashboardSchedules(now);
 	    updatePendataanCountdowns();
+renderAnnounceLatestSchedule(now);
 
         if (currentUser && appData.schedules) {
           const todayStr = getLocalDateString(now);
@@ -2059,6 +2072,82 @@ setTimeout(checkSoundPermission, 1500); // Tunda 1.5 detik agar munculnya halus
       lucide.createIcons();
     }
 
+function renderAnnounceLatestSchedule(now = new Date()) {
+  const wrapper = document.getElementById('announceLatestScheduleWrapper');
+  if (!wrapper) return;
+  
+  const todayStr = now.toISOString().split('T')[0];
+  const todaySchedules = appData.schedules.filter(s => s.date === todayStr);
+  
+  if (todaySchedules.length === 0) {
+    wrapper.innerHTML = `<p class="text-slate-400 text-xs italic py-4 text-center">Belum ada kegiatan hari ini.</p>`;
+    return;
+  }
+
+  // Mengurutkan jadwal berdasarkan waktu
+  const sorted = [...todaySchedules].sort((a,b) => a.time.localeCompare(b.time));
+  const currentTimeStr = String(now.getHours()).padStart(2, '0') + ":" + String(now.getMinutes()).padStart(2, '0');
+  
+  let activeIdx = -1;
+  for (let i = 0; i < sorted.length; i++) {
+    if (currentTimeStr >= sorted[i].time) activeIdx = i;
+  }
+  
+  let activeEvent = activeIdx !== -1 ? sorted[activeIdx] : sorted[sorted.length - 1];
+  let nextEvent = activeIdx + 1 < sorted.length ? sorted[activeIdx + 1] : null;
+
+  let html = '';
+  
+  // Render: Kegiatan yang Sedang Berlangsung
+  if (activeEvent) {
+    html += `
+      <div class="flex justify-between items-center p-4 bg-blue-50/50 dark:bg-blue-900/20 rounded-ios-md border border-ios-blue/30 shadow-sm relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-1 h-full bg-ios-blue active-pulse"></div>
+        <div class="flex items-center gap-4 pl-2">
+          <div class="text-center min-w-[70px]">
+            <span class="text-lg font-black text-ios-blue">${activeEvent.time}</span>
+            <span class="text-[9px] font-black uppercase text-slate-400 block -mt-1">Berlangsung</span>
+          </div>
+          <div>
+            <h4 class="text-sm font-extrabold text-slate-800 dark:text-white">${activeEvent.title}</h4>
+            <p class="text-[10px] text-slate-500 font-bold"><i data-lucide="map-pin" class="w-3 h-3 inline text-ios-blue"></i> ${activeEvent.location || "-"}</p>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // Render: Hitung Mundur Kegiatan Berikutnya
+  if (nextEvent) {
+    const nextTimeParts = nextEvent.time.split(':');
+    let target = new Date(now);
+    target.setHours(parseInt(nextTimeParts[0]), parseInt(nextTimeParts[1]), 0, 0);
+    const diffMs = target - now;
+    const diffHrs = Math.floor(diffMs / 3600000);
+    const diffMins = Math.floor((diffMs % 3600000) / 60000);
+    const diffStr = diffHrs > 0 ? `${diffHrs}j ${diffMins}m` : `${diffMins} menit`;
+
+    html += `
+      <div class="flex justify-between items-center p-4 bg-slate-50 dark:bg-zinc-800/40 rounded-ios-md border border-slate-200/50 dark:border-zinc-700 mt-1">
+        <div class="flex items-center gap-4">
+          <div class="text-center min-w-[70px]">
+            <span class="text-lg font-black text-slate-700 dark:text-zinc-300">${nextEvent.time}</span>
+            <span class="text-[9px] font-black uppercase text-ios-orange block -mt-1">Berikutnya</span>
+          </div>
+          <div>
+            <h4 class="text-sm font-extrabold text-slate-600 dark:text-zinc-300">${nextEvent.title}</h4>
+          </div>
+        </div>
+        <div class="text-right">
+          <span class="px-2.5 py-1 bg-orange-100 text-ios-orange rounded text-[10px] font-black"><i data-lucide="timer" class="w-3 h-3 inline"></i> ${diffStr} lagi</span>
+        </div>
+      </div>
+    `;
+  }
+  
+  wrapper.innerHTML = html;
+  if (typeof lucide !== 'undefined') lucide.createIcons();
+}
     function updateDashboardDetails() {
       setCategory(activeCategory);
       document.getElementById('dashGeneralAnnouncement').innerText = appData.settings.general_announcement || "Belum ada pengumuman.";
