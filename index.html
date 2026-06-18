@@ -2046,13 +2046,16 @@ setTimeout(checkSoundPermission, 1500); // Tunda 1.5 detik agar munculnya halus
         if (ann.piketBatalyonPutraAvatar) {
           const imgPa = document.getElementById('dashPiketPaAvatar');
           imgPa.src = ann.piketBatalyonPutraAvatar;
+          imgPa.style.display = ''; 
           imgPa.classList.remove('hidden'); 
-          imgPa.nextElementSibling.style.display = 'none';        }
+          if(imgPa.nextElementSibling) imgPa.nextElementSibling.style.display = 'none';        
+        }
         if (ann.piketBatalyonPutriAvatar) {
           const imgPi = document.getElementById('dashPiketPiAvatar');
           imgPi.src = ann.piketBatalyonPutriAvatar;
-          imgPi.classList.remove('hidden');
-          imgPi.nextElementSibling.style.display = 'none';        }
+          imgPi.style.display = '';           imgPi.classList.remove('hidden');
+          if(imgPi.nextElementSibling) imgPi.nextElementSibling.style.display = 'none';        
+        }
 
         document.getElementById('announcePakaian').value = ann.pakaianInfo || "";
         document.getElementById('announcePiketBatPaName').value = ann.piketBatalyonPutraName || "";
