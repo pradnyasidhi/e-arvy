@@ -2195,7 +2195,6 @@ updateDashboardPendataan();
         compressImage(file, 100, async function(compressedBase64) {
           showToast('Mengunggah...', `Mengirim foto piket ke Cloud...`, 'info');
           
-         
           const cloudUrl = await window.uploadFileToCloudStorage(compressedBase64, 'piket_avatars', `piket_${type}_${Date.now()}`);
           
           const today = new Date().toISOString().split('T')[0];
@@ -2208,7 +2207,12 @@ updateDashboardPendataan();
           if (type === 'Pa') ann.piketBatalyonPutraAvatar = cloudUrl;
           else ann.piketBatalyonPutriAvatar = cloudUrl;
           
-          showToast('Avatar Siap', `Foto profil piket tersimpan sementara. Klik simpan pengumuman.`, 'success');
+                    storage.setItem('e_arvy_announcements', JSON.stringify(appData.announcements));
+          if (window.syncLocalStorageToCloud) window.syncLocalStorageToCloud('e_arvy_announcements');
+          
+                    updateDashboardDetails();
+          
+          showToast('Avatar Tersimpan', `Foto profil piket berhasil diperbarui di Cloud.`, 'success');
         });
       }
     }     
@@ -2225,6 +2229,10 @@ function handleProfilePhotoUpload(event) {
             storage.setItem('e_arvy_session', JSON.stringify(currentUser)); 
             
             updateProfilePage(); 
+            
+                if (window.syncLocalStorageToCloud) {
+                window.syncLocalStorageToCloud('e_arvy_users_v6'); 
+            }
                        
             showToast('Berhasil', 'Foto profil diperbarui untuk semua perangkat.', 'success');
           });
