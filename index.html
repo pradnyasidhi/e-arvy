@@ -3774,7 +3774,22 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
     }
 
     function populateAdminProdiOptions() {
-      const s = document.getElementById('adminSelectProdi'); if(s) { s.innerHTML = ''; appData.prodis.forEach(p => s.innerHTML += `<option value="${p.currentName}">${p.currentName}</option>`); loadAdminCadetList(); }
+      const s = document.getElementById('adminSelectProdi');
+      if (s) {
+            const currentVal = s.value;
+        
+        s.innerHTML = '';
+        appData.prodis.forEach(p => s.innerHTML += `<option value="${p.currentName}">${p.currentName}</option>`);
+        
+               if (currentVal) {
+          const exists = appData.prodis.some(p => p.currentName === currentVal);
+          if (exists) {
+            s.value = currentVal;
+          }
+        }
+        
+             loadAdminCadetList();
+      }
     }
 
     function loadAdminCadetList() {
