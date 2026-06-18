@@ -1087,7 +1087,24 @@ let initialDataLoaded = false;
 let lastAnnouncementText = "";
 let lastPendataanIds = [];
 
-    function sendDesktopNotification(title, message) {
+    function sendDesktopNotification(title, message, soundType = 'default') {
+      
+      // --- LOGIKA PEMUTAR SUARA KUSTOM ---
+      try {
+        let audioFile = '';
+        if (soundType === 'peluit') audioFile = './sounds/peluit.mp3';
+        else if (soundType === 'pengumuman') audioFile = './sounds/sirine.mp3';
+        
+        if (audioFile !== '') {
+          const audio = new Audio(audioFile);
+          // Putar suara. Catch error digunakan jika browser memblokir Autoplay
+          audio.play().catch(err => console.log('Suara diblokir oleh browser (butuh interaksi pengguna):', err));
+        }
+      } catch(e) {
+        console.log('Gagal memutar audio', e);
+      }
+      // -----------------------------------
+
       if ('Notification' in window && Notification.permission === 'granted') {
         
         if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
@@ -1095,7 +1112,7 @@ let lastPendataanIds = [];
             registration.showNotification(title, {
               body: message,
               icon: 'https://www.image2url.com/r2/default/images/1781409226493-1bc2a13a-36c6-4972-9a1c-6114ed273acc.png',
-              vibrate: [200, 100, 200], 
+              vibrate: soundType === 'peluit' ? [300, 100, 300, 100, 300] : [200, 100, 200], 
               requireInteraction: true 
             });
           });
@@ -1106,13 +1123,11 @@ let lastPendataanIds = [];
             icon: 'https://www.image2url.com/r2/default/images/1781409226493-1bc2a13a-36c6-4972-9a1c-6114ed273acc.png'
           });
           
-          // Tambahkan aksi saat notifikasi diklik (Fallback)
           notif.onclick = function() {
-            window.focus(); // Fokuskan jendela browser ini
-            this.close(); // Tutup notifikasi
+            window.focus(); 
+            this.close(); 
           };
         }
-        
       }
     }
 
@@ -1801,7 +1816,7 @@ const lastActiveTab = storage.getItem('e_arvy_active_tab') || 'dashboard';
       // Cek apakah ada perubahan teks Pengumuman
       const currentAnnouncement = appData.settings.general_announcement || "";
       if (currentAnnouncement !== lastAnnouncementText && currentAnnouncement !== "") {
-        sendDesktopNotification("Pengumuman Diperbarui", currentAnnouncement);
+        sendDesktopNotification("Pengumuman Diperbarui", currentAnnouncement, "pengumuman");
         lastAnnouncementText = currentAnnouncement; // Update memori
       }
 
