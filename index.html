@@ -2219,7 +2219,6 @@ function handleProfilePhotoUpload(event) {
         compressImage(file, 100, async function(compressedBase64) {
           showToast('Mengunggah...', 'Mengirim foto profil ke Cloud...', 'info');
           
-  
           const cloudUrl = await window.uploadFileToCloudStorage(compressedBase64, 'profile_photos', `profile_${currentUser.username}_${Date.now()}`);
           
           callServer('updateProfilePhoto', { username: currentUser.username, photoBase64: cloudUrl }, () => {
@@ -2227,9 +2226,7 @@ function handleProfilePhotoUpload(event) {
             storage.setItem('e_arvy_session', JSON.stringify(currentUser)); 
             
             updateProfilePage(); 
-            if (window.syncLocalStorageToCloud) {
-                window.syncLocalStorageToCloud('e_arvy_users_v6'); 
-            }
+                       
             showToast('Berhasil', 'Foto profil diperbarui untuk semua perangkat.', 'success');
           });
         });
@@ -3842,9 +3839,24 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
     }
 
     function updateProfilePage() {
-      document.getElementById('profileUsername').innerText = currentUser.username; document.getElementById('profileRoleBadge').innerText = currentUser.role;
-      document.getElementById('profileKompi').innerText = currentUser.kompiName || "Batalyon"; document.getElementById('profileProdi').innerText = currentUser.prodiName || "Tidak ada (Akses Penuh)";
-      if (currentUser.profilePhoto) { document.getElementById('profilePhotoImg').src = currentUser.profilePhoto; document.getElementById('profilePhotoImg').classList.remove('hidden'); document.getElementById('profilePhotoPlaceholder').classList.add('hidden'); }
+          try {
+        const users = JSON.parse(storage.getItem('e_arvy_users_v6') || '[]');
+        const dbUser = users.find(u => u.username === currentUser.username);
+        if (dbUser && dbUser.profilePhoto) {
+           currentUser.profilePhoto = dbUser.profilePhoto;
+           storage.setItem('e_arvy_session', JSON.stringify(currentUser));         }
+      } catch(e) {}
+
+      document.getElementById('profileUsername').innerText = currentUser.username; 
+      document.getElementById('profileRoleBadge').innerText = currentUser.role;
+      document.getElementById('profileKompi').innerText = currentUser.kompiName || "Batalyon"; 
+      document.getElementById('profileProdi').innerText = currentUser.prodiName || "Tidak ada (Akses Penuh)";
+      
+      if (currentUser.profilePhoto) { 
+        document.getElementById('profilePhotoImg').src = currentUser.profilePhoto; 
+        document.getElementById('profilePhotoImg').classList.remove('hidden'); 
+        document.getElementById('profilePhotoPlaceholder').classList.add('hidden'); 
+      }
       
       callServer('getActivityLogs', null, (logs) => {
         const container = document.getElementById('activityLogsWrapper'); if (!container) return; 
