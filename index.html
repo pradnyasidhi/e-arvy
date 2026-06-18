@@ -1352,7 +1352,7 @@ storage.removeItem = function(key) {
         originalSetItem('e_arvy_cadets', JSON.stringify(cadets));
 originalSetItem('e_arvy_settings', JSON.stringify(appData.settings));
 
-        const todayStr = new Date()getLocalDateString();
+        const todayStr = getLocalDateString();
 const defaultSchedules = [
 { date: todayStr, time: "05:00", title: "Apel Pagi", location: "Lapangan Utama", photoUrl: "" },
           { date: todayStr, time: "12:00", title: "Makan Siang", location: "Ruang Makan"} ];
@@ -1402,7 +1402,7 @@ originalSetItem('e_arvy_initialized_real_data_v6', 'true');
         data.historyAttendance.sort((a, b) => new Date(b.verifiedAt) - new Date(a.verifiedAt));
         data.latestAttendance = data.historyAttendance.length > 0 ? data.historyAttendance[0] : null;
         return data;
-      }}
+      }
       if (methodName === 'saveAttendance') {
         const histories = JSON.parse(storage.getItem('e_arvy_history_attendance') || '[]');
         
@@ -1624,7 +1624,7 @@ originalSetItem('e_arvy_initialized_real_data_v6', 'true');
 
     window.onload = function() {
       initMockDatabase();
-      const todayStr = new Date().toISOString().split('T')[0];
+      const todayStr = getLocalDateString();
       document.getElementById('presensiDate').value = todayStr;
       document.getElementById('kepulanganFilterDate').value = todayStr;
       document.getElementById('announceScheduleDate').value = todayStr;
@@ -1925,7 +1925,7 @@ setTimeout(checkSoundPermission, 1500); // Tunda 1.5 detik agar munculnya halus
 	    updatePendataanCountdowns();
 
         if (currentUser && appData.schedules) {
-          const todayStr = now.toISOString().split('T')[0];
+          const todayStr = getLocalDateString(now);
           
           // Reset memori pelacak jika berganti hari
           if (notifiedSchedules.date !== todayStr) {
@@ -2060,7 +2060,7 @@ setTimeout(checkSoundPermission, 1500); // Tunda 1.5 detik agar munculnya halus
       setCategory(activeCategory);
       document.getElementById('dashGeneralAnnouncement').innerText = appData.settings.general_announcement || "Belum ada pengumuman.";
       
-      const today = new Date().toISOString().split('T')[0];
+      const today = getLocalDateString();
       const ann = appData.announcements.find(a => a.date === today) || appData.announcements[appData.announcements.length - 1];
       
       if (ann) {
@@ -3599,7 +3599,7 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
     function renderKepulanganList() {
       const wrapper = document.getElementById('kepulanganListWrapper');
       if (!wrapper) return;
-      const selectedDate = document.getElementById('kepulanganFilterDate').value || new Date().toISOString().split('T')[0];
+      const selectedDate = document.getElementById('kepulanganFilterDate').value || getLocalDateString();
       let sudahCount = 0, belumCount = 0;
 
       appData.prodis.forEach((prodi) => {
@@ -4115,7 +4115,7 @@ function updatePendataanCountdowns() {
     function addNewPendataanItem() {
       const items = JSON.parse(storage.getItem('e_arvy_pendataan') || '[]');
       const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
-      const tomorrowStr = tomorrow.toISOString().split('T')[0];
+      const tomorrowStr = getLocalDateString(tomorrow);
 
       const newItem = {
         id: "P_" + new Date().getTime(),
