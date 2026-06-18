@@ -1083,6 +1083,13 @@ let initialDataLoaded = false;
 let lastAnnouncementText = "";
 let lastPendataanIds = [];
 
+function getLocalDateString(d = new Date()) {
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
     function sendDesktopNotification(title, message, soundType = 'default') {
       
       // --- LOGIKA PEMUTAR SUARA KUSTOM ---
@@ -1345,7 +1352,7 @@ storage.removeItem = function(key) {
         originalSetItem('e_arvy_cadets', JSON.stringify(cadets));
 originalSetItem('e_arvy_settings', JSON.stringify(appData.settings));
 
-        const todayStr = new Date().toISOString().split('T')[0];
+        const todayStr = new Date()getLocalDateString();
 const defaultSchedules = [
 { date: todayStr, time: "05:00", title: "Apel Pagi", location: "Lapangan Utama", photoUrl: "" },
           { date: todayStr, time: "12:00", title: "Makan Siang", location: "Ruang Makan"} ];
@@ -1385,17 +1392,17 @@ originalSetItem('e_arvy_initialized_real_data_v6', 'true');
 }
       if (methodName === 'getInitialData') {
         const data = {};
-        data.settings = JSON.parse(storage.getItem('e_arvy_settings'));
-        data.prodis = JSON.parse(storage.getItem('e_arvy_prodis'));
-        data.cadets = JSON.parse(storage.getItem('e_arvy_cadets'));
-        data.schedules = JSON.parse(storage.getItem('e_arvy_schedules'));
-        data.kepulangan = JSON.parse(storage.getItem('e_arvy_kepulangan'));
+        data.settings = JSON.parse(storage.getItem('e_arvy_settings') || '{}');
+        data.prodis = JSON.parse(storage.getItem('e_arvy_prodis') || '[]');
+        data.cadets = JSON.parse(storage.getItem('e_arvy_cadets') || '{}');
+        data.schedules = JSON.parse(storage.getItem('e_arvy_schedules') || '[]'); // WAJIB ADA || '[]'
+        data.kepulangan = JSON.parse(storage.getItem('e_arvy_kepulangan') || '[]');
         data.announcements = JSON.parse(storage.getItem('e_arvy_announcements') || '[]');
         data.historyAttendance = JSON.parse(storage.getItem('e_arvy_history_attendance') || '[]');
         data.historyAttendance.sort((a, b) => new Date(b.verifiedAt) - new Date(a.verifiedAt));
         data.latestAttendance = data.historyAttendance.length > 0 ? data.historyAttendance[0] : null;
         return data;
-      }
+      }}
       if (methodName === 'saveAttendance') {
         const histories = JSON.parse(storage.getItem('e_arvy_history_attendance') || '[]');
         
@@ -2224,7 +2231,7 @@ updateDashboardPendataan();
           else ann.piketBatalyonPutriAvatar = cloudUrl;
           
                     storage.setItem('e_arvy_announcements', JSON.stringify(appData.announcements));
-          if (window.syncLocalStorageToCloud) window.syncLocalStorageToCloud('e_arvy_announcements');
+          
           
                     updateDashboardDetails();
           
@@ -4550,7 +4557,7 @@ if ('serviceWorker' in navigator) {
 </script>
 
 <!-- Banner Izin Suara -->
-  <div id="soundPermissionBanner" class="hidden fixed top-24 left-1/2 -translate-x-1/2 w-[90%] max-w-sm bg-white dark:bg-zinc-90000 border border-slate-200 dark:border-zinc-700 shadow-2xl rounded-ios-lg p-4 z-[9999] flex flex-col gap-3 transition-all">
+  <div id="soundPermissionBanner" class="hidden fixed top-24 left-1/2 -translate-x-1/2 w-[90%] max-w-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 shadow-2xl rounded-ios-lg p-4 z-[9999] flex flex-col gap-3 transition-all">
     <div class="flex items-center gap-3">
       <div class="p-2.5 bg-blue-50 dark:bg-blue-900/30 rounded-full text-ios-blue">
         <i data-lucide="volume-2" class="w-6 h-6"></i>
