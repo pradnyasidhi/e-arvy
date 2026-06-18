@@ -1088,8 +1088,9 @@ let lastPendataanIds = [];
       // --- LOGIKA PEMUTAR SUARA KUSTOM ---
       try {
         let audioFile = '';
-        if (soundType === 'peluit') audioFile = './sounds/peluit.mp3';
-        else if (soundType === 'pengumuman') audioFile = './sounds/stealing.mp3';
+        if (soundType === 'bell') audioFile = './sounds/bell.mp3';
+        else if (soundType === 'stealing') audioFile = './sounds/stealing.mp3';
+else if (soundType === 'rukanmalam') audioFile = './sounds/rukanmalam.mp3';
         
         if (audioFile !== '') {
           const audio = new Audio(audioFile);
@@ -1847,10 +1848,16 @@ setTimeout(checkSoundPermission, 1500); // Tunda 1.5 detik agar munculnya halus
         return;
       }
 
-      // Cek apakah ada perubahan teks Pengumuman
+      // cek apakah ada perubahan teks Pengumuman
       const currentAnnouncement = appData.settings.general_announcement || "";
       if (currentAnnouncement !== lastAnnouncementText && currentAnnouncement !== "") {
-        sendDesktopNotification("Pengumuman Diperbarui", currentAnnouncement, "pengumuman");
+        
+        if (currentAnnouncement.toUpperCase().includes("APEL LUAR BIASA")) {
+          sendDesktopNotification("PERINGATAN: APEL LUAR BIASA!", currentAnnouncement, "stealing");
+        } else {
+          sendDesktopNotification("Pengumuman Diperbarui", currentAnnouncement, "bell");
+        }
+        
         lastAnnouncementText = currentAnnouncement; // Update memori
       }
 
@@ -1928,9 +1935,17 @@ setTimeout(checkSoundPermission, 1500); // Tunda 1.5 detik agar munculnya halus
 
             // Jika selisih waktu persis 30 menit sebelumnya
             if (diffMins === 30 && diffMs > 0) {
+              let jenisSuara = 'default';
+              
+              // Jika judul jadwal adalah Rukan Malam, gunakan suara khusus
+              if (s.title.toUpperCase().includes("RUKAN MALAM")) {
+                jenisSuara = 'rukan';
+              }
+
               sendDesktopNotification(
                 "Persiapan Kegiatan!", 
-                `"${s.title}" akan dimulai 30 menit lagi (${s.time} WIB) di ${s.location || 'lokasi yang ditentukan'}.`
+                `"${s.title}" akan dimulai 30 menit lagi (${s.time} WIB) di ${s.location || 'lokasi yang ditentukan'}.`,
+                jenisSuara
               );
               // Tandai agar tidak melakukan spam notifikasi setiap detik
               notifiedSchedules.events.push(eventKey); 
@@ -2045,7 +2060,6 @@ setTimeout(checkSoundPermission, 1500); // Tunda 1.5 detik agar munculnya halus
           document.getElementById('dashPiketPaAvatar').src = ann.piketBatalyonPutraAvatar;
         }
         
-      
         if (ann.piketBatalyonPutriAvatar) {
           document.getElementById('dashPiketPiAvatar').src = ann.piketBatalyonPutriAvatar;
         }
