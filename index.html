@@ -1689,6 +1689,48 @@ storage.removeItem('e_arvy_session');
         window.location.reload();
       }
     }
+// --- FITUR IZIN SUARA ---
+    function checkSoundPermission() {
+      // Cek apakah user sudah pernah mengizinkan suara sebelumnya
+      const soundEnabled = window.localStorage.getItem('e_arvy_sound_enabled');
+      if (soundEnabled !== 'true') {
+        // Tampilkan banner jika belum
+        const banner = document.getElementById('soundPermissionBanner');
+        if (banner) {
+          banner.classList.remove('hidden');
+          lucide.createIcons();
+        }
+      }
+    }
+
+    function enableSoundContext() {
+      // 1. Pancing browser dengan memutar suara sangat pelan / kosong
+      try {
+        const testAudio = new Audio('./sounds/ting.mp3'); // Sesuaikan dengan file mp3 Anda
+        testAudio.volume = 0.01; // Volume nyaris tak terdengar
+        
+        testAudio.play().then(() => {
+          console.log('Izin autoplay suara berhasil dibuka!');
+          
+          // 2. Simpan status di memori agar banner tidak muncul lagi
+          window.localStorage.setItem('e_arvy_sound_enabled', 'true');
+          
+          // 3. Tutup banner dan beri tahu user
+          closeSoundBanner();
+          showToast('Suara Aktif', 'Suara notifikasi berhasil diaktifkan.', 'success');
+        }).catch(err => {
+          console.error('Gagal membuka izin suara:', err);
+          showToast('Gagal', 'Terjadi kesalahan saat mengaktifkan suara.', 'error');
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function closeSoundBanner() {
+      const banner = document.getElementById('soundPermissionBanner');
+      if (banner) banner.classList.add('hidden');
+    }
 
     function setupUserInterface() {
 if ('Notification' in window && Notification.permission !== 'granted') {
@@ -1729,6 +1771,8 @@ if ('Notification' in window && Notification.permission !== 'granted') {
       loadDashboardAndAppData();
 const lastActiveTab = storage.getItem('e_arvy_active_tab') || 'dashboard';
       switchTab(lastActiveTab);
+
+setTimeout(checkSoundPermission, 1500); // Tunda 1.5 detik agar munculnya halus
     }
 
     function renderApplicationLogos() {
@@ -4394,6 +4438,22 @@ if ('serviceWorker' in navigator) {
 
   // Minta izin notifikasi saat tombol login ditekan (Bisa diletakkan di dalam handleLogin nanti)
   document.getElementById('loginSubmitBtn')?.addEventListener('click', requestNotificationPermission);
+<!-- Banner Izin Suara -->
+  <div id="soundPermissionBanner" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 shadow-2xl rounded-ios-lg p-4 z-[9999] flex flex-col gap-3 transition-all">
+    <div class="flex items-center gap-3">
+      <div class="p-2.5 bg-blue-50 dark:bg-blue-900/30 rounded-full text-ios-blue">
+        <i data-lucide="volume-2" class="w-6 h-6"></i>
+      </div>
+      <div>
+        <h4 class="text-sm font-extrabold text-slate-900 dark:text-white">Izinkan Suara Notifikasi</h4>
+        <p class="text-[10px] text-slate-500 dark:text-zinc-400 mt-0.5 leading-relaxed">Klik tombol di bawah agar aplikasi dapat memutar suara peringatan kegiatan secara otomatis.</p>
+      </div>
+    </div>
+    <div class="flex gap-2">
+      <button onclick="closeSoundBanner()" class="flex-1 py-2 bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-300 text-xs font-bold rounded-ios-md hover:bg-slate-200 transition-colors">Nanti Saja</button>
+      <button onclick="enableSoundContext()" class="flex-1 py-2 bg-ios-blue text-white text-xs font-bold rounded-ios-md shadow-md hover:opacity-90 transition-all">Izinkan Suara</button>
+    </div>
+  </div>
 </script>
 </body>
 </html>
