@@ -1517,7 +1517,7 @@ originalSetItem('e_arvy_initialized_real_data_v6', 'true');
         return { success: true };
       }
       if (methodName === 'saveSchedule') {
-        const list = JSON.parse(storage.getItem('e_arvy_schedules'));
+  const list = JSON.parse(storage.getItem('e_arvy_schedules') || '[]');
         if (params.action === 'add') list.push({ date: params.date, time: params.time, title: params.title, location: params.location, photoUrl: params.photoUrl });
         else if (params.action === 'edit') {
           const idx = list.findIndex(s => s.date === params.oldDate && s.time === params.oldTime && s.title === params.oldTitle);
@@ -1919,7 +1919,7 @@ setTimeout(checkSoundPermission, 1500); // Tunda 1.5 detik agar munculnya halus
             notifiedSchedules = { date: todayStr, events: [] };
           }
 
-          const todaySchedules = appData.schedules.filter(s => s.date === todayStr || s.date);
+          const todaySchedules = appData.schedules.filter(s => s.date === todayStr);
 
           todaySchedules.forEach(s => {
             const eventKey = s.time + s.title;
@@ -3763,7 +3763,7 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
       const container = document.getElementById('announceSchedulesList');
       if (!container) return; 
       
-      const list = appData.schedules.filter(s => s.date === date || s.date);
+      const list = appData.schedules.filter(s => s.date === date);
       if (list.length === 0) { container.innerHTML = '<p class="text-slate-400 text-xs italic text-center py-4">Tidak ada jadwal.</p>'; return; }
 
       let schedulesHtml = ''; 
