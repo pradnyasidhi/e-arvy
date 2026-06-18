@@ -514,10 +514,9 @@
                 <div class="p-3 bg-[#f8f9fa] dark:bg-zinc-800/40 rounded-xl border border-slate-100 dark:border-zinc-800/60 flex justify-between items-center">
                   <div class="flex items-center gap-3">
                     <div class="w-9 h-9 rounded-full border border-slate-200 overflow-hidden bg-slate-200 flex items-center justify-center text-slate-400 font-bold text-sm">
-                      <img id="dashPiketPaAvatar" src="" class="w-full h-full object-cover hidden" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                      <span>Pa</span>
-                    </div>
-                    <div>
+  <img id="dashPiketPaAvatar" src="https://placehold.co/100?text=Pa" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100?text=Pa'">
+</div>
+  <div>
                       <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">Piket Batalyon Putra</span>
                       <h4 id="dashPiketBatPaName" class="text-xs font-black text-slate-900 dark:text-white">-</h4>
                     </div>
@@ -530,9 +529,8 @@
                 <div class="p-3 bg-[#f8f9fa] dark:bg-zinc-800/40 rounded-xl border border-slate-100 dark:border-zinc-800/60 flex justify-between items-center">
                   <div class="flex items-center gap-3">
                     <div class="w-9 h-9 rounded-full border border-slate-200 overflow-hidden bg-slate-200 flex items-center justify-center text-slate-400 font-bold text-sm">
-                      <img id="dashPiketPiAvatar" src="" class="w-full h-full object-cover hidden" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                      <span>Pi</span>
-                    </div>
+  <img id="dashPiketPiAvatar" src="https://placehold.co/100?text=Pi" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100?text=Pi'">
+</div>
                     <div>
                       <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">Piket Batalyon Putri</span>
                       <h4 id="dashPiketBatPiName" class="text-xs font-black text-slate-900 dark:text-white">-</h4>
@@ -2044,17 +2042,12 @@ setTimeout(checkSoundPermission, 1500); // Tunda 1.5 detik agar munculnya halus
         document.getElementById('dashPiketBatPiName').innerText = ann.piketBatalyonPutriName || "-";
         document.getElementById('dashPiketBatPiTg').href = ann.piketBatalyonPutriTelegram || "#";
         if (ann.piketBatalyonPutraAvatar) {
-          const imgPa = document.getElementById('dashPiketPaAvatar');
-          imgPa.src = ann.piketBatalyonPutraAvatar;
-          imgPa.style.display = ''; 
-          imgPa.classList.remove('hidden'); 
-          if(imgPa.nextElementSibling) imgPa.nextElementSibling.style.display = 'none';        
+          document.getElementById('dashPiketPaAvatar').src = ann.piketBatalyonPutraAvatar;
         }
+        
+      
         if (ann.piketBatalyonPutriAvatar) {
-          const imgPi = document.getElementById('dashPiketPiAvatar');
-          imgPi.src = ann.piketBatalyonPutriAvatar;
-          imgPi.style.display = '';           imgPi.classList.remove('hidden');
-          if(imgPi.nextElementSibling) imgPi.nextElementSibling.style.display = 'none';        
+          document.getElementById('dashPiketPiAvatar').src = ann.piketBatalyonPutriAvatar;
         }
 
         document.getElementById('announcePakaian').value = ann.pakaianInfo || "";
