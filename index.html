@@ -2182,6 +2182,7 @@ updateDashboardPendataan();
           if (icon) icon.classList.remove('animate-spin');
         });
       }
+}
 
     function populatePresensiActivities() {
       const select = document.getElementById('presensiActivitySelect');
@@ -4460,11 +4461,7 @@ const aDate = document.getElementById('announceScheduleDate'); if(aDate) aDate.v
     if (typeof currentUser !== 'undefined' && currentUser && typeof loadDashboardAndAppData === 'function') {
       loadDashboardAndAppData();
       
-          const activeTab = storage.getItem('e_arvy_active_tab') || 'dashboard';
-      if (activeTab === 'announce') {
-         loadAnnounceSchedules();
-      }
-    }
+     }
   }).catch(err => {
     if (icon) icon.classList.remove('animate-spin');
   });
