@@ -1968,7 +1968,7 @@ setTimeout(checkSoundPermission, 1500); // Tunda 1.5 detik agar munculnya halus
       if (!flowWrapper) return;
       
       const todayStr = now.toISOString().split('T')[0];
-      const todaySchedules = appData.schedules.filter(s => s.date === todayStr || s.date);
+      const todaySchedules = appData.schedules.filter(s => s.date === todayStr);
       
       if (todaySchedules.length === 0) {
         flowWrapper.innerHTML = `<p class="text-slate-400 text-xs italic py-4">Belum ada kegiatan.</p>`;
