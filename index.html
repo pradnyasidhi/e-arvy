@@ -1834,6 +1834,12 @@ setTimeout(checkSoundPermission, 1500); // Tunda 1.5 detik agar munculnya halus
         renderApplicationLogos(); updateDashboardDetails(); populatePresensiActivities();
         renderAttendanceList(); populateStatProdiOptions(); renderCharts(); renderHistoryTable();
         renderKepulanganList(); renderDepartureLogs(); updateProfilePage();
+        
+        // BARIS BARU: Segarkan tabel jadwal saat data ditarik/diubah
+        loadAnnounceSchedules();
+        
+        checkNotificationsForUpdates();
+
         if(currentUser.role === 'Admin') { renderAdminProdiList(); populateAdminProdiOptions(); renderAbsenceStatusManager(); }
       });
     }
@@ -3763,12 +3769,20 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
       const container = document.getElementById('announceSchedulesList');
       if (!container) return; 
       
-      const list = appData.schedules.filter(s => s.date === date);
-      if (list.length === 0) { container.innerHTML = '<p class="text-slate-400 text-xs italic text-center py-4">Tidak ada jadwal.</p>'; return; }
+      // Amankan pembacaan data array
+      const allSchedules = appData.schedules || [];
+      
+      // Filter ketat berdasarkan tanggal kalender yang dipilih
+      const list = allSchedules.filter(s => s.date === date);
+      
+      if (list.length === 0) { 
+        container.innerHTML = '<p class="text-slate-400 text-xs italic text-center py-4">Tidak ada jadwal pada tanggal ini.</p>'; 
+        return; 
+      }
 
       let schedulesHtml = ''; 
-
       list.forEach(s => {
+      // ... (sisa kode di bawahnya biarkan sama, jangan dihapus) ...
         const pBtn = s.photoUrl ? `<button onclick="viewDocumentedPhoto('${s.title}', '${s.photoUrl}')" class="flex-1 md:flex-none px-3 py-2 bg-emerald-100 text-ios-green rounded text-xs font-bold">Foto</button>` : '';
         schedulesHtml += `
           <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 p-3.5 bg-slate-50 dark:bg-zinc-800/40 dark:border-zinc-700/60 rounded-ios-md border">
@@ -4270,8 +4284,11 @@ function updateDashboardPendataan() {
     }
   };
 
-  window.savePresensiKeCloud = async function(dataPresensi) {
+ window.savePresensiKeCloud = async function(dataPresensi) {
     try {
+      // [BARU] KUNCI TARIKAN DATA: Cegah auto-refresh menimpa data lokal
+      window.isUploadingData = true; 
+      
       const LogPresensi = Parse.Object.extend("LogPresensi");
       const query = new Parse.Query(LogPresensi);
       query.equalTo("logId", dataPresensi.logId);
@@ -4299,12 +4316,17 @@ function updateDashboardPendataan() {
       await logBaru.save();
     } catch (error) {
       console.error("Gagal menyimpan presensi ke Cloud: ", error);
+    } finally {
+      // [BARU] BUKA KUNCI: Izinkan sistem menarik data Cloud kembali
+      window.isUploadingData = false; 
     }
   };
-window.syncLocalStorageToCloud = async function(key) {
+
+  window.syncLocalStorageToCloud = async function(key) {
     const data = localStorage.getItem(key);
     if (!data) return;
     try {
+      window.isUploadingData = true; // Kunci tarikan data Cloud
       const CloudStorage = Parse.Object.extend("DataArvy");
       const query = new Parse.Query(CloudStorage);
       query.equalTo("kunci", key);
@@ -4319,10 +4341,12 @@ window.syncLocalStorageToCloud = async function(key) {
       await record.save();
     } catch (e) {
       console.error("Gagal sinkronisasi ke Back4App:", e);
+    } finally {
+      window.isUploadingData = false; // Buka kembali kunci setelah sukses
     }
   };
-
   window.fetchDatabaseFromCloud = async function() {
+if (window.isUploadingData) return;
     try {
       const CloudStorage = Parse.Object.extend("DataArvy");
       const settingQuery = new Parse.Query(CloudStorage);
