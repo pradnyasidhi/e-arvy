@@ -4374,7 +4374,8 @@ const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
           jumlahKurang: dataPresensi.absentCount,
           teksRekap: dataPresensi.recapText,
           verifikator: dataPresensi.verifier,
-          detailAbsen: dataPresensi.absents
+          detailAbsen: dataPresensi.absents,
+          created_at: new Date().toISOString()
         }, { onConflict: 'logId' });
         
       if (error) throw error;
