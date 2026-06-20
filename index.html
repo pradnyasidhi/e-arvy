@@ -4329,7 +4329,7 @@ function updateDashboardPendataan() {
   <script>
   const supabaseUrl = 'https://ygfzxemuzhwwadamkgen.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlnZnp4ZW11emh3d2FkYW1rZ2VuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4NjA1ODAsImV4cCI6MjA5NzQzNjU4MH0.sY1ffJXkef3wUxRfaoD8ecAitQtdN9fFNeCxJjXnoPo';
-const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
     
   window.deleteFromCloud = async function(key) {
