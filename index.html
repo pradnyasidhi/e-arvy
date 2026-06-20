@@ -2250,7 +2250,7 @@ updateDashboardPendataan();
   if (icon) icon.classList.add('animate-spin');
   
  if (window.fetchDatabaseFromCloud) {
-        window.fetchDatabaseFromCloud().then(() => {
+       window.fetchDatabaseFromCloud().then(() => {
           if (icon) icon.classList.remove('animate-spin');
           if (typeof currentUser !== 'undefined' && currentUser && typeof loadDashboardAndAppData === 'function') {
             loadDashboardAndAppData(); // Ini sekarang akan otomatis memuat jadwal!
@@ -4325,79 +4325,63 @@ function updateDashboardPendataan() {
     function closeModal(modalId) { const m = document.getElementById(modalId); m.querySelector('.ios-modal-content').classList.add('translate-y-full'); setTimeout(() => { m.classList.remove('flex'); m.classList.add('hidden'); }, 300); }
   </script>
 
-<script type="text/javascript" src="https://unpkg.com/parse/dist/parse.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
-  Parse.initialize("yrivktjbMxh6WkhSfNZHvNypSplAnlNVe1Za6NRT", "ZMb4e7MYUQH8TlMeO85Ym4I797Zpyw9InkY91jkJ");
-  Parse.serverURL = 'https://parseapi.back4app.com/';
+  const supabaseUrl = 'https://xyzcompany.supabase.co'; // Masukkan URL Supabase Anda
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'; // Masukkan Anon Key Anda
+const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-    const LogPresensi = Parse.Object.extend("LogPresensi");
-
-
+    
   window.deleteFromCloud = async function(key) {
     try {
-      const CloudStorage = Parse.Object.extend("DataArvy");
-      const query = new Parse.Query(CloudStorage);
-      query.equalTo("kunci", key);
-      const record = await query.first();
-      
-      if (record) {
-        await record.destroy();
-      }
+      const { error } = await supabaseClient
+        .from('DataArvy')
+        .delete()
+        .eq('kunci', key);
+        
+      if (error) throw error;
     } catch (e) {
-      console.error("Gagal menghapus kunci dari Back4App:", e);
+      console.error("Gagal menghapus kunci dari Supabase:", e);
     }
   };
 
   window.deletePresensiFromCloud = async function(logId) {
     try {
-      const LogPresensi = Parse.Object.extend("LogPresensi");
-      const query = new Parse.Query(LogPresensi);
-      query.equalTo("logId", logId);
-      const record = await query.first();
-      
-      if (record) {
-        await record.destroy();
-      }
+      const { error } = await supabaseClient
+        .from('LogPresensi')
+        .delete()
+        .eq('logId', logId);
+        
+      if (error) throw error;
     } catch (e) {
-      console.error("Gagal menghapus LogPresensi dari Back4App:", e);
+      console.error("Gagal menghapus LogPresensi dari Supabase:", e);
     }
   };
 
  window.savePresensiKeCloud = async function(dataPresensi) {
     try {
-      // [BARU] KUNCI TARIKAN DATA: Cegah auto-refresh menimpa data lokal
       window.isUploadingData = true; 
       
-      const LogPresensi = Parse.Object.extend("LogPresensi");
-      const query = new Parse.Query(LogPresensi);
-      query.equalTo("logId", dataPresensi.logId);
-      
-      // Cari apakah log ini sudah ada di Cloud
-      let logBaru = await query.first();
-      
-      // Jika belum ada, buat objek Parse baru
-      if (!logBaru) {
-        logBaru = new LogPresensi();
-        logBaru.set("logId", dataPresensi.logId);
-      }
-      
-      // Update atau Set field
-      logBaru.set("tanggal", dataPresensi.date);
-      logBaru.set("namaKegiatan", dataPresensi.activityName);
-      logBaru.set("kategori", dataPresensi.category);
-      logBaru.set("totalKadet", dataPresensi.totalCadets);
-      logBaru.set("jumlahHadir", dataPresensi.presentCount);
-      logBaru.set("jumlahKurang", dataPresensi.absentCount);
-      logBaru.set("teksRekap", dataPresensi.recapText);
-      logBaru.set("verifikator", dataPresensi.verifier);
-      logBaru.set("detailAbsen", dataPresensi.absents); 
-      
-      await logBaru.save();
+      const { error } = await supabaseClient
+        .from('LogPresensi')
+        .upsert({
+          logId: dataPresensi.logId,
+          tanggal: dataPresensi.date,
+          namaKegiatan: dataPresensi.activityName,
+          kategori: dataPresensi.category,
+          totalKadet: dataPresensi.totalCadets,
+          jumlahHadir: dataPresensi.presentCount,
+          jumlahKurang: dataPresensi.absentCount,
+          teksRekap: dataPresensi.recapText,
+          verifikator: dataPresensi.verifier,
+          detailAbsen: dataPresensi.absents
+        }, { onConflict: 'logId' });
+        
+      if (error) throw error;
     } catch (error) {
-      console.error("Gagal menyimpan presensi ke Cloud: ", error);
+      console.error("Gagal menyimpan presensi ke Supabase: ", error);
     } finally {
-      // [BARU] BUKA KUNCI: Izinkan sistem menarik data Cloud kembali
       window.isUploadingData = false; 
     }
   };
@@ -4406,68 +4390,99 @@ function updateDashboardPendataan() {
     const data = localStorage.getItem(key);
     if (!data) return;
     try {
-      window.isUploadingData = true; // Kunci tarikan data Cloud
-      const CloudStorage = Parse.Object.extend("DataArvy");
-      const query = new Parse.Query(CloudStorage);
-      query.equalTo("kunci", key);
-      let record = await query.first();
-
-      if (!record) {
-        record = new CloudStorage();
-        record.set("kunci", key);
-      }
+      window.isUploadingData = true; 
       
-      record.set("jsonString", data);
-      await record.save();
+      const { error } = await supabaseClient
+        .from('DataArvy')
+        .upsert({ 
+          kunci: key, 
+          jsonString: data 
+        }, { onConflict: 'kunci' });
+
+      if (error) throw error;
     } catch (e) {
-      console.error("Gagal sinkronisasi ke Back4App:", e);
+      console.error("Gagal sinkronisasi ke Supabase:", e);
     } finally {
-      window.isUploadingData = false; // Buka kembali kunci setelah sukses
+      window.isUploadingData = false; 
     }
   };
-  window.fetchDatabaseFromCloud = async function() {
-if (window.isUploadingData) return;
-    try {
-      const CloudStorage = Parse.Object.extend("DataArvy");
-      const settingQuery = new Parse.Query(CloudStorage);
-      settingQuery.limit(1000); 
-      settingQuery.descending("updatedAt"); 
-      
-      const results = await settingQuery.find();
-      
-     
-      const processedKeys = new Set();
 
-      for (let i = 0; i < results.length; i++) {
-        const kunci = results[i].get("kunci");
-        
-               if(kunci !== 'e_arvy_history_attendance' && kunci !== 'e_arvy_session' && kunci !== 'e_arvy_active_tab') {
-            
-                        if (!processedKeys.has(kunci)) {
-                localStorage.setItem(kunci, results[i].get("jsonString"));
-                processedKeys.add(kunci);             }
+  window.fetchDatabaseFromCloud = async function() {
+    if (window.isUploadingData) return;
+    try {
+      // 1. Tarik tabel DataArvy
+      const { data: results, error: errData } = await supabaseClient
+        .from('DataArvy')
+        .select('*')
+        .order('updated_at', { ascending: false }) // Pastikan tabel memiliki kolom updated_at di Supabase (Opsional)
+        .limit(1000);
+
+      if (errData) throw errData;
+
+      const processedKeys = new Set();
+      if (results) {
+        for (let i = 0; i < results.length; i++) {
+          const kunci = results[i].kunci;
+          if(kunci !== 'e_arvy_history_attendance' && kunci !== 'e_arvy_session' && kunci !== 'e_arvy_active_tab') {
+              if (!processedKeys.has(kunci)) {
+                  localStorage.setItem(kunci, results[i].jsonString);
+                  processedKeys.add(kunci);             
+              }
+          }
         }
       }
 
-     
-      const logQuery = new Parse.Query(LogPresensi);
-      logQuery.descending("createdAt"); 
-      logQuery.limit(10000); 
-const logResults = await logQuery.find();
+      // 2. Tarik tabel LogPresensi
+      const { data: logResults, error: errLog } = await supabaseClient
+        .from('LogPresensi')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(10000);
+
+      if (errLog) throw errLog;
       
-      const formattedLogs = logResults.map(parseObj => ({
-        logId: parseObj.get("logId"),
-        date: parseObj.get("tanggal"),
-        activityName: parseObj.get("namaKegiatan"),
-        category: parseObj.get("kategori"),
-        totalCadets: parseObj.get("totalKadet"),
-        presentCount: parseObj.get("jumlahHadir"),
-        absentCount: parseObj.get("jumlahKurang"),
-        recapText: parseObj.get("teksRekap"),
-        verifier: parseObj.get("verifikator"),
-        absents: parseObj.get("detailAbsen"),
-        verifiedAt: parseObj.createdAt
-      }));
+      const formattedLogs = logResults ? logResults.map(row => ({
+        logId: row.logId,
+        date: row.tanggal,
+        activityName: row.namaKegiatan,
+        category: row.kategori,
+        totalCadets: row.totalKadet,
+        presentCount: row.jumlahHadir,
+        absentCount: row.jumlahKurang,
+        recapText: row.teksRekap,
+        verifier: row.verifikator,
+        absents: row.detailAbsen,
+        verifiedAt: row.created_at
+      })) : [];
+
+      localStorage.setItem('e_arvy_history_attendance', JSON.stringify(formattedLogs));
+      
+      // ... [Sisa fungsi Local Storage bawaan biarkan utuh seperti aslinya] ...
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith("saved_bundle_")) {
+          try {
+            const bundleStr = localStorage.getItem(key);
+            if (!bundleStr || bundleStr === "{}" || bundleStr === "undefined") continue;
+            const bundle = JSON.parse(bundleStr);
+            localStorage.setItem(`saved_present_cnt_${bundle.dateStr}_${bundle.act}_${bundle.prodiId}`, bundle.presentCnt);
+            localStorage.setItem(`saved_absent_cnt_${bundle.dateStr}_${bundle.act}_${bundle.prodiId}`, bundle.absentCnt);
+            localStorage.setItem(`saved_total_cnt_${bundle.dateStr}_${bundle.act}_${bundle.prodiId}`, bundle.totalCnt);
+            localStorage.setItem(`saved_${bundle.dateStr}_${bundle.act}_${bundle.prodiName}`, 'true');
+            if (bundle.cadets && Array.isArray(bundle.cadets)) {
+              bundle.cadets.forEach(c => {
+                if (c.status) localStorage.setItem(`draft_status_${bundle.dateStr}_${bundle.act}_${bundle.prodiId}_${c.no}`, c.status);
+                if (c.reason) localStorage.setItem(`draft_reason_${bundle.dateStr}_${bundle.act}_${bundle.prodiId}_${c.no}`, c.reason);
+                if (c.proof) localStorage.setItem(`draft_proof_${bundle.dateStr}_${bundle.act}_${bundle.prodiId}_${c.no}`, c.proof);
+              });
+            }
+          } catch(err) { console.error("Gagal membongkar cloud bundle:", err); }
+        }
+      }
+    } catch (e) {
+      console.error("Gagal menarik data dari cloud:", e);
+    }
+  };
 
       localStorage.setItem('e_arvy_history_attendance', JSON.stringify(formattedLogs));
       for (let i = 0; i < localStorage.length; i++) {
@@ -4499,16 +4514,39 @@ const logResults = await logQuery.find();
  
   window.uploadFileToCloudStorage = async function(base64Data, folderPath, fileName) {
     if (!base64Data || !base64Data.startsWith("data:")) return base64Data;
+    
     try {
+      // 1. Ubah string Base64 dari kanvas HTML menjadi format Blob (File Binary)
+      const fetchResponse = await fetch(base64Data);
+      const blobData = await fetchResponse.blob();
+
+      // 2. Format nama dan jalur folder untuk bucket Supabase
       const bersihFileName = fileName.replace(/[^a-zA-Z0-9]/g, "_") + ".jpg";
-      const parseFile = new Parse.File(bersihFileName, { base64: base64Data });
-      await parseFile.save();
-      return parseFile.url(); 
+      const fullPath = `${folderPath}/${bersihFileName}`; 
+
+      // 3. Eksekusi unggah ke Bucket bernama 'berkas_arvy'
+      const { data, error } = await supabaseClient.storage
+        .from('berkas_arvy')
+        .upload(fullPath, blobData, {
+          contentType: 'image/jpeg',
+          upsert: true // Ganti foto lama jika namanya persis sama
+        });
+
+      if (error) throw error;
+
+      // 4. Tarik dan kembalikan URL yang bisa diakses publik (Public URL)
+      const { data: publicUrlData } = supabaseClient.storage
+        .from('berkas_arvy')
+        .getPublicUrl(fullPath);
+
+      return publicUrlData.publicUrl;
+
     } catch(err) {
-      console.error("Gagal unggah foto ke cloud:", err);
-      return base64Data;
+      console.error("Gagal unggah foto ke Supabase:", err);
+      return base64Data; 
     }
   };
+
 </script>
 
 <script>
