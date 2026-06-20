@@ -4413,7 +4413,7 @@ const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
       const { data: results, error: errData } = await supabaseClient
         .from('DataArvy')
         .select('*')
-        .order('updated_at', { ascending: false }) // Pastikan tabel memiliki kolom updated_at di Supabase (Opsional)
+        .order('created_at', { ascending: false }) // Pastikan tabel memiliki kolom updated_at di Supabase (Opsional)
         .limit(1000);
 
       if (errData) throw errData;
