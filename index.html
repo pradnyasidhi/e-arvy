@@ -4326,7 +4326,6 @@ function updateDashboardPendataan() {
   </script>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
   <script>
   const supabaseUrl = 'https://ygfzxemuzhwwadamkgen.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlnZnp4ZW11emh3d2FkYW1rZ2VuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4NjA1ODAsImV4cCI6MjA5NzQzNjU4MH0.sY1ffJXkef3wUxRfaoD8ecAitQtdN9fFNeCxJjXnoPo';
@@ -4458,33 +4457,6 @@ const supabase = supabase.createClient(supabaseUrl, supabaseKey);
       localStorage.setItem('e_arvy_history_attendance', JSON.stringify(formattedLogs));
       
       // ... [Sisa fungsi Local Storage bawaan biarkan utuh seperti aslinya] ...
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && key.startsWith("saved_bundle_")) {
-          try {
-            const bundleStr = localStorage.getItem(key);
-            if (!bundleStr || bundleStr === "{}" || bundleStr === "undefined") continue;
-            const bundle = JSON.parse(bundleStr);
-            localStorage.setItem(`saved_present_cnt_${bundle.dateStr}_${bundle.act}_${bundle.prodiId}`, bundle.presentCnt);
-            localStorage.setItem(`saved_absent_cnt_${bundle.dateStr}_${bundle.act}_${bundle.prodiId}`, bundle.absentCnt);
-            localStorage.setItem(`saved_total_cnt_${bundle.dateStr}_${bundle.act}_${bundle.prodiId}`, bundle.totalCnt);
-            localStorage.setItem(`saved_${bundle.dateStr}_${bundle.act}_${bundle.prodiName}`, 'true');
-            if (bundle.cadets && Array.isArray(bundle.cadets)) {
-              bundle.cadets.forEach(c => {
-                if (c.status) localStorage.setItem(`draft_status_${bundle.dateStr}_${bundle.act}_${bundle.prodiId}_${c.no}`, c.status);
-                if (c.reason) localStorage.setItem(`draft_reason_${bundle.dateStr}_${bundle.act}_${bundle.prodiId}_${c.no}`, c.reason);
-                if (c.proof) localStorage.setItem(`draft_proof_${bundle.dateStr}_${bundle.act}_${bundle.prodiId}_${c.no}`, c.proof);
-              });
-            }
-          } catch(err) { console.error("Gagal membongkar cloud bundle:", err); }
-        }
-      }
-    } catch (e) {
-      console.error("Gagal menarik data dari cloud:", e);
-    }
-  };
-
-      localStorage.setItem('e_arvy_history_attendance', JSON.stringify(formattedLogs));
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
         if (key && key.startsWith("saved_bundle_")) {
