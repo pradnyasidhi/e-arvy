@@ -216,6 +216,12 @@
     width: 80px; /* Sesuaikan ukuran logo */
     height: 80px;
 }
+    .view-screen:not(.active) {
+      display: none !important;
+    }
+    .view-screen.active {
+      display: flex !important;
+    }
   </style>
 </head>
 <body class="bg-zinc-100 dark:bg-black text-slate-900 dark:text-zinc-100 min-h-screen flex flex-col font-sans transition-all-300 pb-16 lg:pb-4">
@@ -321,7 +327,7 @@
             <label class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Username</label>
             <div class="relative">
               <i data-lucide="user" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
-             <input type="text" id="loginUsername" class="w-full pl-10 pr-4 py-2.5 rounded-ios-md glass-input text-sm focus:outline-none focus:ring-2 focus:ring-red-500 text-slate-900 dark:text-white" placeholder="Username Telegram (tanpa @)" required>
+             <input type="text" id="loginUsername" class="w-full pl-10 pr-4 py-2.5 rounded-ios-md glass-input text-sm focus:outline-none focus:ring-2 focus:ring-red-500 text-slate-900 dark:text-white" placeholder="Username" required>
             </div>
           </div>
 
@@ -399,7 +405,7 @@
         
         <div class="p-5 md:p-6 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-[0_8px_30px_rgb(0,122,255,0.2)]">
           <div class="flex flex-col gap-1.5">
-            <h2 class="text-2xl sm:text-3xl font-black tracking-tight">Portal e-Arvy #6</h2>
+            <h2 class="text-2xl sm:text-3xl font-black tracking-tight">Portal e-Arvy #6 (Tahap Pengembangan)</h2>
             <p class="text-sm text-blue-100 font-medium">Batalyon Nara Arvyaksa - Sistem Interoperabilitas & Presensi Terpadu</p>
           </div>
           <button onclick="switchTab('kehadiran')" class="px-5 py-2.5 bg-white text-ios-blue font-bold text-sm rounded-xl hover:scale-105 active:scale-95 transition-all shadow-md">
@@ -4419,23 +4425,18 @@ function updateDashboardPendataan() {
       
       storage.setItem('e_arvy_active_tab', viewId);
 
-      // --- PERBAIKAN BUG BERTUMPUK MULAI DARI SINI ---
-      document.querySelectorAll('.view-screen').forEach(s => { 
-        s.classList.add('hidden'); 
-        s.classList.remove('flex'); // <-- WAJIB: Cabut class flex agar hidden berfungsi
-        s.classList.remove('active'); 
+      // Hanya perlu memindahkan class "active", CSS akan mengurus sisanya!
+      document.querySelectorAll('.view-screen').forEach(s => {
+        s.classList.remove('active');
       });
       
       const target = document.getElementById(`view-${viewId}`); 
       if (target) { 
-        target.classList.remove('hidden'); 
-        target.classList.add('flex'); // <-- WAJIB: Pasang kembali flex saat halaman aktif
         target.classList.add('active'); 
       }
       
       // Mengembalikan layar ke atas secara otomatis saat ganti halaman
       window.scrollTo({ top: 0, behavior: 'smooth' });
-      // --- PERBAIKAN SELESAI ---
 
       // Ubah warna aktif pada Sidebar
       document.querySelectorAll('.sidebar-item').forEach(i => i.className = i.id === `side-${viewId}` ? "sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-ios-md text-sm font-bold text-ios-blue bg-blue-100/50" : "sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-ios-md text-sm font-semibold text-slate-600 hover:bg-slate-100/50");
@@ -4443,7 +4444,7 @@ function updateDashboardPendataan() {
       // Ubah warna aktif pada Tabbar bawah (Mobile)
       document.querySelectorAll('.tabbar-item').forEach(i => i.className = i.id === `tab-${viewId}` ? "tabbar-item flex flex-col items-center gap-0.5 text-ios-blue font-bold text-[10px]" : "tabbar-item flex flex-col items-center gap-0.5 text-slate-400 font-semibold text-[10px]");
       
-      // Panggil fungsi spesifik untuk tiap halaman
+      // Panggil fungsi pemuatan data sesuai halaman
       if (viewId === 'statistik') { 
         renderCharts(); 
         renderHistoryTable(); 
