@@ -4414,21 +4414,36 @@ function updateDashboardPendataan() {
       lucide.createIcons();
     }
 
-   function switchTab(viewId) {
+  function switchTab(viewId) {
       if (viewId === 'admin-panel' && currentUser.role !== 'Admin') return switchTab('dashboard');
       
-            storage.setItem('e_arvy_active_tab', viewId);
-     
+      storage.setItem('e_arvy_active_tab', viewId);
 
-      document.querySelectorAll('.view-screen').forEach(s => { s.classList.add('hidden'); s.classList.remove('active'); });
-      const target = document.getElementById(`view-${viewId}`); 
-      if (target) { target.classList.remove('hidden'); target.classList.add('active'); }
+      // --- PERBAIKAN BUG BERTUMPUK MULAI DARI SINI ---
+      document.querySelectorAll('.view-screen').forEach(s => { 
+        s.classList.add('hidden'); 
+        s.classList.remove('flex'); // <-- WAJIB: Cabut class flex agar hidden berfungsi
+        s.classList.remove('active'); 
+      });
       
+      const target = document.getElementById(`view-${viewId}`); 
+      if (target) { 
+        target.classList.remove('hidden'); 
+        target.classList.add('flex'); // <-- WAJIB: Pasang kembali flex saat halaman aktif
+        target.classList.add('active'); 
+      }
+      
+      // Mengembalikan layar ke atas secara otomatis saat ganti halaman
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      // --- PERBAIKAN SELESAI ---
+
+      // Ubah warna aktif pada Sidebar
       document.querySelectorAll('.sidebar-item').forEach(i => i.className = i.id === `side-${viewId}` ? "sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-ios-md text-sm font-bold text-ios-blue bg-blue-100/50" : "sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-ios-md text-sm font-semibold text-slate-600 hover:bg-slate-100/50");
       
+      // Ubah warna aktif pada Tabbar bawah (Mobile)
       document.querySelectorAll('.tabbar-item').forEach(i => i.className = i.id === `tab-${viewId}` ? "tabbar-item flex flex-col items-center gap-0.5 text-ios-blue font-bold text-[10px]" : "tabbar-item flex flex-col items-center gap-0.5 text-slate-400 font-semibold text-[10px]");
       
-      
+      // Panggil fungsi spesifik untuk tiap halaman
       if (viewId === 'statistik') { 
         renderCharts(); 
         renderHistoryTable(); 
@@ -4740,7 +4755,8 @@ const aDate = document.getElementById('announceScheduleDate'); if(aDate) aDate.v
     } catch (e) {
       console.error("Error saat inisialisasi:", e);
       setTimeout(() => document.getElementById('app-preloader')?.classList.add('preloader-hidden'), 200);
-    }
+    };
+
     document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible" && currentUser && window.fetchDatabaseFromCloud) {
       const icon = document.getElementById('localRefreshIcon');
