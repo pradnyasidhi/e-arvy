@@ -4419,29 +4419,30 @@ function updateDashboardPendataan() {
       
       storage.setItem('e_arvy_active_tab', viewId);
 
-      // 1. KUNCI MATI: Sembunyikan semua halaman menggunakan Inline Style
+      // 1. BERSIHKAN SEMUA HALAMAN: Hapus flex & active, lalu paksa hidden
       document.querySelectorAll('.view-screen').forEach(s => { 
-        s.style.display = 'none';    // Memaksa elemen hilang 100%
-        s.classList.remove('active'); 
+        s.style.display = ''; // Bersihkan sisa inline style yang lama
+        s.classList.remove('flex', 'active'); 
+        s.classList.add('hidden');
       });
       
-      // 2. KUNCI MATI: Tampilkan hanya halaman yang dituju
+      // 2. TAMPILKAN TARGET: Hapus hidden, lalu pasang flex & active
       const target = document.getElementById(`view-${viewId}`); 
       if (target) { 
-        target.style.display = 'flex'; // Memaksa elemen tampil sebagai flexbox
-        target.classList.add('active'); 
+        target.classList.remove('hidden');
+        target.classList.add('flex', 'active'); 
       }
       
-      // 3. Kembalikan posisi layar ke paling atas dengan mulus
+      // 3. Scroll layar ke atas dengan mulus
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
-      // Ubah warna aktif pada Sidebar
+      // -- Pembaruan Warna Tombol Sidebar --
       document.querySelectorAll('.sidebar-item').forEach(i => i.className = i.id === `side-${viewId}` ? "sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-ios-md text-sm font-bold text-ios-blue bg-blue-100/50" : "sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-ios-md text-sm font-semibold text-slate-600 hover:bg-slate-100/50");
       
-      // Ubah warna aktif pada Tabbar bawah (Mobile)
+      // -- Pembaruan Warna Tombol Tabbar Mobile --
       document.querySelectorAll('.tabbar-item').forEach(i => i.className = i.id === `tab-${viewId}` ? "tabbar-item flex flex-col items-center gap-0.5 text-ios-blue font-bold text-[10px]" : "tabbar-item flex flex-col items-center gap-0.5 text-slate-400 font-semibold text-[10px]");
       
-      // Panggil fungsi pemuatan data sesuai halaman
+      // -- Pemanggilan Data Sesuai Halaman --
       if (viewId === 'statistik') { 
         renderCharts(); 
         renderHistoryTable(); 
