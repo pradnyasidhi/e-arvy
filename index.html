@@ -4319,7 +4319,7 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
 
         // 2. Hapus semua data lama khusus untuk prodi yang sedang diedit di Supabase
         const { error: deleteError } = await supabaseClient
-          .from('datakadet')
+          .from('Datakadet')
           .delete()
           .eq('prodi', p);
 
@@ -4328,14 +4328,14 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
         // 3. Masukkan (Insert) daftar kadet yang baru/sudah diedit ke Supabase
         if (list.length > 0) {
           const { error: insertError } = await supabaseClient
-            .from('datakadet')
+            .from('Datakadet')
             .insert(list);
 
           if (insertError) throw insertError;
         }
 
         // 4. Tarik ulang data dari Supabase agar memori lokal aplikasi ikut ter-update
-        await window.fetchDataKadetDariSupabase();
+        await window.fetchDatakadetDariSupabase();
 
         // 5. Catat log aktivitas dan beri notifikasi berhasil
         if (typeof logLocalActivity === 'function') {
@@ -4776,11 +4776,11 @@ const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
     }
   };
 
-window.fetchDataKadetDariSupabase = async function() {
+window.fetchDatakadetDariSupabase = async function() {
   try {
     // 1. Tarik data termasuk tempat_lahir dan tanggal_lahir
     const { data: kadetData, error } = await supabaseClient
-      .from('datakadet')
+      .from('Datakadet')
       .select('nama_kadet, prodi, gender, tempat_lahir, tanggal_lahir')
       .order('prodi', { ascending: true })
       .order('nama_kadet', { ascending: true });
@@ -4818,7 +4818,7 @@ window.fetchDataKadetDariSupabase = async function() {
       if (typeof renderBirthdays === 'function') renderBirthdays();
     }
   } catch (error) {
-    console.error("Gagal menarik tabel datakadet dari Supabase:", error);
+    console.error("Gagal menarik tabel Datakadet dari Supabase:", error);
   }
 };
  
@@ -4930,7 +4930,7 @@ const aDate = document.getElementById('announceScheduleDate'); if(aDate) aDate.v
      
      if (window.fetchDatabaseFromCloud) {
   window.fetchDatabaseFromCloud().then(() => {
-window.fetchDataKadetDariSupabase();
+window.fetchDatakadetDariSupabase();
     if (icon) icon.classList.remove('animate-spin');
     if (typeof currentUser !== 'undefined' && currentUser && typeof loadDashboardAndAppData === 'function') {
       loadDashboardAndAppData();
@@ -4944,7 +4944,7 @@ window.fetchDataKadetDariSupabase();
       setInterval(() => {
          if (window.fetchDatabaseFromCloud && typeof currentUser !== 'undefined' && currentUser) {
            window.fetchDatabaseFromCloud().then(() => { 
-window.fetchDataKadetDariSupabase();
+window.fetchDatakadetDariSupabase();
              const activeTab = storage.getItem('e_arvy_active_tab') || 'dashboard';
                    if (['dashboard', 'statistik', 'profile'].includes(activeTab)) {
                  if (typeof loadDashboardAndAppData === 'function') loadDashboardAndAppData(); 
@@ -4963,7 +4963,7 @@ window.fetchDataKadetDariSupabase();
       if (icon) icon.classList.add('animate-spin');
       
       window.fetchDatabaseFromCloud().then(() => {
-window.fetchDataKadetDariSupabase();
+window.fetchDatakadetDariSupabase();
         const activeTab = storage.getItem('e_arvy_active_tab') || 'dashboard';
                 if (['dashboard', 'statistik', 'profile'].includes(activeTab)) {
             loadDashboardAndAppData();
