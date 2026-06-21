@@ -1380,60 +1380,53 @@ originalSetItem('e_arvy_initialized_real_data_v6', 'true');
   }
 
     async function updatePiketProfileFromWeb(username, piketType) {
+      const cleanUser = username.replace('@', '').trim();
+      if (!cleanUser) return;
+      
+      // GANTI URL DI BAWAH DENGAN URL DARI GOOGLE APPS SCRIPT MILIKMU
+      const GAS_URL = 'https://script.google.com/macros/s/AKfycby-FDhY3nasdOpPMpW7Us8tHwf8-coAa7EP-2IiVGoOm4bB7vdOKNpiKCkAv-H6-sKvPg/exec'; 
+      
+      // Tampilan sementara
+      let displayName = "Mencari data...";
+      let photoUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(cleanUser)}&background=random&color=fff`;
+      let profileLink = `https://t.me/${cleanUser}`;
+
       try {
-        const cleanUser = username.replace('@', '').trim();
-        if (!cleanUser) return;
-        
-        // Gunakan CORS Proxy agar browser tidak memblokir penarikan data
-        const targetUrl = `https://t.me/${cleanUser}`;
-        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
-        
-        const response = await fetch(proxyUrl);
+        // Panggil API buatan kita di Google
+        const response = await fetch(`${GAS_URL}?username=${cleanUser}`);
         const data = await response.json();
         
-        // Baca HTML dari website Telegram
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(data.contents, 'text/html');
-
-        // 1. Ambil Nama Asli
-        let displayName = cleanUser;
-        const titleMeta = doc.querySelector('meta[property="og:title"]');
-        if (titleMeta && titleMeta.content) displayName = titleMeta.content;
-
-        // 2. Ambil Foto Profil (Beri foto inisial warna-warni jika profil dikunci/privat)
-        let photoUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=random&color=fff`; 
-        const imageMeta = doc.querySelector('meta[property="og:image"]');
-        if (imageMeta && imageMeta.content && !imageMeta.content.includes('telegram_logo')) {
-          photoUrl = imageMeta.content; // Timpa dengan foto asli jika ada
-        }
-
-        // 3. Masukkan ke dalam Database Pengumuman e-Arvy
-        const today = getLocalDateString();
-        let ann = appData.announcements.find(a => a.date === today);
-        if (!ann) {
-          ann = { date: today, pakaianInfo: "Seragam Hari Ini", piketBatalyonPutraName: "", piketBatalyonPutriName: "" };
-          appData.announcements.push(ann);
-        }
-
-        if (piketType === 'putra') {
-          ann.piketBatalyonPutraName = displayName;
-          ann.piketBatalyonPutraAvatar = photoUrl;
-          ann.piketBatalyonPutraTelegram = targetUrl;
+        if (data.success) {
+           displayName = data.name;
+           photoUrl = data.photo;
         } else {
-          ann.piketBatalyonPutriName = displayName;
-          ann.piketBatalyonPutriAvatar = photoUrl;
-          ann.piketBatalyonPutriTelegram = targetUrl;
+           displayName = cleanUser; // Rencana cadangan jika username tidak valid
         }
-
-        localStorage.setItem('e_arvy_announcements', JSON.stringify(appData.announcements));
-        if (window.syncLocalStorageToCloud) window.syncLocalStorageToCloud('e_arvy_announcements');
-        
-        // Refresh tampilan dashboard agar foto langsung muncul
-        updateDashboardDetails();
-
       } catch (error) {
-        console.error("Gagal menarik data t.me:", error);
+        console.error("Gagal terhubung ke Google Apps Script:", error);
+        displayName = cleanUser;
       }
+
+      // Simpan ke Pengumuman e-Arvy
+      const today = getLocalDateString();
+      let ann = appData.announcements.find(a => a.date === today);
+      if (!ann) {
+        ann = { date: today, pakaianInfo: "Seragam Hari Ini", piketBatalyonPutraName: "", piketBatalyonPutriName: "" };
+        appData.announcements.push(ann);
+      }
+
+      if (piketType === 'putra') {
+        ann.piketBatalyonPutraName = displayName;
+        ann.piketBatalyonPutraAvatar = photoUrl;
+        ann.piketBatalyonPutraTelegram = profileLink;
+      } else {
+        ann.piketBatalyonPutriName = displayName;
+        ann.piketBatalyonPutriAvatar = photoUrl;
+        ann.piketBatalyonPutriTelegram = profileLink;
+      }
+
+      localStorage.setItem('e_arvy_announcements', JSON.stringify(appData.announcements));
+      if (window.syncLocalStorageToCloud) window.syncLocalStorageToCloud('e_arvy_announcements');
     }
 
     function simulateServerCall(methodName, params) {
