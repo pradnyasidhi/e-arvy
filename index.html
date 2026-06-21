@@ -216,13 +216,7 @@
     width: 80px; /* Sesuaikan ukuran logo */
     height: 80px;
 }
-    .view-screen:not(.active) {
-      display: none !important;
-    }
-    .view-screen.active {
-      display: flex !important;
-    }
-  </style>
+      </style>
 </head>
 <body class="bg-zinc-100 dark:bg-black text-slate-900 dark:text-zinc-100 min-h-screen flex flex-col font-sans transition-all-300 pb-16 lg:pb-4">
 <div id="app-preloader">
@@ -4420,22 +4414,25 @@ function updateDashboardPendataan() {
       lucide.createIcons();
     }
 
-  function switchTab(viewId) {
+ function switchTab(viewId) {
       if (viewId === 'admin-panel' && currentUser.role !== 'Admin') return switchTab('dashboard');
       
       storage.setItem('e_arvy_active_tab', viewId);
 
-      // Hanya perlu memindahkan class "active", CSS akan mengurus sisanya!
-      document.querySelectorAll('.view-screen').forEach(s => {
-        s.classList.remove('active');
+      // 1. KUNCI MATI: Sembunyikan semua halaman menggunakan Inline Style
+      document.querySelectorAll('.view-screen').forEach(s => { 
+        s.style.display = 'none';    // Memaksa elemen hilang 100%
+        s.classList.remove('active'); 
       });
       
+      // 2. KUNCI MATI: Tampilkan hanya halaman yang dituju
       const target = document.getElementById(`view-${viewId}`); 
       if (target) { 
+        target.style.display = 'flex'; // Memaksa elemen tampil sebagai flexbox
         target.classList.add('active'); 
       }
       
-      // Mengembalikan layar ke atas secara otomatis saat ganti halaman
+      // 3. Kembalikan posisi layar ke paling atas dengan mulus
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
       // Ubah warna aktif pada Sidebar
