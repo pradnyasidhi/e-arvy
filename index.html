@@ -491,6 +491,57 @@
               <h2 id="realTimeClock" class="text-4xl font-black tracking-tight">--:--:--</h2>
               <p id="realTimeDate" class="text-[10px] text-slate-400 font-bold tracking-widest uppercase mt-1">Memuat...</p>
             </div>
+<!-- KALENDER ULANG TAHUN ESTETIK -->
+            <div class="bg-white dark:bg-zinc-900 rounded-xl border border-slate-200 dark:border-zinc-700 shadow-lg flex flex-col relative overflow-hidden pb-4">
+              <!-- Binder Rings Simulation -->
+              <div class="absolute top-0 left-0 w-full h-4 flex justify-around px-2 z-10">
+                 <div class="w-2 h-6 bg-slate-800 rounded-full border-2 border-slate-200 -mt-2 shadow-sm"></div>
+                 <div class="w-2 h-6 bg-slate-800 rounded-full border-2 border-slate-200 -mt-2 shadow-sm"></div>
+                 <div class="w-2 h-6 bg-slate-800 rounded-full border-2 border-slate-200 -mt-2 shadow-sm"></div>
+                 <div class="w-2 h-6 bg-slate-800 rounded-full border-2 border-slate-200 -mt-2 shadow-sm"></div>
+                 <div class="w-2 h-6 bg-slate-800 rounded-full border-2 border-slate-200 -mt-2 shadow-sm"></div>
+                 <div class="w-2 h-6 bg-slate-800 rounded-full border-2 border-slate-200 -mt-2 shadow-sm"></div>
+                 <div class="w-2 h-6 bg-slate-800 rounded-full border-2 border-slate-200 -mt-2 shadow-sm"></div>
+                 <div class="w-2 h-6 bg-slate-800 rounded-full border-2 border-slate-200 -mt-2 shadow-sm"></div>
+              </div>
+              
+              <div class="flex justify-between items-end pt-5 pb-2 px-4 border-b-[1.5px] border-black dark:border-white">
+                <h2 id="calMonthName" class="text-2xl font-black tracking-tighter text-black dark:text-white">Month</h2>
+                <h2 id="calYearNum" class="text-xl font-black tracking-tighter text-black dark:text-white">Year</h2>
+              </div>
+              
+              <div class="grid grid-cols-3 text-center border-b border-black dark:border-white py-1.5">
+                <div class="text-[10px] font-bold text-black dark:text-white border-r border-black dark:border-white tracking-widest" id="calDayMinus1">sunday</div>
+                <div class="text-[10px] font-bold text-black dark:text-white border-r border-black dark:border-white tracking-widest" id="calDayName">monday</div>
+                <div class="text-[10px] font-bold text-black dark:text-white tracking-widest" id="calDayPlus1">tuesday</div>
+              </div>
+              
+              <div class="grid grid-cols-3 min-h-[160px] relative">
+                <!-- Background dekoratif samar -->
+                <div class="absolute inset-0 opacity-10 flex items-center justify-center pointer-events-none">
+                   <i data-lucide="heart" class="w-24 h-24 text-pink-500 fill-pink-500"></i>
+                </div>
+                
+                <div class="border-r border-black dark:border-white p-2">
+                   <span class="text-base font-black text-black dark:text-white opacity-40" id="calDateMinus1">0</span>
+                </div>
+                <div class="border-r border-black dark:border-white p-2 flex flex-col items-center relative z-10 bg-gradient-to-b from-transparent to-pink-50/50 dark:to-pink-900/20">
+                   <div class="inline-block px-1.5 py-0.5 border-[1.5px] border-rose-500 rounded-full text-base font-black text-black dark:text-white transform -rotate-6 shadow-sm" id="calDateNum">0</div>
+                   <div class="mt-4 flex flex-col items-center gap-1.5 w-full px-1" id="calBirthdayNames">
+                      <!-- Nama ulang tahun muncul di sini -->
+                      <p class="text-[9px] text-slate-400 italic text-center mt-4">Memuat...</p>
+                   </div>
+                </div>
+                <div class="p-2">
+                   <span class="text-base font-black text-black dark:text-white opacity-40" id="calDatePlus1">0</span>
+                </div>
+              </div>
+              <div class="grid grid-cols-3 border-t border-black dark:border-white bg-slate-50 dark:bg-zinc-800">
+                <div class="border-r border-black dark:border-white p-2 h-10"><span class="text-sm font-black text-black dark:text-white opacity-30" id="calDateMinus1Wk">0</span></div>
+                <div class="border-r border-black dark:border-white p-2 h-10"><span class="text-sm font-black text-black dark:text-white opacity-30" id="calDatePlus1Wk">0</span></div>
+                <div class="p-2 h-10"><span class="text-sm font-black text-black dark:text-white opacity-30" id="calDatePlus2Wk">0</span></div>
+              </div>
+            </div>
 
             <div class="p-5 bg-white dark:bg-zinc-900 rounded-2xl border border-slate-100 dark:border-zinc-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col gap-3">
               <div class="flex items-center justify-between">
@@ -506,7 +557,7 @@
             
             <div class="p-5 bg-white dark:bg-zinc-900 rounded-2xl border border-slate-100 dark:border-zinc-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col gap-4">
               <div class="flex items-center justify-between">
-                <h3 class="font-black text-lg tracking-tight text-slate-900 dark:text-white">Petugas Piket Batalyon</h3>
+                <h3 class="font-black text-lg tracking-tight text-slate-900 dark:text-white">Piket Batalyon</h3>
                 <button onclick="switchTab('announce')" class="admin-piket-only hidden text-[10px] font-bold text-ios-blue hover:underline uppercase tracking-wider">Edit</button>
               </div>
 
@@ -686,7 +737,7 @@
           
         <div class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg shadow-lg flex flex-col gap-4">
           <div class="flex justify-between items-center pb-2 border-b border-slate-100 dark:border-zinc-800/60">
-            <h4 class="font-extrabold text-base tracking-tight">Riwayat Kegiatan & Keterangan Roster</h4>
+            <h4 class="font-extrabold text-base tracking-tight">Riwayat Kegiatan & Keterangan</h4>
             <div class="flex items-center gap-2">
               <button id="bulkDeleteHistoryBtn" onclick="deleteSelectedHistoryLogs()" class="hidden px-3.5 py-1.5 bg-rose-50 dark:bg-rose-950/40 text-ios-red dark:text-rose-400 rounded-full text-xs font-bold hover:bg-rose-100 transition-colors border border-rose-200 dark:border-rose-900 shadow-sm">
                 <i data-lucide="trash-2" class="w-3.5 h-3.5 inline mr-1"></i>Hapus (<span id="bulkDeleteCount">0</span>)
@@ -728,7 +779,7 @@
         <div class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg shadow-lg flex flex-col gap-4">
           <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 pb-3 border-b border-slate-100 dark:border-zinc-800">
             <div>
-              <h3 class="font-extrabold text-lg text-slate-900 dark:text-white tracking-tight">Manajemen Kepulangan Roster</h3>
+              <h3 class="font-extrabold text-lg text-slate-900 dark:text-white tracking-tight">Manajemen Kepulangan</h3>
               <p class="text-xs text-slate-500 font-medium">Reset kepulangan prodi dilakukan secara otomatis pada 03:00 AM.</p>
             </div>
             <div class="flex flex-col gap-1 w-full sm:w-auto min-w-[180px]">
@@ -794,8 +845,23 @@
             </button>
           </div>
           
+<!-- BLOK ULANG TAHUN KADET -->
+        <div class="p-6 bg-white/85 dark:bg-zinc-900/85 backdrop-blur-md rounded-ios-lg shadow-xl flex flex-col gap-4">
+          <div class="pb-2 border-b border-slate-100 dark:border-zinc-800 flex items-center gap-2">
+            <i data-lucide="gift" class="w-5 h-5 text-pink-500"></i>
+            <div>
+              <h3 class="font-black text-lg tracking-tight">Informasi Ulang Tahun Kadet</h3>
+              <p class="text-xs text-slate-500">Daftar anggota yang berulang tahun minggu ini.</p>
+            </div>
+          </div>
+          <div id="announceBirthdaysList" class="flex flex-col gap-1 mt-2">
+            <!-- Render via JS -->
+            <p class="text-xs italic text-slate-400">Memuat data kelahiran...</p>
+          </div>
+        </div>
+
           <div class="flex flex-col gap-1.5 max-w-xs">
-            <label class="text-[10px] font-black uppercase tracking-widest text-slate-400">Pilih Tanggal Roster</label>
+            <label class="text-[10px] font-black uppercase tracking-widest text-slate-400">Pilih Tanggal</label>
             <input type="date" id="announceScheduleDate" onchange="loadAnnounceSchedules()" class="w-full px-4 py-2.5 rounded-ios-md glass-input text-sm text-slate-950 dark:text-white focus:outline-none">
           </div>
 
@@ -818,7 +884,7 @@
           <div class="pb-2 border-b border-slate-100 dark:border-zinc-800 flex items-center gap-2">
             <i data-lucide="shield-check" class="w-5 h-5 text-ios-green"></i>
             <div>
-              <h3 class="font-black text-lg tracking-tight">Petugas Piket Batalyon</h3>
+              <h3 class="font-black text-lg tracking-tight">Piket Batalyon</h3>
             </div>
           </div>
 
@@ -826,7 +892,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div class="p-5 bg-slate-50/50 dark:bg-zinc-800/10 rounded-ios-md border border-slate-100 flex flex-col gap-3.5">
                 <span class="text-xs font-black text-ios-blue uppercase tracking-widest">Piket Putra</span>
-                <input type="text" id="announcePiketBatPaName" onblur="this.value = standardizeEYD(this.value);" class="w-full px-3 py-2.5 rounded-ios-sm glass-input text-xs text-slate-900 dark:text-white" placeholder="Nama Petugas">
+                <input type="text" id="announcePiketBatPaName" onblur="this.value = standardizeEYD(this.value);" class="w-full px-3 py-2.5 rounded-ios-sm glass-input text-xs text-slate-900 dark:text-white" placeholder="Nama Piket">
                <input type="url" id="announcePiketBatPaTg" class="w-full px-3 py-2.5 rounded-ios-sm glass-input text-xs text-slate-900 dark:text-white" placeholder="Link Telegram">
                 <label class="text-[9px] font-bold text-ios-blue cursor-pointer hover:underline">Ganti Foto Profil
                   <input type="file" id="announcePiketPaAvatar" accept="image/*" onchange="uploadPiketAvatar(event, 'Pa')" class="hidden">
@@ -834,7 +900,7 @@
               </div>
               <div class="p-5 bg-slate-50/50 dark:bg-zinc-800/10 rounded-ios-md border border-slate-100 flex flex-col gap-3.5">
                 <span class="text-xs font-black text-ios-blue uppercase tracking-widest">Piket Putri</span>
-               <input type="text" id="announcePiketBatPiName" onblur="this.value = standardizeEYD(this.value);" class="w-full px-3 py-2.5 rounded-ios-sm glass-input text-xs text-slate-900 dark:text-white" placeholder="Nama Petugas">
+               <input type="text" id="announcePiketBatPiName" onblur="this.value = standardizeEYD(this.value);" class="w-full px-3 py-2.5 rounded-ios-sm glass-input text-xs text-slate-900 dark:text-white" placeholder="Nama Piket">
                 <input type="url" id="announcePiketBatPiTg" class="w-full px-3 py-2.5 rounded-ios-sm glass-input text-xs text-slate-900 dark:text-white" placeholder="Link Telegram">
                 <label class="text-[9px] font-bold text-ios-blue cursor-pointer hover:underline">Ganti Foto Profil
                   <input type="file" id="announcePiketPiAvatar" accept="image/*" onchange="uploadPiketAvatar(event, 'Pi')" class="hidden">
@@ -891,7 +957,7 @@
           </div>
 
           <div class="md:col-span-2 p-6 bg-white dark:bg-zinc-900 rounded-ios-lg shadow-lg flex flex-col gap-4">
-            <h3 class="font-extrabold text-lg text-slate-900 dark:text-white">Riwayat Aktivitas Roster</h3>
+            <h3 class="font-extrabold text-lg text-slate-900 dark:text-white">Riwayat Aktivitas</h3>
             <div id="activityLogsWrapper" class="flex flex-col gap-2 max-h-[300px] overflow-y-auto no-scrollbar"></div>
           </div>
         </div>
@@ -1265,97 +1331,6 @@ storage.removeItem = function(key) {
   }));
 
   storage.setItem('e_arvy_users_v6', JSON.stringify(users))
-        const rawCadetData = {
-          "FK 1": [
-            "KK KED ABIGAIL QUEENCYLA SAHARI SARAGIH", "KK KED ACHMAD ABRIELL NIZAR FAZARI PRASETYA", "KK KED ADELIA ZUKHRIFA AJANI", "KK KED ALFAURA SALSABILA", "KK KED ALIFIAN RASYIDI PUTRA ISBIANTO", "KK KED ALIYA ANASSHAFAH TANJUNG", "KK KED ALKAUSAR AMIN HUTAGAOL", "KK KED ALYSHA NADRA", "KK KED ANDIKA AHMAD ROZAN AQILAH", "KK KED ANINDYA WAHYU SYAZARISMA", "KK KED ANUGERAH PEKERTI TUMANGGOR", "KK KED ARDAN HIDAYAT", "KK KED ARKA ANANDETA PRATAMA", "KK KED ATHALAH NAKILLAYA DULLAYA WILOGO", "KK KED ATHALIA NASYWA TSANY", "KK KED ATIIQAH DIANIZZAH", "KK KED AULIA YASINA WIJAYA", "KK KED AURA RIZKA NOURMA GANIQ", "KK KED BEATRICE ALICIA HARDANI", "KK KED BENYAMIN FEBRIYAN SIMANJUNTAK", "KK KED BISMA ALFIN BERRY", "KK KED BRAM KAUTSAR SUTEJAPUTRA", "KK KED BUNGA KURNIA LESTARI", "KK KED CELVIN PARDAMEAN SIMORANGKIR"
-          ],
-          "FM 1": [
-            "KK FM ABYAN BAIHAQI HIDAYAT", "KK FM AHMAD FAUZAN SINUHAJI", "KK FM ALFREDA LUTHFIYAH KHUSHANDINI", "KK FM ALIFIA GUSMIAR", "KK FM ALMIRA ELOK NABILAH", "KK FM ANASTASYA JULIA RAHMA", "KK FM ANDHIKA JULIAN ABADI SIAGIAN", "KK FM ANDHIKA KAISAR RAMADHAN", "KK FM ANDITO FAJHRI RIZKYANO", "KK FM ANDREAS DAFFA LUKITA", "KK FM ARRIFA BIAN ALVARO", "KK FM ARYA GALIH SETA", "KK FM AUDI RASYA KUSUMA", "KK FM AURIEL RAYIE PRAYOGA", "KK FM AVRILLITA NUR ALKHILA", "KK FM AYLA KHIRANIA SYAPUTRI", "KK FM AYUB MIKAEL MARPAUNG", "KK FM AZAHRA CANDI ARTIKA", "KK FM AZKA ARUNA PRADIPTA", "KK FM BETRAND HARDI WILLIAM MANIHURUK", "KK FM CELSILIA ALIKA AMANDA MAULANA", "KK FM CHARISSA BERLIAN RAMADITA PUTRI", "KK FM CHITRA SEVANYA", "KK FM CORNELIUS ROLANDO SOFYAN", "KK FM NAIFA ALAIKA NAJMI"
-          ],
-          "IF 1": [
-            "KK IF A. M. QAYYUM FAHREZI JAENAL", "KK IF ABELARD RACHEL ATHAYYA GHANIE", "KK IF ANDHEYRA NOVA MAHARDINATA", "KK IF ANINDYA ARAMINTA APSARI", "KK IF ARYA NIRBITA PRATAMA TARIGAN", "KK IF AYATULLAH MUHAMMAD ALDEN", "KK IF AZIZAH ZAHROH", "KK IF DHINI YUHANATA MAHESINTA", "KK IF DJOKO HARYO BASKORO", "KK IF GABRIEL CARLO VINCEN KIIK", "KK IF GILANG PRATAMA ANWAR", "KK IF GIRASZIYAD HAMMAM AHMAD", "KK IF HENDRIK PANAHATAN SIRAIT", "KK IF IVANO YUJONG", "KK IF JONA ADRIAN PURBA", "KK IF KEZIA NABILA SAPHIRRE", "KK IF LAKSAMANA GUSTI ATHUR ANTONI", "KK IF LUNA EVANGELISTA GURNING", "KK IF M. FARHAN FILIE", "KK IF MUHAMMAD NUR RAFIF MUHA", "KK IF PANDU JOSE ALADNTA NAPITU", "KK IF RADHI SHAFAD RABBANI", "KK IF RAFFI ABDURRAHMAN ERMIZAL", "KK IF SURYA NUGROHO", "KK IF WAODE AMERWANGI ZAHRA AMULIA"
-          ],
-          "IKOR": [
-            "KK IKOR ADILA HERMULIA PUTRI", "KK IKOR AERLANGGA ASTIKNYO PAKSI", "KK IKOR AMANDA PUTRI FARELINA", "KK IKOR APRIAZI WISESA SENTANA", "KK IKOR BRILIAN SATRIA YUDHA", "KK IKOR CALLYSTA SATYA ADRIN", "KK IKOR CANTIK LUIFIANA MAURINTAHUL", "KK IKOR DAIVA FAUZI ARIBOWO", "KK IKOR DAIVANDRA KUSUMA WARDHANA", "KK IKOR DARMASYAH SETIAJI", "KK IKOR FARADILAH RAMADHANI SILAMA", "KK IKOR FRIDA ANNAS FATHSABILLA", "KK IKOR INDRA M.Y NAPITUPULU", "KK IKOR MUHAMMAD ARJEN YUDANTO WIRASENO", "KK IKOR MUHAMMAD PUTRA AFRIANSYAH PELU", "KK IKOR MUHAMMAD ZARNUH AL FAREALSHA", "KK IKOR NAJLA GHINA NUR AZIZAH", "KK IKOR NHORY RAHMADANI CHANIA", "KK IKOR NINDITA MEGANTARI MULYANA", "KK IKOR OSCAR IQBAL MAKARIM", "KK IKOR RAINA APRILIA", "KK IKOR SILVIA IMTIYAS NISRINA", "KK IKOR TIARA MARANTI ZAHRA", "KK IKOR WIDYA CINTYADI PRASETYA", "KK IKOR ZAHAVAH AURELLIA AMANDA SARI"
-          ],
-          "FK 2": [
-            "KK KED CHERYL VANIA SANTI", "KK KED CHRISTANIA MILITIA LANTANG", "KK KED CHRISTINE SRI ULINA BANJARNAHOR", "KK KED CLAUDIA RIZKY AN'NISA", "KK KED DAFFA BUDIYANTO", "KK KED DARRELL KEINO ERVANTHE", "KK KED DEWI SUKAINAH SESARINO", "KK KED DIANDRA DWI SURYA ATMAJA", "KK KED DINAR ATIKA DANIS SU'UDIYAH", "KK KED DYFAL MUHAMMAD RAZAN", "KK KED EAN SINTANTA GINTING", "KK KED FABIAN RIFIAL AZMI", "KK KED FADEL FAHREZI PARE", "KK KED FADLY KAMAL", "KK KED FAIZ FIRZATULLOH FIRMANSYAH", "KK KED FAIZ HADYANANTA", "KK KED FAREL JANAVE MUNTHE", "KK KED FELIX JONATAN MANIHURUK", "KK KED GABRIELLA FELICIA RAMANDEY", "KK KED GERY HOSEA SIRAIT", "KK KED GHILFANI RAHMAN", "KK KED GLADYS THERESIA ALVERA SIAHAAN", "KK KED GLENN OLOAN SITANGGANG", "KK KED GORTAP RICHARD PARAPAT", "KK KED GRACE FEBRI EILYNORA SIMARMATA"
-          ],
-          "FM 2": [
-            "KK FM CUT DEVA ULHAQ MARDHATILLAH", "KK FM DAFFA ALFAAIZ HABIB", "KK FM DERRIAN IQBAL BAZLI", "KK FM ELVITA FREDA AYU DZAKIRA", "KK FM FADHILAH AINUN NOOR CHANDRA", "KK FM FADHILAH DAHLAN", "KK FM FARAH ANANDA PUTRI", "KK FM FARAH DITA ALYAH", "KK FM FAREL ABYAN PUTRA WIJAYA", "KK FM FATIH RAHMA FITRI AMALIYA TUMANGGOR", "KK FM FIANA CANTIKA RUSMANA", "KK FM FINA APRILIA AZIZAH", "KK FM FRANZION DANIELS HOSEA AGATHOS", "KK FM GABRIELA ARTALITA NAULI SIAHAAN", "KK FM GRAFHIA GENEFA AKHFANI HARAHAP", "KK FM HAFIDZ PUTRA RAMADHAN", "KK FM IDA AYU DWIPAYANI", "KK FM IRENE CRISTIN PURBA", "KK FM JAHWA CIKA APRILIANI", "KK FM JASMINEA SALWA ALEEA", "KK FM JAUHARIN INSIYA", "KK FM JESICA OLIVIA SIHOMBING", "KK FM JIHAN KARTIKA SHARLY", "KK FM KAYLA ARDHYA", "KK FM KAYLA AZZAHRA DENNIS NAWAWI"
-          ],
-          "IF 2": [
-            "KK IF ADITYA PRATAMA RAMADHAN", "KK IF AHMAD ADHYAPTA NASUTION", "KK IF AHMAD NAUFAL FIRNANDA", "KK IF ARIE ALFIATHUR GURITNO NUGROHO", "KK IF AZKA NADHIF ISLAMY", "KK IF BARIROH AULIA MUMTAZ", "KK IF FARREL EMERSON LIMBONG", "KK IF FIORENT ALMAHRI", "KK IF GALUH NISMARA CANDANILOKA", "KK IF JUSTITIA FARHAN NAFILA", "KK IF KAYLA SYAFIRA OKTAVIANI", "KK IF KEIZA AZZIKRA WINANDA PUTRA", "KK IF M. FAUZAN JABAR SIDIQ", "KK IF MAHARANI WIBAWANTI TIARA JASMINE", "KK IF MELKI YOSIA HASURUNGAN BAKKARA", "KK IF MIGUEL HAMONANGAN RAJAGUKGUK", "KK IF MUHAMMAD HAFIZH VERIANSYAH PUTRA HARMA", "KK IF MUHAMMAD RQ PARADISE", "KK IF NATASYA ANGELICHA RITONGA", "KK IF NI KOMANG MUTIARA PRADNYA SIDHI", "KK IF NIHA IZZATI BILQIS", "KK IF RADO ANUGRAH NABABAN", "KK IF RAGIL SURYA RAMADHANI", "KK IF RIFKY ADISHATYA", "KK IF ZAKI ADITYA A"
-          ],
-          "SM": [
-            "KK SM AGAN FIRDAUS PANJIWIJAYA", "KK SM ALENOIS RIZQULLAH", "KK SM ALYSSA ELNATH TAUFIK", "KK SM ARYANUL IKRAM ARDIVIAN", "KK SM CHRISTIAN AUSTIN PAKPAHAN", "KK SM CHRISTINA NENO", "KK SM CISSIE CALLISTA CAMARI", "KK SM DZAKWAN IBRAHIM", "KK SM FERNANDA KURNIAWAN", "KK SM HAMMAM PRIMA BHAKTI", "KK SM KHAIRUNNAFIS ARBI", "KK SM M. CHYKAL HIDAYATULLAH", "KK SM M. Razi Pardana", "KK SM MARSHANDA NURUL SUSTIKA", "KK SM MUHAMMAD DAFFA ALBAR SUTARA", "KK SM MUHAMMAD HANAN AL-HABIB DAULAY", "KK SM NAZWA ARTIKA DESI", "KK SM PUTRI HERLINA ALEXANDRIA", "KK SM RIRIN JESSIE FELICIA LUBIS", "KK SM SITI ALISHA FAKHIRAH KOMARA", "KK SM VYOLA PATRICE BUTARBUTAR", "KK SM YAZID BERYL MAHADI", "KK SM ZAFIRA KHAIRUNISA", "KK SM ZUL FAJRI"
-          ],
-          "FK 3": [
-            "KK KED GRACE PRETTY MARGARETHA SITORUS", "KK KED GRACIA PERMATA TUMANGGOR", "KK KED GRISELDA RATNADEWATI ANOM WARSITO", "KK KED GROYRIMIC EBENHAEZER SAOLO TARIHORAN", "KK KED HANIF AHLINA NAJIB", "KK KED HIDEMI NURHALIZA", "KK KED I PUTU SURYA SRIWIJAYA PUTRA", "KK KED ICE FLAFIA KILANMASE", "KK KED IRA SAFITRI WIBOWO", "KK KED JABAL ROZAN ZIAUDDIN", "KK KED JEFANYA FITRIASIH NAULI HUTAGALUNG", "KK KED JHEZKIEL REVRANANDA AGUSTY", "KK KED JOHN BILL VAN YEHUDA DIMI", "KK KED KAFKA BINTANG TIMORA", "KK KED KAILA LEILANI ABDUL QODRI", "KK KED KAMELIA SIMANJUNTAK", "KK KED KARINA SHAFIRA", "KK KED KEYZA FILDZAH GHAISANI HARAHAP", "KK KED LEON VIKESHA KAY", "KK KED LILY MARTHA SARI", "KK KED LUTFIYAH NUR MUTHIAH", "KK KED MARCEL APRIAN SIMAMORA", "KK KED MARIA YOSIA HUTASOIT", "KK KED MARTHA ROMA ULI SIAGIAN", "KK KED MAULANA AHMAD RAFA ABDULLAH"
-          ],
-          "FM 3": [
-            "KK FM KAYLA HASNA WIRA KHAIRUNISA", "KK FM KEIJI AKRAM OBAY", "KK FM KESYA CHRISTINE AZZURE SITORUS", "KK FM KESYA PUTRI ANGELINA", "KK FM KEYSYA ASRICHA", "KK FM KEZIA CECILIA GURNING", "KK FM KEZIA PRATIWI ARITONANG", "KK FM KHALILA NAFASYA FITRA", "KK FM LIBREVI MOURENNA NESIMNASI", "KK FM M. ARIF FATURRAIHAN", "KK FM M. FIRLY AFIAN BIMANTARA", "KK FM M. IBADURRAHMAN ALFARISY", "KK FM MAHAVIRA BINTANG SAKTI RAMADHAN", "KK FM MARCELLA TAMBUN", "KK FM MAYANISA KUSUMA SAMUDRA", "KK FM MAYLAN INDRIANTARA", "KK FM MEISYA NAURA CITRA LARASATI", "KK FM MEYSINTA AINURRIFDA", "KK FM MUHAMAD HANAN AZ-DZIKRA", "KK FM MUHAMMAD ALLAAM WIRAYUDHA MUCHTAR SJAMS", "KK FM MUHAMMAD PRAWIRA HARYANSYAH", "KK FM MUHAMMAD RADITYA SUNDARA", "KK FM NABILA ALMAS FAUZIYAH", "KK FM NABILAH CANDRANINGTYAS", "KK FM NABILLATUL SHAFIRA AZIZAH"
-          ],
-          "BIO": [
-            "KK BIO ANNISA DELINA PUTRI SIREGAR", "KK BIO AWANG BANYUSELO AGNI", "KK BIO DENIDA PUTRI MAHARANI", "KK BIO DIARRA FAIRUZ MIRQUIZHAL ROHIM", "KK BIO DIONELA NAJWA AZKA", "KK BIO EZRA RAVELINA TAMBUNAN", "KK BIO FARAH AULIA AGHNIA NURUL ARIFAH", "KK BIO GIJKA BR SITEPU", "KK BIO INTAN PASARIBU", "KK BIO JANNICKA PUTRI SOLEHA", "KK BIO MUHAMMAD AIZAR NASYAH", "KK BIO MUHAMMAD SHEVCHENKO PUTRA RAVIKHASHA", "KK BIO NAUFAL BIFAQIH", "KK BIO NAZWA PRIMA TIARA", "KK BIO NUNA SAPTA NINGRUM", "KK BIO RAISA HASNA PUTRI CANTIKA", "KK BIO REBEKKA PUTRI NATALIA SINAGA", "KK BIO RIJAL WIDYA UTAMA", "KK BIO RINDA AULIA RAHMADHANI", "KK BIO SEAN FARESKY KARAENG", "KK BIO THEODOR NATHANAEL MANIHURUK", "KK BIO UMU KULTSUM NUR AZIZATIN SOE CITRANING RATU", "KK BIO VANESSA T.B. JAHE", "KK BIO VIOLA ANJANI", "KK BIO ZEIN DWIGUSVITHA LINTIN"
-          ],
-          "RSDA": [
-            "KK RSDA ADHITYA DWI FEBRIAN", "KK RSDA ALVINE ARYA PUTRA PURNAMA", "KK RSDA AZZAHRA BANAFSAJ CALISTA", "KK RSDA BAGAS HADI PRASETYA", "KK RSDA CHRISTIAN MOSES PURBA", "KK RSDA FADIA NURBAITHA RAHMA", "KK RSDA FARID GHAISAN AMARTA", "KK RSDA FARRAS JAMHARI MAHARDIKA", "KK RSDA FELICIA JENYTA DE ANDRADE", "KK RSDA FERDY NAUFAL IYANANDA", "KK RSDA FITRAH RAMADHANI", "KK RSDA GRACE SEPTAYUNI SIAHAAN", "KK RSDA GRACELIA NAOMI PANDIANGAN", "KK RSDA HERMON VALENT FAHUWUSA HULU", "KK RSDA IQBAL PUTRA RAMADHAN", "KK RSDA JARIS YAFIK WIRZA", "KK RSDA JOSEPH FAREL NAPITUPULU", "KK RSDA MAREL REVELINO", "KK RSDA MARETA TRICAHYA RESNA", "KK RSDA MORA ARDINA MARGARET SILALAHI", "KK RSDA MUHAMMAD BINTANG CAHAYA NEGARA", "KK RSDA NAYLA ILMATYA KHAWASI", "KK RSDA RIBKA ADELINA LUBIS", "KK RSDA SATYA FAREL ABYANTORO", "KK RSDA STEVEN IMANUEL SITANGGANG", "SK RSDA UMI LATHIFATUL AZKIYYAH" 
-          ],
-          "FK 4": [
-            "KK KED MAUREZIO RICHARD WILSON", "KK KED MERCY AUREL JALLA BING", "KK KED METAMICHELLE TABITHA LISTIARINI SEMBIRING", "KK KED MGS.M.FAHRI AL-FATIH", "KK KED MIFTAHUL JANNAH", "KK KED MISYA ISAURA ROHMAT", "KK KED MOHAMMAD BAYU RIZQI SAPUTRA", "KK KED MORLI ZAHRAWANI", "KK KED MUH. NABIL FIRDAUS SABIR", "KK KED MUHAMAD KALEVI PRATAMA", "KK KED MUHAMMAD DEAPAMA MIRZA MAREFA", "KK KED MUHAMMAD FAUZAN NAWAWI", "KK KED MUHAMMAD FERDIANSYAH DWI SAPUTRA", "KK KED MUHAMMAD GADING AL FARISH", "KK KED MUHAMMAD HAZIQ ATHIR LUBIS", "KK KED MUHAMMAD NAUVAL RASPATI", "KK KED MUHAMMAD RADI", "KK KED MUHAMMAD RAFFIUDIN", "KK KED MUHAMMAD RAFIE KAMAL", "KK KED MUHAMMAD TSAQIF ANARGYA PHALOSA YULIANTO", "KK KED MUTHIA ERWIN", "KK KED MUTHIA SALYA RASYID", "KK KED MUTHIAH SALSABILA AZ-ZAHRA", "KK KED NAADHIR FIRAS AMRULLAH", "KK KED NAFFARA ZIVANA LETISSA"
-          ],
-          "FM 4": [
-            "KK FM NAJWA AYU PRAMESTY", "KK FM NAJWA FIRDA WINATA", "KK FM NANCY PELOSI TAMPUBOLON", "KK FM NAYLA HERTIYANA", "KK FM NAYLA PUTRI RASYDAH LUBIS", "KK FM NAYLA SABILAH MUKSIN", "KK FM NUNKI MUSAFIRA TIRTA KURNIAWAN", "KK FM PUTRI KHAILA D'WANDRI", "KK FM RABBANI ISMAIL", "KK FM RAFIQ EVSA KUSUMAWARDHANA", "KK FM RAHMA ALIYA RAMADHANI", "KK FM RICCO ARCHY ATHA WIJAYA", "KK FM RIFKY PUTRA PRATAMA", "KK FM SAHALA IMMANUEL SIMANUNGKALIT", "KK FM SATRIYA MANGGALA PUTRA", "KK FM SEVANYA AUFA ANGGONO PUTRI", "KK FM SHAKYLA ALMYRA FASYA", "KK FM SHINTA PARASMITHA KIRANI", "KK FM SIMON SIRAIT", "KK FM THANIA KARTIKA BR SINAGA", "KK FM TOBIAS MARELIS LEIFMARGAN", "KK FM VALDA HAJ TAHTA ALYA", "KK FM VIRA WITA HANDAYANI", "KK FM WILLIAM ARTHUR PARAPAT", "KK FM YUDHISTIRA PRATAMA ADJIE"
-          ],
-          "MATH": [
-            "KK MATH ADITYA FAIQ PUTRA", "KK MATH ALGAFA TAQIY VANSPIJK PASIA", "KK MATH ALIFINKA ANANDILA DIARA", "KK MATH ALVIAN CRISTIANO KUMAYAS", "KK MATH ELTANIN LIONEL PURBA", "KK MATH FIKRI HANIF HADI RAMADHAN", "KK MATH GABRIEL KENZO DAVIDEO WURANGIAN", "KK MATH HAIDAR AFRADANINDRA OCTAVIANTO", "KK MATH JASER JODIE ALQAHTANI", "KK MATH JEREMI SEPTIAN MANALU", "KK MATH JESSICA ESTHER YERI PANGARIBUAN", "KK MATH MUHAMMAD BILAL AL-HAFIDZ ADIPUTRA RAMADHAN", "KK MATH MUHAMMAD ILZAM ALFA RAFIQI", "KK MATH MUHAMMAD RAFI RAMADHAN", "KK MATH MUTIARA HANANTA RAMADHANI", "KK MATH NABIL AJI SYAPUTRA", "KK MATH NI PUTU CHERY APRILIA", "KK MATH NUR WAHYU WIRATAMA", "KK MATH PANDHU SATRIA UTAMA", "KK MATH PRATAMA DIRTA", "KK MATH PUTRI FAUZIAH KAMILAH HARSOYO", "KK MATH RAIHAN SYAH ALI SAFAAT", "KK MATH SHIFA ALYA RAISA", "KK MATH VANIA WAHYU UTAMI PUTRI", "KK MATH YOSE FEBRIYAN SIMANULLANG"
-          ],
-          "TS": [
-            "KK TS ADRIAN ZUHDI ERLANGGA", "KK TS AHMAD NAUVAL AZIZ PRATAMA", "KK TS ANDHIKA ZAHRAN DARMAWAN", "KK TS ARDHIA PRAMESTY REGITA KUSUMA WARDANI", "KK TS CINDY RENATA", "KK TS DAMAR MARIO PURBA", "KK TS DEWI GALUH MULANSARI", "KK TS ELSA ANNI STEVANA SIMANJUNTAK", "KK TS GLEN CLEO", "KK TS HANSEL OSBERT LUMBANTOBING", "KK TS IMANUELA KEZIA YAHUI", "KK TS IRSYAD ANDHIKA WANDI PUTRA", "KK TS ISKANDAR YUNUS HSB", "KK TS JAVAS ANGAPUS HARMARESA", "KK TS KEISYA RICHIE HARYONO", "KK TS KRYSNA WAHYU NUGROHO", "KK TS MARIA SRI REZEKI TAMBUNAN", "KK TS MATTHEW RAPHAEL TARORE", "KK TS MOCHAMMAD ALFAN ARDIANSYAH", "KK TS MUHAMMAD HABIBI", "KK TS MUHAMMAD KEVIN ATTHILLAH AZHAR", "KK TS MUHAMMAD QISYAL ALFITRAH", "KK TS MUHAMMAD REZA IFTITACH RIYADI", "KK TS NANDINI AULIA ARIFANNY", "KK TS RAIYAN MUSPITO PRATAMA MUNANTO"
-          ],
-          "FK 5": [
-            "KK KED NAILA RAHMA FEBRIANI", "KK KED NAILAH ZAHRA PURBA", "KK KED NAJWA MUTIARA RAMADHAN", "KK KED NAKULA FAUZAN RAMADHANA", "KK KED NANDYA ALFINA KUMALASARI", "KK KED NATANAEL YUNUS WANDOYO SIANTURI", "KK KED NAURA RAIHANA RIDWAN", "KK KED NAYLA SYAWALITA MASNI", "KK KED NICO ALAN SIMANJUNTAK", "KK KED NUR FARELIA ARWAN", "KK KED NUR NABILAH PUTRI", "KK KED NURIN DALILI BATRISYIA SAMOSIR", "KK KED NURIS FARIHA SEKARWATI", "KK KED PRISCILLA KHYMKI ABIGAIL", "KK KED PUTRI DEA RAHMAWATI", "KK KED PUTRI FEBRIANI VALENTINS ARITONANG", "KK KED RADEN MAS RAFLY ANANTA KUSUMA DHEWA TIRTOATMODJO", "KK KED RADEN MAS WAHYU MAHESA DAYA PRASETYA", "KK KED RAFA PRATAMA RADIANSYAH", "KK KED RAFAEL THIERRY TAMPUBOLON", "KK KED RAFAEL WILLY RITONGA", "KK KED RAFEYFA QANITA NIWA", "KK KED RAHMAT", "KK KED RAJA ALIN DANISH PERDANA", "KK KED RAY MIRACLE HUTAPEA"
-          ],
-          "IF 3": [
-            "KK IF M.NAUFAL AL HARITS", "KK IF M. ZAHRUL FURIZK", "KK IF NAURA AZZAHRA KUSUMA PUTRI", "KK IF HANA CHAENITA PERANGIN ANGIN", "KK IF IAN FAREL SIHOMBING", "KK IF NASHWA AZAHRA PUTRI HANDOKO", "KK IF GAMANTHA RADITYANTY KURNIADI", "KK IF MAHIB ANKA FADHLILLAH", "KK IF ATRYA LIVEANA SURYANTO", "KK IF OSKAR SIREGAR", "KK IF GHIRFAN HAKIM", "KK IF NUGROHO WIBISONO", "KK IF DEWANGGA MAULANA SAPUTRO", "KK IF AZWAR RESTU WARDANA", "KK IF ELANG SAMUDRA", "KK IF RIFKI RHAMDANI SOMALI", "KK IF RADITYA ARYASATYA MAHESWARA", "KK IF RIZKI AULIYA RAHMAN", "KK IF MUHAMMAD REVONANDRY BRAMADHYA", "KK IF MUHAMMAD IQBAL SATRIA WIBOWO", "KK IF DIAN ANUGERAH TRI LESTARI", "KK IF FACHREL NAUFAL KURNIAWAN", "KK IF RAYMOND MULIA PURBA", "KK IF SANDY JERICHO", "KK IF SATRIA DHARMA LAKSMANA"
-          ],
-          "KIM": [
-            "KK KIM AFIFAH NOVIANA", "KK KIM ARIMBI AURA SAFITRI", "KK KIM DHIOVANO SATRIYA AGUNG", "KK KIM DION H.B. SIAHAAN", "KK KIM DYAH WIYAT RAJADEWI MAHARAJASA SAMSU HUDA", "KK KIM FATMA YULI DARMALISA", "KK KIM GERALD MALVINO PANDIANGAN", "KK KIM IREN REKI EPRILIA SIDABUTAR", "KK KIM IRFAN MARTINUS MANIK", "KK KIM JESICA KURNIA PRADANI", "KK KIM JESZA RADITIA PUTRA SITUMORANG", "KK KIM MOHAMMAD AKBAR DZIKIRIYA AROSI", "KK KIM MUHAMMAD WAHID FAHRIZA", "KK KIM NABIL YUFNA WISNU SASMITO", "KK KIM NAYLA ZAHRA ARIBOWO", "KK KIM NUR IFRA SIDIQIA AHYA", "KK KIM RATU FELICIA ANGGRAENI SEKAR PUTRI", "KK KIM RIDWAN SHABRI", "KK KIM SULINDRA AHTARINI", "KK KIM SYAHNA KHAIRANI WIBOWO", "KK KIM TALITHA NADA AINI", "KK KIM THOMAS ARDIANSYAH", "KK KIM TRISTANTI", "KK KIM VERY MEGAH ARASY", "KK KIM YOSEPH MARSHA PANJAITAN"
-          ],
-          "TE": [
-            "KK TE ANASTASYA DAMESTI HUTABARAT", "KK TE ANDHIKA FAWWAS BAHAUDDIN FAHMI", "KK TE AULIA AZHAR", "KK TE BELINDA ZHAFIRA", "KK TE CRISTIAN TAMBUN", "KK TE DEO SATRIA WIJAYA SILABAN", "KK TE EDI BAGAS SITOMPUL", "KK TE I GEDE ANDHARA PASTA PRATAMA", "KK TE INES MEY KRISTI BR SITEPU", "KK TE JOHN FRANKLYN RAFAEL HUTAURUK", "KK TE LUSY AMELIA", "KK TE M FAIZAN SETIARSO", "KK TE MICHAEL ELISAMA NAPITUPULU", "KK TE MUHAMMAD ZHAFAR HAFIZ", "KK TE MUKHAMAD AYX T ZUS RIZAL TOFA", "KK TE NANDRA SINWA AROFIQ", "KK TE PRAKOSO DWI AQILLAH", "KK TE RADIFAN NASRULLAH ELRIZKY PUTRA", "KK TE RAFYENDRA BAGAZ LOFAROZ", "KK TE SEPTIAN ROHIP SIREGAR", "KK TE TAFAKUR AKBARI ILMI", "KK TE UZIA GLORIA SITORUS", "KK TE VAHRIZA PUTRA RIVLY", "KK TE WIRA TRI ARJUNA LIMBONG", "KK TE YOHANES SEBASTIAN FIAT VOLUNTAS TUA"
-          ],
-          "FK 6": [
-            "KK KED REGINA MARY VIRGINIE PALMITA", "KK KED RIDHO AMANI", "KK KED RIDOYON SIMANGUNSONG", "KK KED SASKIA MEI SALSABILAH", "KK KED SAYYIDAH AFIFATURRAFIDHAH", "KK KED SEKAR AYU LINTANG WIJAYANTO", "KK KED SEPTIANA DEWI SRI PANGASTUTI", "KK KED SISKA AMELIA SILALAHI", "KK KED STEFANY ANGELI NABABAN", "KK KED SUCI RAMADHANI", "KK KED SUCI ZANETA ZEGA", "KK KED SYFA KHALISA YASMIN", "KK KED T.M. HAFIZ HANNAN", "KK KED TANGGUH PUTRA BIJAKSANA", "KK KED THALITA ZULFAA LIANI", "KK KED TOBIAS SITUMORANG", "KK KED VANIA PERMATASARI PURNOMO", "KK KED VERRELL ARSHANIO MAULANA", "KK KED VIOLETHANARRA ATHALA PRAYA", "KK KED VIRA DWIPUTRI", "KK KED VOLNY VIVIEN SIMANULLANG", "KK KED WA ODE SALSABILA RAMADHANI", "KK KED ZAHRA NABILA", "KK KED ZAKY FADHIL KUMAIDI", "KK KED ZULAIKHA ISNINA RAMADHANI"
-          ],
-          "IF 4": [
-            "KK IF ACHMAD KRESNA PAMUNGKAS", "KK IF ARSYFA RAHMA KRYANI LESTARI", "KK IF AZIZI FARIS ABQARI", "KK IF DANISH GHAISAN PUTERA AHMADI", "KK IF FARREL RADITYA FERNANDA", "KK IF FARREL YUDIATHA", "KK IF GAFRIEL ZACHRI IVANOV", "KK IF HANIF AZKA TAFTAZANI", "KK IF HANIF BAGUS SAFARAZ", "KK IF JUNIYO MIKA RAHIL", "KK IF KEYLLA SYIFA MAULIDYA AZZAHRA", "KK IF MUHAMMAD RAYA RABBANI PASHA", "KK IF MUHAMMAD SYAUQI", "KK IF RABITHA ALIZA YAHYA", "KK IF RACHEL BASANA SIMAJUNTAK", "KK IF RADITYA WAHYU DHARMAWAN", "KK IF RAFFA NAZAIR PUTRA WINARSO", "KK IF RAFFAEL FIRNANDA SAPUTRA", "KK IF RAIHAN KHAIRUL ANAM", "KK IF RIFALDO RIDHO MARTHAPRAWIRA PUTRA", "KK IF ROMAULI MEILANI TAMBUNAN", "KK IF SALMAN CHALIL AL FARIZZY", "KK IF SHAN WIRAMARSHA WIBOWO", "KK IF THERESIA MARPAUNG", "KK IF ZAHWA DWI SYAKIRA"
-          ],
-          "TM": [
-            "KK MESIN AHMADI ZAKY FAZA HARAHAP", "KK MESIN ANDHIKA BAYU WIDIANTO", "KK MESIN ARKAN PUTRA AJI", "KK MESIN ATHA HAFIZH LUTHFIRESTA", "KK MESIN BLESSING YUDA PUTRA SIALLAGAN", "KK MESIN DEKO STIAWAN", "KK MESIN FADANI DWI PUTRA", "KK MESIN FARREL ADIKA FIRDAUS PRATAMA", "KK MESIN FERDINAND MARULI TUA MANURUNG", "KK MESIN GLENN LIBERTY PARDEDE", "KK MESIN GUMAYANG FITRI ANNISA", "KK MESIN HARSA RASYID", "KK MESIN HOT BAYU HAPOSAN SINAGA", "KK MESIN KRISTOFORUS MICHAEL KISLEW SAPUTRO", "KK MESIN LAURENSIUS ABINAWA PRADIPTA", "KK MESIN MUHAMMAD FARREL DAVIAN", "KK MESIN MUHAMMAD HAIKAL HANAFI", "KK MESIN MUHAMMAD PASHA AZZUHRI DAULAY", "KK MESIN MUHAMMAD ZALVI NUR", "KK MESIN NAJIHAN ABIYYU AMMARSYAH", "KK MESIN NICHOLAS PEDRO NEHEMIA PANGARIBUAN", "KK MESIN TORNANDA SIREGAR", "KK MESIN VANDEL PUTRA CAKRA BHIRAWA", "KK MESIN WANDANIEL PURBA", "KK MESIN YOSUA DWI NOBERTUS EDITYA"
-          ],
-          "FIS": [
-            "KK FIS ALDO ZAKY PUTRA SANDI", "KK FIS DAVINA NAZWA ZAHRA DALIMUNTHE", "KK FIS EFRUAN ADJI FACHREZA", "KK FIS ELENA DESTI NUGRAHA", "KK FIS ELSADAY BUTAR BUTAR", "KK FIS EMAILDA ROMAITO SIANTURI", "KK FIS FARHAN AZZUHRI", "KK FIS FARRAH AMELIA TARA", "KK FIS FARREL AKBAR FERDINAL", "KK FIS FARSYA IKMAL RA’UF", "KK FIS HAIKAL THIHAL RIZKI", "KK FIS JALUNG ADHWA PANJI WIJANARKO", "KK FIS JUNDY ISLAMI FASYA", "KK FIS M ARVAN YEFRI NASUTION", "KK FIS MIRHAM RISKI PRATAMA", "KK FIS NABILA EKA RAMADHANI", "KK FIS NIA SASTRI CANDRA MAHARAJA", "KK FIS NISRINA ADHI UFAIROH", "KK FIS NUR INDAH IRIANI", "KK FIS PUTRI AYU PALUPI", "KK FIS RESYA AURELIA SAFITRI", "KK FIS TUNGGA PRAWIRA MAULAWARMAN", "KK FIS VIVIANA FARADILLA ANGESTI", "KK FIS ZAIN ALTHAF DEDIANDRA", "KK FIS ZUYYINA BRILLIANTY BAROROH", "SK FIS ALYSSA TRIHAPSARI INAYA"
-          ]
-        };
-
-        const cadets = {};
-        const femaleKeywords = ['PUTRI', 'AURA', 'AYLA', 'AZAHRA', 'CANTIK', 'NAJWA', 'NISA', 'SITI', 'AYU', 'SALSA', 'ALIA', 'THERESIA', 'GRACE', 'MUTHIA', 'NAYLA', 'ANGEL', 'DITA', 'ELSA', 'CINDY', 'ZAHRA'];
-        
-        defaultProdiList.forEach(p => {
-          cadets[p.currentName] = [];
-          const names = rawCadetData[p.currentName] || [];
-          names.forEach((name, idx) => {
-             let gender = "Laki-Laki";
-             for(let word of femaleKeywords) {
-                if(name.toUpperCase().includes(word)) { gender = "Perempuan"; break; }
-             }
-             cadets[p.currentName].push({ no: idx + 1, name: name, gender: gender });
-          });
-        });
-
-        originalSetItem('e_arvy_cadets', JSON.stringify(cadets));
 originalSetItem('e_arvy_settings', JSON.stringify(appData.settings));
 
         const todayStr = getLocalDateString();
@@ -2062,6 +2037,122 @@ renderAnnounceLatestSchedule(now);
       const now = new Date();
       document.getElementById('realTimeDate').innerText = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
     }
+
+function renderBirthdays() {
+  const flatCadets = JSON.parse(localStorage.getItem('e_arvy_all_cadets_flat') || '[]');
+  if (flatCadets.length === 0) return;
+
+  const now = new Date();
+  const todayMonth = now.getMonth();
+  const todayDate = now.getDate();
+  const today = new Date(now.getFullYear(), todayMonth, todayDate);
+  
+  const todayList = [];
+  const pastWeekList = [];
+  const nextWeekList = [];
+
+  const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+  flatCadets.forEach(cadet => {
+    if (!cadet.tanggal_lahir) return;
+    
+    // Pastikan format dari database adalah YYYY-MM-DD
+    const parts = cadet.tanggal_lahir.split('-');
+    if (parts.length !== 3) return;
+    
+    const bYear = parseInt(parts[0]);
+    const bMonth = parseInt(parts[1]) - 1;
+    const bDate = parseInt(parts[2]);
+    
+    // Fungsi untuk cek jarak hari
+    const checkBirthday = (year) => {
+        const b = new Date(year, bMonth, bDate);
+        const diffTime = b.getTime() - today.getTime();
+        const diffDays = Math.round(diffTime / (1000 * 3600 * 24));
+        
+        const formattedStr = `<strong class="text-slate-800 dark:text-white">${cadet.name}</strong>: ${cadet.tempat_lahir}, ${bDate} ${months[bMonth]} ${bYear}`;
+
+        if (diffDays === 0) {
+            todayList.push({ name: cadet.name, text: formattedStr });
+        } else if (diffDays >= -7 && diffDays < 0) {
+            pastWeekList.push({ name: cadet.name, text: formattedStr, days: diffDays });
+        } else if (diffDays > 0 && diffDays <= 7) {
+            nextWeekList.push({ name: cadet.name, text: formattedStr, days: diffDays });
+        }
+    };
+
+    checkBirthday(now.getFullYear());
+    // Antisipasi jika ulang tahun lewat pergantian tahun (Desember - Januari)
+    if (now.getMonth() === 0 && bMonth === 11) checkBirthday(now.getFullYear() - 1);
+    if (now.getMonth() === 11 && bMonth === 0) checkBirthday(now.getFullYear() + 1);
+  });
+
+  // --- RENDER KALENDER DASHBOARD ---
+  const dashCalNames = document.getElementById('calBirthdayNames');
+  if (dashCalNames) {
+      const daysStr = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+      const engMonths = ['October', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      
+      document.getElementById('calMonthName').innerText = engMonths[now.getMonth() === 9 ? 0 : now.getMonth() + 1]; // Fallback array indexing
+      document.getElementById('calYearNum').innerText = now.getFullYear();
+      
+      document.getElementById('calDayName').innerText = daysStr[now.getDay()];
+      document.getElementById('calDayMinus1').innerText = daysStr[(now.getDay() + 6) % 7];
+      document.getElementById('calDayPlus1').innerText = daysStr[(now.getDay() + 1) % 7];
+      
+      document.getElementById('calDateNum').innerText = now.getDate();
+      
+      let tmp = new Date(now); tmr = new Date(now); nxt1 = new Date(now); nxt2 = new Date(now); nxt3 = new Date(now);
+      tmp.setDate(now.getDate() - 1); document.getElementById('calDateMinus1').innerText = tmp.getDate();
+      tmr.setDate(now.getDate() + 1); document.getElementById('calDatePlus1').innerText = tmr.getDate();
+      nxt1.setDate(now.getDate() + 6); document.getElementById('calDateMinus1Wk').innerText = nxt1.getDate();
+      nxt2.setDate(now.getDate() + 7); document.getElementById('calDatePlus1Wk').innerText = nxt2.getDate();
+      nxt3.setDate(now.getDate() + 8); document.getElementById('calDatePlus2Wk').innerText = nxt3.getDate();
+
+      if (todayList.length > 0) {
+          dashCalNames.innerHTML = todayList.map(c => `
+            <div class="bg-gradient-to-r from-pink-400 to-rose-400 text-white w-full text-center px-1 py-1.5 rounded text-[10px] font-black shadow-sm tracking-tight leading-none uppercase">
+              ${c.name.split(' ').slice(2).join(' ')} <!-- Menghapus KK/KED dll jika ada agar muat -->
+            </div>
+          `).join('');
+      } else {
+          dashCalNames.innerHTML = `<p class="text-[9px] text-slate-500 italic mt-4 font-semibold text-center">Nihil</p>`;
+      }
+  }
+
+  // --- RENDER ANNOUNCE SECTION ---
+  const annContainer = document.getElementById('announceBirthdaysList');
+  if (annContainer) {
+      let html = '';
+      
+      const buildList = (title, list, icon, colorClass) => {
+          if (list.length === 0) return '';
+          let items = list.map(c => `<li class="text-xs text-slate-600 dark:text-zinc-400 py-1.5 border-b border-slate-100 dark:border-zinc-800 last:border-0">${c.text}</li>`).join('');
+          return `
+            <div class="mb-3">
+              <h4 class="text-[10px] font-black uppercase tracking-widest ${colorClass} mb-1.5 flex items-center gap-1.5">
+                <i data-lucide="${icon}" class="w-3.5 h-3.5"></i> ${title}
+              </h4>
+              <ul class="bg-slate-50 dark:bg-zinc-800/40 px-3 py-1 rounded-ios-sm border border-slate-100 dark:border-zinc-800/60">
+                ${items}
+              </ul>
+            </div>
+          `;
+      };
+
+      pastWeekList.sort((a,b) => b.days - a.days);
+      nextWeekList.sort((a,b) => a.days - b.days);
+
+      html += buildList('Hari Ini 🎂', todayList, 'gift', 'text-pink-500');
+      html += buildList('Seminggu Kedepan', nextWeekList, 'calendar-clock', 'text-ios-blue');
+      html += buildList('Seminggu Kebelakang', pastWeekList, 'history', 'text-slate-500');
+
+      if (!html) html = '<p class="text-xs text-slate-400 italic py-2">Tidak ada data ulang tahun di minggu ini.</p>';
+      
+      annContainer.innerHTML = html;
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+  }
+}
 
  
     function renderDashboardSchedules(now = new Date()) {
@@ -4202,11 +4293,62 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
       const p = document.getElementById('adminSelectProdi').value;
       if(confirm(`Hapus absen ${no}?`)) { appData.cadets[p] = appData.cadets[p].filter(c => c.no !== no).map((c,i) => ({...c, no: i+1})); loadAdminCadetList(); }
     }
-    function saveAdminCadetNames() {
-      const p = document.getElementById('adminSelectProdi').value; const list = [];
-      (appData.cadets[p] || []).forEach(c => list.push({ no: c.no, name: standardizeEYD(document.getElementById(`adm-cadet-name-${c.no}`).value), gender: document.getElementById(`adm-cadet-gender-${c.no}`).value }));
-      callServer('updateCadetNames', { prodiName: p, cadetsList: list, username: currentUser.username }, () => { showToast('Tersimpan', `Roster ${p} disimpan.`, 'success'); loadDashboardAndAppData(); });
-    }
+    window.saveAdminCadetNames = async function() {
+      const p = document.getElementById('adminSelectProdi').value; 
+      const list = [];
+      const uiCadets = appData.cadets[p] || [];
+
+      // 1. Kumpulkan data dari inputan di layar (Panel Admin)
+      uiCadets.forEach(c => {
+        const nameInput = document.getElementById(`adm-cadet-name-${c.no}`).value;
+        const genderInput = document.getElementById(`adm-cadet-gender-${c.no}`).value;
+        
+        // Pastikan nama tidak kosong sebelum dimasukkan ke daftar
+        if (nameInput.trim() !== '') {
+          list.push({ 
+            nama_kadet: standardizeEYD(nameInput), 
+            prodi: p,
+            gender: genderInput 
+          });
+        }
+      });
+
+      try {
+        // Beri tahu user bahwa proses sinkronisasi sedang berjalan
+        showToast('Menyimpan...', `Menyinkronkan roster ${p} ke Supabase...`, 'info');
+
+        // 2. Hapus semua data lama khusus untuk prodi yang sedang diedit di Supabase
+        const { error: deleteError } = await supabaseClient
+          .from('datakadet')
+          .delete()
+          .eq('prodi', p);
+
+        if (deleteError) throw deleteError;
+
+        // 3. Masukkan (Insert) daftar kadet yang baru/sudah diedit ke Supabase
+        if (list.length > 0) {
+          const { error: insertError } = await supabaseClient
+            .from('datakadet')
+            .insert(list);
+
+          if (insertError) throw insertError;
+        }
+
+        // 4. Tarik ulang data dari Supabase agar memori lokal aplikasi ikut ter-update
+        await window.fetchDataKadetDariSupabase();
+
+        // 5. Catat log aktivitas dan beri notifikasi berhasil
+        if (typeof logLocalActivity === 'function') {
+          logLocalActivity(currentUser.username, `Ubah roster prodi ${p} via Supabase`);
+        }
+        
+        showToast('Tersimpan', `Roster ${p} berhasil diperbarui di database!`, 'success');
+
+      } catch (error) {
+        console.error("Gagal menyimpan ke Supabase:", error);
+        showToast('Gagal', 'Terjadi kesalahan saat menyimpan data ke server.', 'error');
+      }
+    };
 
     function renderPendataanList() {
   const container = document.getElementById('pendataanListContainer');
@@ -4634,6 +4776,51 @@ const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
     }
   };
 
+window.fetchDataKadetDariSupabase = async function() {
+  try {
+    // 1. Tarik data termasuk tempat_lahir dan tanggal_lahir
+    const { data: kadetData, error } = await supabaseClient
+      .from('datakadet')
+      .select('nama_kadet, prodi, gender, tempat_lahir, tanggal_lahir')
+      .order('prodi', { ascending: true })
+      .order('nama_kadet', { ascending: true });
+
+    if (error) throw error;
+
+    if (kadetData && kadetData.length > 0) {
+      const formattedCadets = {};
+      const allCadetsFlat = []; // Untuk memudahkan filter ulang tahun
+
+      kadetData.forEach((kadet) => {
+        const prodiName = kadet.prodi;
+        if (!formattedCadets[prodiName]) formattedCadets[prodiName] = [];
+        
+        const cadetObj = {
+          no: formattedCadets[prodiName].length + 1,
+          name: kadet.nama_kadet,
+          gender: kadet.gender || "Laki-Laki",
+          tempat_lahir: kadet.tempat_lahir || "Tidak diketahui",
+          tanggal_lahir: kadet.tanggal_lahir || ""
+        };
+
+        formattedCadets[prodiName].push(cadetObj);
+        allCadetsFlat.push(cadetObj);
+      });
+
+      appData.cadets = formattedCadets;
+      localStorage.setItem('e_arvy_cadets', JSON.stringify(formattedCadets));
+      localStorage.setItem('e_arvy_all_cadets_flat', JSON.stringify(allCadetsFlat));
+
+      if (typeof renderAttendanceList === 'function') renderAttendanceList();
+      if (typeof loadAdminCadetList === 'function' && document.getElementById('view-admin-panel').classList.contains('active')) loadAdminCadetList();
+      
+      // Panggil fungsi render ulang tahun
+      if (typeof renderBirthdays === 'function') renderBirthdays();
+    }
+  } catch (error) {
+    console.error("Gagal menarik tabel datakadet dari Supabase:", error);
+  }
+};
  
   window.uploadFileToCloudStorage = async function(base64Data, folderPath, fileName) {
     if (!base64Data || !base64Data.startsWith("data:")) return base64Data;
@@ -4674,23 +4861,19 @@ const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
 <script>
 
-function clearStaleCacheAndHistory() {
-  const today = getLocalDateString();
-  const lastClear = localStorage.getItem('last_cache_clear_date');
-  
-  if (lastClear !== today) {
-        for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith('draft_')) {
-        
-        const keyParts = key.split('_');
-        if (keyParts.length > 2 && keyParts[2] !== today) {
-          localStorage.removeItem(key);
-        }
-      }
-    }
+// --- UBAH ANGKA INI SETIAP KALI AKU DEPLOY HTML BARU ---
+const APP_VERSION = "v1.0.1"; 
+// -------------------------------------------------------------------
 
-       if ('caches' in window) {
+function forceClearCacheOnUpdate() {
+  const storedVersion = localStorage.getItem('e_arvy_app_version');
+  
+  // Jika versi di perangkat user beda dengan versi HTML saat ini
+  if (storedVersion !== APP_VERSION) {
+    console.log(`🚀 Update terdeteksi! Versi lama: ${storedVersion || 'kosong'}, Versi baru: ${APP_VERSION}`);
+    
+    // 1. Bersihkan semua Cache Storage (Menghancurkan memori Service Worker)
+    if ('caches' in window) {
       caches.keys().then(names => {
         for (let name of names) {
           caches.delete(name);
@@ -4698,14 +4881,34 @@ function clearStaleCacheAndHistory() {
       });
     }
 
-    localStorage.setItem('last_cache_clear_date', today);
-    console.log("Cache lama dan histori draf telah dibersihkan untuk hari ini.");
+    // 2. Unregister/Matikan Service Worker lama agar tidak menahan file lama
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function(registrations) {
+        for(let registration of registrations) {
+          registration.unregister();
+        }
+      });
+    }
+
+    // 3. Bersihkan sisa-sisa draf lama di memori (biar bersih total)
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('draft_')) {
+        localStorage.removeItem(key);
+      }
+    }
+
+    // 4. Simpan versi baru agar tidak terus-terusan nge-refresh
+    localStorage.setItem('e_arvy_app_version', APP_VERSION);
+    
+    // 5. Paksa browser memuat ulang halaman langsung dari Server (Hard Reload bypass cache)
+    window.location.href = window.location.pathname + "?v=" + new Date().getTime();
   }
 }
 
 const originalOnload = window.onload;
 window.onload = function() {
-  clearStaleCacheAndHistory(); // 
+  forceClearCacheOnUpdate(); 
 };
     try {
       if (typeof renderApplicationLogos === 'function') renderApplicationLogos();
@@ -4727,6 +4930,7 @@ const aDate = document.getElementById('announceScheduleDate'); if(aDate) aDate.v
      
      if (window.fetchDatabaseFromCloud) {
   window.fetchDatabaseFromCloud().then(() => {
+window.fetchDataKadetDariSupabase();
     if (icon) icon.classList.remove('animate-spin');
     if (typeof currentUser !== 'undefined' && currentUser && typeof loadDashboardAndAppData === 'function') {
       loadDashboardAndAppData();
@@ -4740,6 +4944,7 @@ const aDate = document.getElementById('announceScheduleDate'); if(aDate) aDate.v
       setInterval(() => {
          if (window.fetchDatabaseFromCloud && typeof currentUser !== 'undefined' && currentUser) {
            window.fetchDatabaseFromCloud().then(() => { 
+window.fetchDataKadetDariSupabase();
              const activeTab = storage.getItem('e_arvy_active_tab') || 'dashboard';
                    if (['dashboard', 'statistik', 'profile'].includes(activeTab)) {
                  if (typeof loadDashboardAndAppData === 'function') loadDashboardAndAppData(); 
@@ -4758,6 +4963,7 @@ const aDate = document.getElementById('announceScheduleDate'); if(aDate) aDate.v
       if (icon) icon.classList.add('animate-spin');
       
       window.fetchDatabaseFromCloud().then(() => {
+window.fetchDataKadetDariSupabase();
         const activeTab = storage.getItem('e_arvy_active_tab') || 'dashboard';
                 if (['dashboard', 'statistik', 'profile'].includes(activeTab)) {
             loadDashboardAndAppData();
