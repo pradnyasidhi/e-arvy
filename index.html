@@ -1379,18 +1379,35 @@ originalSetItem('e_arvy_initialized_real_data_v6', 'true');
     }, 150);
   }
 
-async function updatePiketProfileFromWeb(username, piketType) {
-      const cleanUser = username.replace('@', '').trim();
-      if (!cleanUser) return;
-      
-      const targetUrl = `https://t.me/${cleanUser}`;
-      
-      // Beri status loading sementara agar Piket tahu sistem sedang bekerja mencari nama aslinya
-      let displayName = "Mencari nama..."; 
-      let photoUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(cleanUser)}&background=random&color=fff`;
-      
-      // Sub-fungsi untuk menyimpan dan merefresh layar
-      const saveAndRefreshUI = (finalName, finalPhoto) => {
+    async function updatePiketProfileFromWeb(username, piketType) {
+      try {
+        const cleanUser = username.replace('@', '').trim();
+        if (!cleanUser) return;
+        
+        // Gunakan CORS Proxy agar browser tidak memblokir penarikan data
+        const targetUrl = `https://t.me/${cleanUser}`;
+        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
+        
+        const response = await fetch(proxyUrl);
+        const data = await response.json();
+        
+        // Baca HTML dari website Telegram
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(data.contents, 'text/html');
+
+        // 1. Ambil Nama Asli
+        let displayName = cleanUser;
+        const titleMeta = doc.querySelector('meta[property="og:title"]');
+        if (titleMeta && titleMeta.content) displayName = titleMeta.content;
+
+        // 2. Ambil Foto Profil (Beri foto inisial warna-warni jika profil dikunci/privat)
+        let photoUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=random&color=fff`; 
+        const imageMeta = doc.querySelector('meta[property="og:image"]');
+        if (imageMeta && imageMeta.content && !imageMeta.content.includes('telegram_logo')) {
+          photoUrl = imageMeta.content; // Timpa dengan foto asli jika ada
+        }
+
+        // 3. Masukkan ke dalam Database Pengumuman e-Arvy
         const today = getLocalDateString();
         let ann = appData.announcements.find(a => a.date === today);
         if (!ann) {
@@ -1399,61 +1416,23 @@ async function updatePiketProfileFromWeb(username, piketType) {
         }
 
         if (piketType === 'putra') {
-          ann.piketBatalyonPutraName = finalName;
-          ann.piketBatalyonPutraAvatar = finalPhoto;
+          ann.piketBatalyonPutraName = displayName;
+          ann.piketBatalyonPutraAvatar = photoUrl;
           ann.piketBatalyonPutraTelegram = targetUrl;
         } else {
-          ann.piketBatalyonPutriName = finalName;
-          ann.piketBatalyonPutriAvatar = finalPhoto;
+          ann.piketBatalyonPutriName = displayName;
+          ann.piketBatalyonPutriAvatar = photoUrl;
           ann.piketBatalyonPutriTelegram = targetUrl;
         }
 
-        storage.setItem('e_arvy_announcements', JSON.stringify(appData.announcements));
+        localStorage.setItem('e_arvy_announcements', JSON.stringify(appData.announcements));
         if (window.syncLocalStorageToCloud) window.syncLocalStorageToCloud('e_arvy_announcements');
-        updateDashboardDetails(); 
-      };
-
-      // 1. Tampilkan status "Mencari nama..." secara instan saat tombol login ditekan
-      saveAndRefreshUI(displayName, photoUrl);
-
-      try {
-        // 2. Kirim "Kurir" untuk menyedot halaman web Telegram
-        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
-        const response = await fetch(proxyUrl);
-        const data = await response.json();
         
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(data.contents, 'text/html');
-
-        // 3. MESIN PENCARI NAMA (Mencari di 2 tempat berbeda agar tidak lolos)
-        // Cek Tag Khusus Judul Halaman Telegram (Prioritas Utama)
-        const nameElement = doc.querySelector('.tgme_page_title span') || doc.querySelector('.tgme_page_title');
-        // Cek Meta Tag (Prioritas Kedua)
-        const titleMeta = doc.querySelector('meta[property="og:title"]');
-
-        if (nameElement && nameElement.textContent && nameElement.textContent.trim() !== '') {
-            displayName = nameElement.textContent.trim();
-        } else if (titleMeta && titleMeta.content && titleMeta.content !== 'Telegram') {
-            displayName = titleMeta.content;
-        } else {
-            displayName = cleanUser; // Rencana cadangan terakhir jika profil benar-benar kosong
-        }
-
-        // 4. MESIN PENCARI FOTO
-        const imageMeta = doc.querySelector('meta[property="og:image"]');
-        if (imageMeta && imageMeta.content && !imageMeta.content.includes('telegram_logo')) {
-          photoUrl = imageMeta.content; // Gunakan foto asli
-        } else {
-          // Jika akun tanpa foto profil, buatkan foto inisial menggunakan NAMA ASLI (bukan username)
-          photoUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=random&color=fff`;
-        }
-
-        // 5. TIMPA LAYAR DENGAN NAMA ASLI YANG SUDAH DITEMUKAN
-        saveAndRefreshUI(displayName, photoUrl);
+        // Refresh tampilan dashboard agar foto langsung muncul
+        updateDashboardDetails();
 
       } catch (error) {
-        console.warn("Gagal menarik data Telegram. Menggunakan username standar.");
-        saveAndRefreshUI(cleanUser, photoUrl);
+        console.error("Gagal menarik data t.me:", error);
       }
     }
 
