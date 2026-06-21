@@ -4319,7 +4319,7 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
 
         // 2. Hapus semua data lama khusus untuk prodi yang sedang diedit di Supabase
         const { error: deleteError } = await supabaseClient
-          .from('Datakadet')
+          .from('DataKadet')
           .delete()
           .eq('prodi', p);
 
@@ -4328,14 +4328,14 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
         // 3. Masukkan (Insert) daftar kadet yang baru/sudah diedit ke Supabase
         if (list.length > 0) {
           const { error: insertError } = await supabaseClient
-            .from('Datakadet')
+            .from('DataKadet')
             .insert(list);
 
           if (insertError) throw insertError;
         }
 
         // 4. Tarik ulang data dari Supabase agar memori lokal aplikasi ikut ter-update
-        await window.fetchDatakadetDariSupabase();
+        await window.fetchDataKadetDariSupabase();
 
         // 5. Catat log aktivitas dan beri notifikasi berhasil
         if (typeof logLocalActivity === 'function') {
@@ -4776,11 +4776,11 @@ const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
     }
   };
 
-window.fetchDatakadetDariSupabase = async function() {
+window.fetchDataKadetDariSupabase = async function() {
   try {
     // 1. Tarik data termasuk tempat_lahir dan tanggal_lahir
     const { data: kadetData, error } = await supabaseClient
-      .from('Datakadet')
+      .from('DataKadet')
       .select('nama_kadet, prodi, gender, tempat_lahir, tanggal_lahir')
       .order('prodi', { ascending: true })
       .order('nama_kadet', { ascending: true });
@@ -4818,7 +4818,7 @@ window.fetchDatakadetDariSupabase = async function() {
       if (typeof renderBirthdays === 'function') renderBirthdays();
     }
   } catch (error) {
-    console.error("Gagal menarik tabel Datakadet dari Supabase:", error);
+    console.error("Gagal menarik tabel DataKadet dari Supabase:", error);
   }
 };
  
@@ -4862,7 +4862,7 @@ window.fetchDatakadetDariSupabase = async function() {
 <script>
 
 // --- UBAH ANGKA INI SETIAP KALI AKU DEPLOY HTML BARU ---
-const APP_VERSION = "v1.0.1"; 
+const APP_VERSION = "v1.0.2"; 
 // -------------------------------------------------------------------
 
 function forceClearCacheOnUpdate() {
@@ -4929,29 +4929,28 @@ const aDate = document.getElementById('announceScheduleDate'); if(aDate) aDate.v
 
      
      if (window.fetchDatabaseFromCloud) {
-  window.fetchDatabaseFromCloud().then(() => {
-window.fetchDatakadetDariSupabase();
-    if (icon) icon.classList.remove('animate-spin');
-    if (typeof currentUser !== 'undefined' && currentUser && typeof loadDashboardAndAppData === 'function') {
-      loadDashboardAndAppData();
-      
-     }
-  }).catch(err => {
-    if (icon) icon.classList.remove('animate-spin');
-  });
-}
+        window.fetchDatabaseFromCloud().then(async () => { // <--- Tambahkan async
+          await window.fetchDataKadetDariSupabase(); // <--- Tambahkan await
+          if (icon) icon.classList.remove('animate-spin');
+          if (typeof currentUser !== 'undefined' && currentUser && typeof loadDashboardAndAppData === 'function') {
+            loadDashboardAndAppData();
+          }
+        }).catch(err => {
+          if (icon) icon.classList.remove('animate-spin');
+        });
+      }
 
       setInterval(() => {
          if (window.fetchDatabaseFromCloud && typeof currentUser !== 'undefined' && currentUser) {
-           window.fetchDatabaseFromCloud().then(() => { 
-window.fetchDatakadetDariSupabase();
+           window.fetchDatabaseFromCloud().then(async () => { // <--- Tambahkan async
+             await window.fetchDataKadetDariSupabase(); // <--- Tambahkan await
              const activeTab = storage.getItem('e_arvy_active_tab') || 'dashboard';
-                   if (['dashboard', 'statistik', 'profile'].includes(activeTab)) {
+             if (['dashboard', 'statistik', 'profile'].includes(activeTab)) {
                  if (typeof loadDashboardAndAppData === 'function') loadDashboardAndAppData(); 
              }
            });
          }
-      }, 10000); 
+      }, 10000);
     } catch (e) {
       console.error("Error saat inisialisasi:", e);
       setTimeout(() => document.getElementById('app-preloader')?.classList.add('preloader-hidden'), 200);
@@ -4962,10 +4961,10 @@ window.fetchDatakadetDariSupabase();
       const icon = document.getElementById('localRefreshIcon');
       if (icon) icon.classList.add('animate-spin');
       
-      window.fetchDatabaseFromCloud().then(() => {
-window.fetchDatakadetDariSupabase();
+      window.fetchDatabaseFromCloud().then(async () => { // <--- Tambahkan async
+        await window.fetchDataKadetDariSupabase(); // <--- Tambahkan await
         const activeTab = storage.getItem('e_arvy_active_tab') || 'dashboard';
-                if (['dashboard', 'statistik', 'profile'].includes(activeTab)) {
+        if (['dashboard', 'statistik', 'profile'].includes(activeTab)) {
             loadDashboardAndAppData();
         }
         if (icon) icon.classList.remove('animate-spin');
