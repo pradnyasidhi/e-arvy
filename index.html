@@ -510,38 +510,35 @@
                 <button onclick="switchTab('announce')" class="admin-piket-only hidden text-[10px] font-bold text-ios-blue hover:underline uppercase tracking-wider">Edit</button>
               </div>
 
-              <div class="flex flex-col gap-2.5">
-                <div class="p-3 bg-[#f8f9fa] dark:bg-zinc-800/40 rounded-xl border border-slate-100 dark:border-zinc-800/60 flex justify-between items-center">
-                  <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-full border border-slate-200 overflow-hidden bg-slate-200 flex items-center justify-center text-slate-400 font-bold text-sm">
-  <img id="dashPiketPaAvatar" src="https://placehold.co/100?text=Pa" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100?text=Pa'">
-</div>
-  <div>
-                      <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">Piket Batalyon Putra</span>
-                      <h4 id="dashPiketBatPaName" class="text-xs font-black text-slate-900 dark:text-white">-</h4>
-                    </div>
-                  </div>
-                  <a id="dashPiketBatPaTg" target="_blank" href="#" class="p-2 text-ios-blue hover:opacity-80 transition-colors">
-                    <i data-lucide="send" class="w-4 h-4"></i>
-                  </a>
+              document.getElementById('announceConfigViewer').innerHTML = `
+          <div class="flex flex-col gap-3">
+            <div class="p-3.5 bg-slate-50 dark:bg-zinc-800/40 rounded-ios-md border border-slate-100 dark:border-zinc-800/60 flex justify-between items-center">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 shrink-0 aspect-square rounded-full border border-ios-blue/30 overflow-hidden bg-slate-200 flex items-center justify-center">
+                  <img src="${ann.piketBatalyonPutraAvatar || ''}" class="w-full h-full object-cover cursor-pointer hover:opacity-80 transition-opacity" onclick="if(this.src) viewDocumentedPhoto('${ann.piketBatalyonPutraName || 'Piket Putra'}', this.src)" onerror="this.src='https://placehold.co/100?text=Pa'">
                 </div>
-
-                <div class="p-3 bg-[#f8f9fa] dark:bg-zinc-800/40 rounded-xl border border-slate-100 dark:border-zinc-800/60 flex justify-between items-center">
-                  <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-full border border-slate-200 overflow-hidden bg-slate-200 flex items-center justify-center text-slate-400 font-bold text-sm">
-  <img id="dashPiketPiAvatar" src="https://placehold.co/100?text=Pi" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100?text=Pi'">
-</div>
-                    <div>
-                      <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">Piket Batalyon Putri</span>
-                      <h4 id="dashPiketBatPiName" class="text-xs font-black text-slate-900 dark:text-white">-</h4>
-                    </div>
-                  </div>
-                  <a id="dashPiketBatPiTg" target="_blank" href="#" class="p-2 text-ios-blue hover:opacity-80 transition-colors">
-                    <i data-lucide="send" class="w-4 h-4"></i>
-                  </a>
+                <div>
+                  <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">Piket Batalyon Putra</span>
+                  <h4 class="text-xs font-extrabold text-slate-900 dark:text-white">${ann.piketBatalyonPutraName || '-'}</h4>
                 </div>
               </div>
+              <a target="_blank" href="${ann.piketBatalyonPutraTelegram || '#'}" class="p-2 rounded-full bg-blue-50 text-ios-blue"><i data-lucide="send" class="w-4 h-4"></i></a>
             </div>
+            
+            <div class="p-3.5 bg-slate-50 dark:bg-zinc-800/40 rounded-ios-md border border-slate-100 dark:border-zinc-800/60 flex justify-between items-center">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 shrink-0 aspect-square rounded-full border border-ios-blue/30 overflow-hidden bg-slate-200 flex items-center justify-center">
+                  <img src="${ann.piketBatalyonPutriAvatar || ''}" class="w-full h-full object-cover cursor-pointer hover:opacity-80 transition-opacity" onclick="if(this.src) viewDocumentedPhoto('${ann.piketBatalyonPutriName || 'Piket Putri'}', this.src)" onerror="this.src='https://placehold.co/100?text=Pi'">
+                </div>
+                <div>
+                  <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">Piket Batalyon Putri</span>
+                  <h4 class="text-xs font-extrabold text-slate-900 dark:text-white">${ann.piketBatalyonPutriName || '-'}</h4>
+                </div>
+              </div>
+              <a target="_blank" href="${ann.piketBatalyonPutriTelegram || '#'}" class="p-2 rounded-full bg-blue-50 text-ios-blue"><i data-lucide="send" class="w-4 h-4"></i></a>
+            </div>
+          </div>
+        `;
 
           </div>
         </div>
@@ -2251,8 +2248,8 @@ function renderAnnounceLatestSchedule(now = new Date()) {
           <div class="flex flex-col gap-3">
             <div class="p-3.5 bg-slate-50 dark:bg-zinc-800/40 rounded-ios-md border border-slate-100 dark:border-zinc-800/60 flex justify-between items-center">
               <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full border border-ios-blue/30 overflow-hidden bg-slate-200 flex items-center justify-center">
-                  <img src="${ann.piketBatalyonPutraAvatar || ''}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100?text=Pa'">
+                <div class="w-10 h-10 shrink-0 aspect-square rounded-full border border-ios-blue/30 overflow-hidden bg-slate-200 flex items-center justify-center">
+                  <img src="${ann.piketBatalyonPutraAvatar || ''}" class="w-full h-full object-cover cursor-pointer hover:opacity-80 transition-opacity" onclick="if(this.src) viewDocumentedPhoto('${ann.piketBatalyonPutraName || 'Piket Putra'}', this.src)" onerror="this.src='https://placehold.co/100?text=Pa'">
                 </div>
                 <div>
                   <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">Piket Batalyon Putra</span>
@@ -2261,10 +2258,11 @@ function renderAnnounceLatestSchedule(now = new Date()) {
               </div>
               <a target="_blank" href="${ann.piketBatalyonPutraTelegram || '#'}" class="p-2 rounded-full bg-blue-50 text-ios-blue"><i data-lucide="send" class="w-4 h-4"></i></a>
             </div>
+            
             <div class="p-3.5 bg-slate-50 dark:bg-zinc-800/40 rounded-ios-md border border-slate-100 dark:border-zinc-800/60 flex justify-between items-center">
               <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full border border-ios-blue/30 overflow-hidden bg-slate-200 flex items-center justify-center">
-                  <img src="${ann.piketBatalyonPutriAvatar || ''}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100?text=Pi'">
+                <div class="w-10 h-10 shrink-0 aspect-square rounded-full border border-ios-blue/30 overflow-hidden bg-slate-200 flex items-center justify-center">
+                  <img src="${ann.piketBatalyonPutriAvatar || ''}" class="w-full h-full object-cover cursor-pointer hover:opacity-80 transition-opacity" onclick="if(this.src) viewDocumentedPhoto('${ann.piketBatalyonPutriName || 'Piket Putri'}', this.src)" onerror="this.src='https://placehold.co/100?text=Pi'">
                 </div>
                 <div>
                   <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">Piket Batalyon Putri</span>
