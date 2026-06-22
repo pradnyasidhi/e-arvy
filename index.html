@@ -1802,8 +1802,15 @@ storage.removeItem('e_arvy_session');
       if (banner) banner.classList.add('hidden');
     }
 function checkNotificationPermission() {
-      // Cek apakah browser mendukung notifikasi, statusnya belum diputuskan ('default'), dan belum pernah ditolak/diklik 'nanti saja'
-      if ('Notification' in window && Notification.permission === 'default' && window.localStorage.getItem('e_arvy_notif_asked') !== 'true') {
+      // Pastikan browser mendukung notifikasi
+      if (!('Notification' in window)) {
+        console.log("Browser tidak mendukung fitur notifikasi.");
+        return;
+      }
+      
+      // PAKSA MUNCUL: Selama statusnya belum 'granted' (diizinkan), banner akan selalu muncul.
+      // (Syarat e_arvy_notif_asked kita hapus sementara agar mudah dites)
+      if (Notification.permission !== 'granted') {
         const banner = document.getElementById('notificationPermissionBanner');
         if (banner) {
           banner.classList.remove('hidden');
@@ -1821,22 +1828,21 @@ function checkNotificationPermission() {
           } else {
             showToast('Notifikasi Ditolak', 'Anda dapat mengaktifkannya nanti di pengaturan browser.', 'warning');
           }
-          closeNotificationBanner(true); // Tutup dan simpan memori
+          closeNotificationBanner(); // Tutup banner setelah ada respon
         });
       } else {
         showToast('Tidak Didukung', 'Browser Anda tidak mendukung notifikasi.', 'error');
-        closeNotificationBanner(true);
+        closeNotificationBanner();
       }
     }
 
-    function closeNotificationBanner(permanently = false) {
+    function closeNotificationBanner() {
       const banner = document.getElementById('notificationPermissionBanner');
       if (banner) banner.classList.add('hidden');
       
-      // Jika user klik "Nanti Saja" atau "Izinkan", simpan di memori agar banner tidak spam muncul terus
-      window.localStorage.setItem('e_arvy_notif_asked', 'true');
+      // Untuk masa uji coba, baris ini kita matikan agar Anda bisa mengetesnya berulang kali
+      // window.localStorage.setItem('e_arvy_notif_asked', 'true');
     }
-
     function setupUserInterface() {
       document.getElementById('userHeaderName').innerText = currentUser.username;
       document.getElementById('userHeaderRole').innerText = currentUser.role;
@@ -4959,7 +4965,7 @@ window.fetchDataKadetDariSupabase = async function() {
 <script>
 
 // --- UBAH ANGKA INI SETIAP KALI AKU DEPLOY HTML BARU ---
-const APP_VERSION = "v1.0.8"; 
+const APP_VERSION = "v1.0.9"; 
 // -------------------------------------------------------------------
 
 function forceClearCacheOnUpdate() {
