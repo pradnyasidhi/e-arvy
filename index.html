@@ -685,6 +685,112 @@
         </div>
       </section>
 
+<!-- View: Announce -->
+      <section id="view-announce" class="view-screen hidden flex flex-col gap-6 transition-all-300">
+        
+        <div class="p-6 bg-white/85 dark:bg-zinc-900/85 backdrop-blur-md rounded-ios-lg shadow-xl flex flex-col gap-5">
+          <div class="flex justify-between items-center pb-3 border-b border-slate-100 dark:border-zinc-800">
+            <div class="flex flex-col gap-1">
+              <h3 class="font-black text-xl tracking-tight flex items-center gap-2">
+                <i data-lucide="calendar" class="w-5 h-5 text-ios-blue animate-pulse"></i> Jadwal Penuh Kegiatan Harian
+              </h3>
+              <p class="text-xs text-slate-400 font-medium">Daftar keseluruhan jadwal kegiatan Batalyon dari pagi hingga malam.</p>
+            </div>
+            <button onclick="openAddScheduleModal()" class="admin-piket-only hidden bg-ios-blue hover:opacity-90 text-white px-4 py-2 rounded-ios-sm text-xs font-bold transition-all shadow-md">
+              + Tambah Kegiatan
+            </button>
+          </div>
+          
+
+          <div class="flex flex-col gap-1.5 max-w-xs">
+            <label class="text-[10px] font-black uppercase tracking-widest text-slate-400">Pilih Tanggal</label>
+            <input type="date" id="announceScheduleDate" onchange="loadAnnounceSchedules()" class="w-full px-4 py-2.5 rounded-ios-md glass-input text-sm text-slate-950 dark:text-white focus:outline-none">
+          </div>
+
+          <div id="announceSchedulesList" class="flex flex-col gap-3 mt-2"></div>
+        </div>
+
+<!-- BLOK ULANG TAHUN KADET -->
+        <div class="p-6 bg-white/85 dark:bg-zinc-900/85 backdrop-blur-md rounded-ios-lg shadow-xl flex flex-col gap-4">
+          <div class="pb-2 border-b border-slate-100 dark:border-zinc-800 flex items-center gap-2">
+            <i data-lucide="gift" class="w-5 h-5 text-pink-500"></i>
+            <div>
+              <h3 class="font-black text-lg tracking-tight">Informasi Ulang Tahun Kadet</h3>
+              <p class="text-xs text-slate-500">Daftar anggota yang berulang tahun minggu ini.</p>
+            </div>
+          </div>
+          <div id="announceBirthdaysList" class="flex flex-col gap-1 mt-2">
+            <!-- Render via JS -->
+            <p class="text-xs italic text-slate-400">Memuat data kelahiran...</p>
+          </div>
+        </div>
+
+        <div class="p-6 bg-white/85 dark:bg-zinc-900/85 backdrop-blur-md rounded-ios-lg shadow-xl flex flex-col gap-5">
+          <div class="pb-2 border-b border-slate-100 dark:border-zinc-800 flex items-center gap-2">
+            <i data-lucide="shirt" class="w-5 h-5 text-ios-indigo"></i>
+            <div>
+              <h3 class="font-black text-lg tracking-tight">Ketentuan Seragam Dinas</h3>
+            </div>
+          </div>
+          <div class="p-4 bg-slate-50 dark:bg-zinc-800/30 rounded-ios-md border border-slate-100 dark:border-zinc-800/80">
+            <input type="text" id="announcePakaian" class="w-full px-4 py-2.5 rounded-ios-md glass-input text-sm text-slate-900 dark:text-white" placeholder="Contoh: Pakaian Dinas Harian (PDH)">
+          </div>
+        </div>
+
+        <div class="p-6 bg-white/85 dark:bg-zinc-900/85 backdrop-blur-md rounded-ios-lg shadow-xl flex flex-col gap-5">
+          <div class="pb-2 border-b border-slate-100 dark:border-zinc-800 flex items-center gap-2">
+            <i data-lucide="shield-check" class="w-5 h-5 text-ios-green"></i>
+            <div>
+              <h3 class="font-black text-lg tracking-tight">Piket Batalyon</h3>
+            </div>
+          </div>
+
+          <form id="announceConfigForm" onsubmit="saveAnnounceConfig(event)" class="admin-piket-only hidden flex flex-col gap-5">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div class="p-5 bg-slate-50/50 dark:bg-zinc-800/10 rounded-ios-md border border-slate-100 flex flex-col gap-3.5">
+                <span class="text-xs font-black text-ios-blue uppercase tracking-widest">Piket Putra</span>
+                <input type="text" id="announcePiketBatPaName" onblur="this.value = standardizeEYD(this.value);" class="w-full px-3 py-2.5 rounded-ios-sm glass-input text-xs text-slate-900 dark:text-white" placeholder="Nama Piket">
+               <input type="url" id="announcePiketBatPaTg" class="w-full px-3 py-2.5 rounded-ios-sm glass-input text-xs text-slate-900 dark:text-white" placeholder="Link Telegram">
+                <label class="text-[9px] font-bold text-ios-blue cursor-pointer hover:underline">Ganti Foto Profil
+                  <input type="file" id="announcePiketPaAvatar" accept="image/*" onchange="uploadPiketAvatar(event, 'Pa')" class="hidden">
+                </label>
+              </div>
+              <div class="p-5 bg-slate-50/50 dark:bg-zinc-800/10 rounded-ios-md border border-slate-100 flex flex-col gap-3.5">
+                <span class="text-xs font-black text-ios-blue uppercase tracking-widest">Piket Putri</span>
+               <input type="text" id="announcePiketBatPiName" onblur="this.value = standardizeEYD(this.value);" class="w-full px-3 py-2.5 rounded-ios-sm glass-input text-xs text-slate-900 dark:text-white" placeholder="Nama Piket">
+                <input type="url" id="announcePiketBatPiTg" class="w-full px-3 py-2.5 rounded-ios-sm glass-input text-xs text-slate-900 dark:text-white" placeholder="Link Telegram">
+                <label class="text-[9px] font-bold text-ios-blue cursor-pointer hover:underline">Ganti Foto Profil
+                  <input type="file" id="announcePiketPiAvatar" accept="image/*" onchange="uploadPiketAvatar(event, 'Pi')" class="hidden">
+                </label>
+              </div>
+            </div>
+            <button type="submit" class="w-fit bg-ios-blue hover:opacity-90 text-white font-extrabold px-6 py-3 rounded-ios-md text-sm shadow-md">
+              Simpan Pengumuman Piket
+            </button>
+          </form>
+
+          <div id="announceConfigViewer" class="hidden flex-col gap-4">
+             <!-- Rendered identical to dashboard layout via JS -->
+          </div>
+        </div>
+
+<div class="p-6 bg-white/85 dark:bg-zinc-900/85 backdrop-blur-md rounded-ios-lg shadow-xl flex flex-col gap-5">
+          <div class="pb-2 border-b border-slate-100 dark:border-zinc-800 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <i data-lucide="clipboard-type" class="w-5 h-5 text-purple-600"></i>
+              <h3 class="font-black text-lg tracking-tight">Pendataan & Google Form</h3>
+            </div>
+            <button onclick="addNewPendataanItem()" class="admin-piket-only hidden bg-ios-blue hover:opacity-90 text-white px-3.5 py-2 rounded-ios-sm text-xs font-bold transition-all shadow-md">
+              + Tambah Formulir
+            </button>
+          </div>
+
+          <div id="pendataanListContainer" class="flex flex-col gap-4">
+             </div>
+        </div>
+
+      </section>
+
       <!-- View: Statistik -->
       <section id="view-statistik" class="view-screen hidden flex flex-col gap-6 transition-all-300">
         
@@ -841,112 +947,6 @@
             </table>
           </div>
         </div>
-      </section>
-
-      <!-- View: Announce -->
-      <section id="view-announce" class="view-screen hidden flex flex-col gap-6 transition-all-300">
-        
-        <div class="p-6 bg-white/85 dark:bg-zinc-900/85 backdrop-blur-md rounded-ios-lg shadow-xl flex flex-col gap-5">
-          <div class="flex justify-between items-center pb-3 border-b border-slate-100 dark:border-zinc-800">
-            <div class="flex flex-col gap-1">
-              <h3 class="font-black text-xl tracking-tight flex items-center gap-2">
-                <i data-lucide="calendar" class="w-5 h-5 text-ios-blue animate-pulse"></i> Jadwal Penuh Kegiatan Harian
-              </h3>
-              <p class="text-xs text-slate-400 font-medium">Daftar keseluruhan jadwal kegiatan Batalyon dari pagi hingga malam.</p>
-            </div>
-            <button onclick="openAddScheduleModal()" class="admin-piket-only hidden bg-ios-blue hover:opacity-90 text-white px-4 py-2 rounded-ios-sm text-xs font-bold transition-all shadow-md">
-              + Tambah Kegiatan
-            </button>
-          </div>
-          
-
-          <div class="flex flex-col gap-1.5 max-w-xs">
-            <label class="text-[10px] font-black uppercase tracking-widest text-slate-400">Pilih Tanggal</label>
-            <input type="date" id="announceScheduleDate" onchange="loadAnnounceSchedules()" class="w-full px-4 py-2.5 rounded-ios-md glass-input text-sm text-slate-950 dark:text-white focus:outline-none">
-          </div>
-
-          <div id="announceSchedulesList" class="flex flex-col gap-3 mt-2"></div>
-        </div>
-
-<!-- BLOK ULANG TAHUN KADET -->
-        <div class="p-6 bg-white/85 dark:bg-zinc-900/85 backdrop-blur-md rounded-ios-lg shadow-xl flex flex-col gap-4">
-          <div class="pb-2 border-b border-slate-100 dark:border-zinc-800 flex items-center gap-2">
-            <i data-lucide="gift" class="w-5 h-5 text-pink-500"></i>
-            <div>
-              <h3 class="font-black text-lg tracking-tight">Informasi Ulang Tahun Kadet</h3>
-              <p class="text-xs text-slate-500">Daftar anggota yang berulang tahun minggu ini.</p>
-            </div>
-          </div>
-          <div id="announceBirthdaysList" class="flex flex-col gap-1 mt-2">
-            <!-- Render via JS -->
-            <p class="text-xs italic text-slate-400">Memuat data kelahiran...</p>
-          </div>
-        </div>
-
-        <div class="p-6 bg-white/85 dark:bg-zinc-900/85 backdrop-blur-md rounded-ios-lg shadow-xl flex flex-col gap-5">
-          <div class="pb-2 border-b border-slate-100 dark:border-zinc-800 flex items-center gap-2">
-            <i data-lucide="shirt" class="w-5 h-5 text-ios-indigo"></i>
-            <div>
-              <h3 class="font-black text-lg tracking-tight">Ketentuan Seragam Dinas</h3>
-            </div>
-          </div>
-          <div class="p-4 bg-slate-50 dark:bg-zinc-800/30 rounded-ios-md border border-slate-100 dark:border-zinc-800/80">
-            <input type="text" id="announcePakaian" class="w-full px-4 py-2.5 rounded-ios-md glass-input text-sm text-slate-900 dark:text-white" placeholder="Contoh: Pakaian Dinas Harian (PDH)">
-          </div>
-        </div>
-
-        <div class="p-6 bg-white/85 dark:bg-zinc-900/85 backdrop-blur-md rounded-ios-lg shadow-xl flex flex-col gap-5">
-          <div class="pb-2 border-b border-slate-100 dark:border-zinc-800 flex items-center gap-2">
-            <i data-lucide="shield-check" class="w-5 h-5 text-ios-green"></i>
-            <div>
-              <h3 class="font-black text-lg tracking-tight">Piket Batalyon</h3>
-            </div>
-          </div>
-
-          <form id="announceConfigForm" onsubmit="saveAnnounceConfig(event)" class="admin-piket-only hidden flex flex-col gap-5">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div class="p-5 bg-slate-50/50 dark:bg-zinc-800/10 rounded-ios-md border border-slate-100 flex flex-col gap-3.5">
-                <span class="text-xs font-black text-ios-blue uppercase tracking-widest">Piket Putra</span>
-                <input type="text" id="announcePiketBatPaName" onblur="this.value = standardizeEYD(this.value);" class="w-full px-3 py-2.5 rounded-ios-sm glass-input text-xs text-slate-900 dark:text-white" placeholder="Nama Piket">
-               <input type="url" id="announcePiketBatPaTg" class="w-full px-3 py-2.5 rounded-ios-sm glass-input text-xs text-slate-900 dark:text-white" placeholder="Link Telegram">
-                <label class="text-[9px] font-bold text-ios-blue cursor-pointer hover:underline">Ganti Foto Profil
-                  <input type="file" id="announcePiketPaAvatar" accept="image/*" onchange="uploadPiketAvatar(event, 'Pa')" class="hidden">
-                </label>
-              </div>
-              <div class="p-5 bg-slate-50/50 dark:bg-zinc-800/10 rounded-ios-md border border-slate-100 flex flex-col gap-3.5">
-                <span class="text-xs font-black text-ios-blue uppercase tracking-widest">Piket Putri</span>
-               <input type="text" id="announcePiketBatPiName" onblur="this.value = standardizeEYD(this.value);" class="w-full px-3 py-2.5 rounded-ios-sm glass-input text-xs text-slate-900 dark:text-white" placeholder="Nama Piket">
-                <input type="url" id="announcePiketBatPiTg" class="w-full px-3 py-2.5 rounded-ios-sm glass-input text-xs text-slate-900 dark:text-white" placeholder="Link Telegram">
-                <label class="text-[9px] font-bold text-ios-blue cursor-pointer hover:underline">Ganti Foto Profil
-                  <input type="file" id="announcePiketPiAvatar" accept="image/*" onchange="uploadPiketAvatar(event, 'Pi')" class="hidden">
-                </label>
-              </div>
-            </div>
-            <button type="submit" class="w-fit bg-ios-blue hover:opacity-90 text-white font-extrabold px-6 py-3 rounded-ios-md text-sm shadow-md">
-              Simpan Pengumuman Piket
-            </button>
-          </form>
-
-          <div id="announceConfigViewer" class="hidden flex-col gap-4">
-             <!-- Rendered identical to dashboard layout via JS -->
-          </div>
-        </div>
-
-<div class="p-6 bg-white/85 dark:bg-zinc-900/85 backdrop-blur-md rounded-ios-lg shadow-xl flex flex-col gap-5">
-          <div class="pb-2 border-b border-slate-100 dark:border-zinc-800 flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <i data-lucide="clipboard-type" class="w-5 h-5 text-purple-600"></i>
-              <h3 class="font-black text-lg tracking-tight">Pendataan & Google Form</h3>
-            </div>
-            <button onclick="addNewPendataanItem()" class="admin-piket-only hidden bg-ios-blue hover:opacity-90 text-white px-3.5 py-2 rounded-ios-sm text-xs font-bold transition-all shadow-md">
-              + Tambah Formulir
-            </button>
-          </div>
-
-          <div id="pendataanListContainer" class="flex flex-col gap-4">
-             </div>
-        </div>
-
       </section>
 
       <!-- View: Profile -->
