@@ -2170,12 +2170,11 @@ function renderBirthdays() {
           const namesHtml = namesArray.map(name => {
               const processedName = name.split(' ').map(word => syllabify(word)).join(' ');
               
-              // Tag <li> diubah jadi <div> karena list-disc (titik) sudah dihapus
               return `<div class="pb-1.5 mb-1.5 lg:pb-1 lg:mb-1 border-b border-black/10 dark:border-white/10 last:border-0 last:mb-0 last:pb-0 leading-snug w-full" style="word-break: normal; overflow-wrap: break-word; hyphens: auto; -webkit-hyphens: auto;">${processedName}</div>`;
           }).join('');
           
           return `
-            <div class="relative w-full max-w-[130px] lg:max-w-[140px] mx-auto p-1 lg:p-1 bg-gradient-to-br from-pink-200 to-yellow-100 dark:from-pink-900/70 dark:to-yellow-800/70 rounded-sm shadow-[3px_5px_12px_rgba(0,0,0,0.15)] transform ${rotateClass} transition-transform hover:rotate-0 hover:z-20 cursor-pointer border border-white/40 dark:border-white/10 group flex flex-col items-center">
+            <div class="relative w-[96%] sm:max-w-[130px] lg:max-w-[140px] mx-auto p-1.5 sm:p-2 bg-gradient-to-br from-pink-200 to-yellow-100 dark:from-pink-900/70 dark:to-yellow-800/70 rounded-sm shadow-[3px_5px_12px_rgba(0,0,0,0.15)] transform ${rotateClass} transition-transform hover:rotate-0 hover:z-20 cursor-pointer border border-white/40 dark:border-white/10 group flex flex-col items-center">
                 <div class="absolute -top-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-amber-300 rounded-full shadow-[0_2px_5px_rgba(0,0,0,0.4)] border border-amber-500 z-10 flex items-center justify-center">
                    <div class="w-1 h-1 bg-white rounded-full absolute top-[1px] left-[1px] opacity-80"></div>
                 </div>
@@ -4960,7 +4959,7 @@ window.fetchDataKadetDariSupabase = async function() {
 <script>
 
 // --- UBAH ANGKA INI SETIAP KALI AKU DEPLOY HTML BARU ---
-const APP_VERSION = "v1.0.7"; 
+const APP_VERSION = "v1.0.8"; 
 // -------------------------------------------------------------------
 
 function forceClearCacheOnUpdate() {
@@ -5111,18 +5110,6 @@ if ('serviceWorker' in navigator) {
     });
   }
 
-  function requestNotificationPermission() {
-    if ('Notification' in window && Notification.permission !== 'granted') {
-      Notification.requestPermission().then(permission => {
-        if (permission === 'granted') {
-          console.log('Izin notifikasi diberikan!');
-        }
-      });
-    }
-  }
-
-  // Minta izin notifikasi saat tombol login ditekan (Bisa diletakkan di dalam handleLogin nanti)
-  document.getElementById('loginSubmitBtn')?.addEventListener('click', requestNotificationPermission);
 </script>
 
 <!-- Banner Izin Suara -->
