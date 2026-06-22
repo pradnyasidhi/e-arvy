@@ -2,7 +2,7 @@
 <html lang="id" class="scroll-smooth">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=0.85, maximum-scale=0.85, user-scalable=no">
   <title>e-Arvy - Nara Arvyaksa #6</title>
 
 <link rel="icon" type="image/png" href="https://www.image2url.com/r2/default/images/1781409226493-1bc2a13a-36c6-4972-9a1c-6114ed273acc.png">
@@ -216,6 +216,19 @@
     width: 80px; /* Sesuaikan ukuran logo */
     height: 80px;
 }
+/* Skala 85% khusus untuk layar HP */
+    @media (max-width: 768px) {
+      body {
+        zoom: 0.85;
+      }
+    }
+/* Tambahkan ini di dalam tag <style> Anda */
+    @font-face {
+      font-family: 'PaperNotes';
+      src: url('papernotes.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
       </style>
 </head>
 <body class="bg-zinc-100 dark:bg-black text-slate-900 dark:text-zinc-100 min-h-screen flex flex-col font-sans transition-all-300 pb-16 lg:pb-4">
@@ -365,33 +378,41 @@
     </div>
   </div>
 
-  <div class="app-container flex-1 max-w-[1400px] w-full mx-auto p-4 sm:p-6 flex flex-col lg:flex-row gap-6">
+  <!-- CONTAINER UTAMA -->
+  <div class="app-container flex-1 max-w-[1400px] w-full mx-auto p-4 sm:p-6 flex flex-col lg:flex-row gap-6 transition-all-300">
+    
     <!-- Sidebar Navigation (Desktop) -->
-    <aside class="no-print hidden lg:flex flex-col gap-1.5 w-[260px] shrink-0 liquid-glass rounded-ios-xl border p-4 shadow-lg h-fit sticky top-24 transition-all-300">
-      <div class="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-zinc-500 px-3 mb-2">Navigasi Utama</div>
+    <aside class="no-print hidden lg:flex flex-col gap-4 w-[260px] shrink-0 h-fit sticky top-24 transition-all-300">
       
-      <button onclick="switchTab('dashboard')" id="side-dashboard" class="sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-ios-md text-sm font-semibold transition-all text-ios-blue bg-blue-50/50 dark:bg-blue-950/20">
-        <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard
-      </button>
-      <button onclick="switchTab('kehadiran')" id="side-kehadiran" class="sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-ios-md text-sm font-semibold transition-all text-slate-600 dark:text-zinc-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/30">
-        <i data-lucide="clipboard-list" class="w-5 h-5"></i> Kehadiran
-      </button>
-      <button onclick="switchTab('statistik')" id="side-statistik" class="sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-ios-md text-sm font-semibold transition-all text-slate-600 dark:text-zinc-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/30">
-        <i data-lucide="trending-up" class="w-5 h-5"></i> Analisis Statistik
-      </button>
-      <button onclick="switchTab('kepulangan')" id="side-kepulangan" class="sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-ios-md text-sm font-semibold transition-all text-slate-600 dark:text-zinc-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/30">
-        <i data-lucide="plane-takeoff" class="w-5 h-5"></i> Kepulangan
-      </button>
-      <button onclick="switchTab('announce')" id="side-announce" class="sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-ios-md text-sm font-semibold transition-all text-slate-600 dark:text-zinc-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/30">
-        <i data-lucide="megaphone" class="w-5 h-5"></i> Pengumuman
-      </button>
-      <button onclick="switchTab('profile')" id="side-profile" class="sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-ios-md text-sm font-semibold transition-all text-slate-600 dark:text-zinc-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/30">
-        <i data-lucide="user-cog" class="w-5 h-5"></i> Profil Pengguna
-      </button>
-      <button onclick="switchTab('admin-panel')" id="side-admin-panel" class="sidebar-item admin-only hidden items-center gap-3 px-3 py-2.5 rounded-ios-md text-sm font-black transition-all text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/20 border-t border-slate-200/50 mt-2 pt-4">
-        <i data-lucide="settings" class="w-5 h-5 animate-spin"></i> Panel Admin
-      </button>
-<div class="p-5 mt-4 bg-[#111827] dark:bg-zinc-900 text-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.15)] flex flex-col items-center justify-center text-center gap-1 min-h-[120px] w-full">
+      <!-- Panel Navigasi -->
+      <div class="liquid-glass rounded-ios-xl border p-4 shadow-lg flex flex-col gap-1.5">
+        <div class="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-zinc-500 px-3 mb-2">Navigasi Utama</div>
+        
+        <button onclick="switchTab('dashboard')" id="side-dashboard" class="sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-ios-md text-sm font-semibold transition-all text-ios-blue bg-blue-50/50 dark:bg-blue-950/20">
+          <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard
+        </button>
+        <button onclick="switchTab('kehadiran')" id="side-kehadiran" class="sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-ios-md text-sm font-semibold transition-all text-slate-600 dark:text-zinc-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/30">
+          <i data-lucide="clipboard-list" class="w-5 h-5"></i> Kehadiran
+        </button>
+        <button onclick="switchTab('statistik')" id="side-statistik" class="sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-ios-md text-sm font-semibold transition-all text-slate-600 dark:text-zinc-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/30">
+          <i data-lucide="trending-up" class="w-5 h-5"></i> Analisis Statistik
+        </button>
+        <button onclick="switchTab('kepulangan')" id="side-kepulangan" class="sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-ios-md text-sm font-semibold transition-all text-slate-600 dark:text-zinc-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/30">
+          <i data-lucide="plane-takeoff" class="w-5 h-5"></i> Kepulangan
+        </button>
+        <button onclick="switchTab('announce')" id="side-announce" class="sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-ios-md text-sm font-semibold transition-all text-slate-600 dark:text-zinc-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/30">
+          <i data-lucide="megaphone" class="w-5 h-5"></i> Pengumuman
+        </button>
+        <button onclick="switchTab('profile')" id="side-profile" class="sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-ios-md text-sm font-semibold transition-all text-slate-600 dark:text-zinc-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/30">
+          <i data-lucide="user-cog" class="w-5 h-5"></i> Profil Pengguna
+        </button>
+        <button onclick="switchTab('admin-panel')" id="side-admin-panel" class="sidebar-item admin-only hidden items-center gap-3 px-3 py-2.5 rounded-ios-md text-sm font-black transition-all text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/20 border-t border-slate-200/50 mt-2 pt-4">
+          <i data-lucide="settings" class="w-5 h-5 animate-spin"></i> Panel Admin
+        </button>
+      </div>
+
+      <!-- Panel Jam (Di Luar Navigasi dengan Shadow Tebal) -->
+      <div class="p-5 bg-[#111827] dark:bg-zinc-900 text-white rounded-2xl shadow-[0_15px_40px_rgba(0,0,0,0.3)] border border-slate-800 flex flex-col items-center justify-center text-center gap-1 min-h-[120px] w-full">
         <i data-lucide="clock" class="w-6 h-6 text-[#007aff] mb-1"></i>
         <h2 id="realTimeClock" class="text-3xl font-black tracking-tight">--:--:--</h2>
         <p id="realTimeDate" class="text-[9px] text-slate-400 font-bold tracking-widest uppercase mt-1">Memuat...</p>
@@ -412,7 +433,7 @@
           </button>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 items-stretch">
           
           <div class="lg:col-span-2 flex flex-col gap-4">
             
@@ -426,7 +447,6 @@
               </div>
               
               <div class="bg-[#f8f9fa] dark:bg-zinc-800/40 rounded-xl border border-slate-100 dark:border-zinc-800/60 p-4 flex flex-col gap-4">
-                
                 <div class="flex justify-between items-center border-b border-slate-200/60 dark:border-zinc-700/60 pb-3 cursor-pointer hover:opacity-80 transition-all" onclick="viewLastRecapDetail()">
                   <div class="flex flex-col gap-1">
                     <strong id="dashLastActName" class="text-lg font-black text-slate-800 dark:text-white leading-none">-</strong>
@@ -450,16 +470,13 @@
                   </div>
                 </div>
 
-                <div class="flex items-center">
-                  <span id="dashLastActVer" class="text-xs font-medium text-slate-500 dark:text-zinc-400 flex items-center gap-1.5">
-                    <i data-lucide="shield-check" class="w-4 h-4 text-ios-blue"></i> Belum ada data verifikasi.
-                  </span>
+                <div class="flex items-start">
+                  <div id="dashLastActVer" class="text-xs font-medium text-slate-500 dark:text-zinc-400 flex items-start sm:items-center gap-1.5 w-full">
+                    <i data-lucide="shield-check" class="w-4 h-4 text-ios-blue shrink-0 mt-0.5 sm:mt-0"></i> Belum ada data verifikasi.
+                  </div>
                 </div>
               </div>
-            </div>
-
-      
-            <div id="dashPendataanWrapper" class="hidden p-5 bg-[#f8f6ff] dark:bg-purple-900/10 rounded-2xl border border-purple-100/50 dark:border-purple-900/30 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col gap-4">
+            </div> <div id="dashPendataanWrapper" class="hidden p-5 bg-[#f8f6ff] dark:bg-purple-900/10 rounded-2xl border border-purple-100/50 dark:border-purple-900/30 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col gap-4">
               <div class="flex items-center justify-between pb-2 border-b border-purple-100/50 dark:border-purple-800/50">
                 <div class="flex items-center gap-2">
                   <i data-lucide="clipboard-list" class="w-5 h-5 text-purple-600 dark:text-purple-400"></i>
@@ -467,8 +484,7 @@
                 </div>
                 <button onclick="switchTab('announce')" class="text-[10px] font-black uppercase tracking-wider text-purple-600 hover:underline">Lihat Semua</button>
               </div>
-              <div id="dashPendataanContent" class="flex flex-col gap-2">
-                 </div>
+              <div id="dashPendataanContent" class="flex flex-col gap-2"></div>
             </div>
 
             <div class="p-5 bg-white dark:bg-zinc-900 rounded-2xl border border-slate-100 dark:border-zinc-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col gap-4">
@@ -487,7 +503,7 @@
               </div>
             </div>
 
-<div class="p-5 bg-white dark:bg-zinc-900 rounded-2xl border border-slate-100 dark:border-zinc-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col gap-3">
+            <div class="p-5 bg-white dark:bg-zinc-900 rounded-2xl border border-slate-100 dark:border-zinc-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col gap-3">
               <div class="flex items-center justify-between">
                 <h3 class="font-black text-lg tracking-tight text-slate-900 dark:text-white">Pengumuman Umum</h3>
                 <button onclick="openEditGeneralAnnounceModal()" class="admin-piket-only hidden text-[10px] font-bold text-ios-blue hover:underline uppercase tracking-wider">Edit</button>
@@ -498,15 +514,12 @@
                 </p>
               </div>
             </div>
-
           </div>
           
-          <div class="flex flex-col gap-4">
+          <div class="flex flex-col gap-4 h-full justify-between">
             
-<!-- KALENDER ULANG TAHUN MAC-STYLE STICKY NOTES -->
-            <div class="bg-white dark:bg-zinc-900 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-slate-200 dark:border-zinc-700 flex flex-col relative overflow-hidden">
+            <div class="bg-white dark:bg-zinc-900 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-slate-200 dark:border-zinc-700 flex flex-col relative overflow-hidden flex-1">
               
-              <!-- Mac Window Top Bar -->
               <div class="bg-slate-100 dark:bg-zinc-800/80 px-4 py-3 flex justify-between items-center border-b border-slate-200 dark:border-zinc-700">
                 <div class="flex gap-2">
                   <div class="w-3 h-3 rounded-full bg-rose-500 shadow-inner"></div>
@@ -520,61 +533,50 @@
                 </div>
               </div>
 
-              <!-- Header Title -->
               <div class="px-5 py-4 pb-2 flex justify-between items-end">
                 <h2 id="calMonthName" class="text-xl sm:text-2xl font-black tracking-tight text-slate-900 dark:text-white">Bulan</h2>
                 <h2 id="calYearNum" class="text-lg sm:text-xl font-bold tracking-tight text-slate-400 dark:text-zinc-500">Tahun</h2>
               </div>
               
-              <!-- Calendar Grid Header -->
               <div class="grid grid-cols-3 text-center py-2 border-b border-slate-200 dark:border-zinc-700">
                 <div class="text-[11px] font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-widest">Kemarin</div>
                 <div class="text-[11px] font-black text-slate-900 dark:text-white uppercase tracking-widest">Hari Ini</div>
                 <div class="text-[11px] font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-widest">Besok</div>
               </div>
               
-              <!-- Calendar Grid Body (Tinggi diperbesar untuk sticky notes) -->
-              <div class="grid grid-cols-3 min-h-[220px] bg-slate-50/50 dark:bg-zinc-900/50">
-                
-                <!-- Kemarin -->
-                <div class="border-r border-slate-200 dark:border-zinc-700 p-2 relative flex flex-col items-center">
+              <div class="grid grid-cols-3 flex-1 min-h-[260px] bg-slate-50/50 dark:bg-zinc-900/50 items-start pt-2">
+                <div class="border-r border-slate-200 dark:border-zinc-700 p-2 relative flex flex-col items-center h-full">
                    <span class="text-sm font-bold text-slate-400 dark:text-zinc-600 mt-1" id="calNumYesterday">0</span>
                    <div id="stickyYesterday" class="w-full flex flex-col items-center mt-2"></div>
                 </div>
 
-                <!-- Hari Ini (Diberi Lingkaran) -->
-                <div class="border-r border-slate-200 dark:border-zinc-700 p-2 relative flex flex-col items-center bg-rose-50/30 dark:bg-rose-900/10">
-                   <!-- Lingkaran Hari Ini yang Sempurna -->
-                   <div class="relative mt-0.5 w-7 h-7 flex items-center justify-center bg-rose-500 rounded-full shadow-sm shadow-rose-200 dark:shadow-none">
+                <div class="border-r border-slate-200 dark:border-zinc-700 p-2 relative flex flex-col items-center bg-rose-50/30 dark:bg-rose-900/10 h-full">
+                   <div class="relative mt-0.5 w-7 h-7 flex items-center justify-center bg-rose-500 rounded-full shadow-sm">
                      <span class="text-sm font-black text-white" id="calNumToday">0</span>
                    </div>
                    <div id="stickyToday" class="w-full flex flex-col items-center mt-3"></div>
                 </div>
 
-                <!-- Besok -->
-                <div class="p-2 relative flex flex-col items-center">
+                <div class="p-2 relative flex flex-col items-center h-full">
                    <span class="text-sm font-bold text-slate-400 dark:text-zinc-600 mt-1" id="calNumTomorrow">0</span>
                    <div id="stickyTomorrow" class="w-full flex flex-col items-center mt-2"></div>
                 </div>
-
               </div>
               
-              <!-- Bottom Grid filler just for design aesthetics -->
-              <div class="grid grid-cols-3 border-t border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800">
-                <div class="border-r border-slate-200 dark:border-zinc-700 p-2 h-12"></div>
-                <div class="border-r border-slate-200 dark:border-zinc-700 p-2 h-12"></div>
-                <div class="p-2 h-12"></div>
+              <div class="grid grid-cols-3 border-t border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 shrink-0">
+                <div class="border-r border-slate-200 dark:border-zinc-700 p-2 h-8"></div>
+                <div class="border-r border-slate-200 dark:border-zinc-700 p-2 h-8"></div>
+                <div class="p-2 h-8"></div>
               </div>
             </div>
             
-            <div class="p-5 bg-white dark:bg-zinc-900 rounded-2xl border border-slate-100 dark:border-zinc-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col gap-4">
+            <div class="p-5 bg-white dark:bg-zinc-900 rounded-2xl border border-slate-100 dark:border-zinc-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col gap-4 shrink-0">
               <div class="flex items-center justify-between">
                 <h3 class="font-black text-lg tracking-tight text-slate-900 dark:text-white">Piket Batalyon</h3>
                 <button onclick="switchTab('announce')" class="admin-piket-only hidden text-[10px] font-bold text-ios-blue hover:underline uppercase tracking-wider">Edit</button>
               </div>
 
               <div class="flex flex-col gap-2.5">
-                <!-- PIKET PUTRA -->
                 <div class="p-3 bg-[#f8f9fa] dark:bg-zinc-800/40 rounded-xl border border-slate-100 dark:border-zinc-800/60 flex justify-between items-center">
                   <div class="flex items-center gap-3">
                     <div class="w-10 h-10 shrink-0 aspect-square rounded-full border border-slate-200 overflow-hidden bg-slate-200 flex items-center justify-center text-slate-400 font-bold text-sm">
@@ -590,7 +592,6 @@
                   </a>
                 </div>
 
-                <!-- PIKET PUTRI -->
                 <div class="p-3 bg-[#f8f9fa] dark:bg-zinc-800/40 rounded-xl border border-slate-100 dark:border-zinc-800/60 flex justify-between items-center">
                   <div class="flex items-center gap-3">
                     <div class="w-10 h-10 shrink-0 aspect-square rounded-full border border-slate-200 overflow-hidden bg-slate-200 flex items-center justify-center text-slate-400 font-bold text-sm">
@@ -606,10 +607,11 @@
                   </a>
                 </div>
               </div>
+            </div>
 
           </div>
         </div>
-      </section>
+</section>
 
       <!-- View: Kehadiran -->
       <section id="view-kehadiran" class="view-screen hidden flex flex-col gap-6 transition-all-300">
@@ -800,15 +802,15 @@
             </div>
           </div>
           
-          <div class="overflow-x-auto no-scrollbar">
-            <div class="min-w-[800px] flex flex-col gap-2">
-              <div class="grid grid-cols-5 gap-4 py-2.5 px-4 bg-slate-100 dark:bg-zinc-800/80 rounded-ios-md text-[10px] font-black uppercase tracking-wider text-slate-400">
+          <div class="w-full">
+            <div class="w-full flex flex-col gap-1">
+              <div class="hidden md:grid grid-cols-6 gap-4 py-2 px-4 bg-slate-100 dark:bg-zinc-800/80 rounded-ios-md text-[10px] font-black uppercase tracking-wider text-slate-400">
                 <div class="col-span-2">Program Studi</div>
-                <div>Tanggal</div>
-                <div>Jam Pulang</div>
-                <div>Status Kehadiran</div>
+                <div>Tanggal & Waktu</div>
+                <div class="col-span-2">Status / Keterangan</div>
+                <div class="text-right">Aksi</div>
               </div>
-              <div id="kepulanganListWrapper" class="flex flex-col gap-2"></div>
+              <div id="kepulanganListWrapper" class="flex flex-col border border-slate-100 dark:border-zinc-800 rounded-ios-md overflow-hidden"></div>
             </div>
           </div>
         </div>
@@ -2150,25 +2152,43 @@ function renderBirthdays() {
       if (elMonth) elMonth.innerText = engMonths[now.getMonth()];
       if (elYear) elYear.innerText = now.getFullYear();
 
+    
       // Fungsi pembuat elemen Sticky Note 
       const buildStickyNote = (namesArray, rotateClass) => {
           if (namesArray.length === 0) return '';
-          // Menggabungkan nama dengan tanda bulat bullet
-          const namesHtml = namesArray.join(' &bull; ');
           
-          // CSS di sini sudah diperbaiki: penambahan break-words, leading-tight, dan font-sans
+          // Logika Pemisah Suku Kata Bahasa Indonesia Otomatis
+          const syllabify = (text) => {
+              const v = '[aeiouAIUEO]'; // Vokal
+              const c = '[bcdfghjklmnpqrstvwxyzBCDFGHJKLMNPQRSTVWXYZ]'; // Konsonan
+              return text
+                  // Aturan VK-KV (Contoh: MAYLAN -> MAY-LAN)
+                  .replace(new RegExp(`(${v}${c})(?=${c}${v})`, 'g'), '$1&shy;')
+                  // Aturan V-KV (Contoh: ZIVANA -> ZI-VA-NA)
+                  .replace(new RegExp(`(${v})(?=${c}${v})`, 'g'), '$1&shy;')
+                  // Aturan V-V (Contoh: MAAF -> MA-AF)
+                  .replace(new RegExp(`(${v})(?=${v})`, 'g'), '$1&shy;');
+          };
+
+          const namesHtml = namesArray.map(name => {
+              // Pisahkan nama per spasi, proses tiap kata dengan pemisah suku kata, lalu gabungkan lagi
+              const processedName = name.split(' ').map(word => syllabify(word)).join(' ');
+              
+              // Gunakan hyphens: auto agar saat suku kata turun, otomatis muncul tanda strip (-)
+              return `<li class="pb-1 mb-1 border-b border-black/10 dark:border-white/10 last:border-0 last:mb-0 last:pb-0 leading-tight pr-0" style="word-break: normal; overflow-wrap: break-word; hyphens: auto; -webkit-hyphens: auto;">${processedName}</li>`;
+          }).join('');
+          
           return `
-            <div class="relative w-11/12 max-w-[120px] p-2.5 sm:p-3 bg-gradient-to-br from-pink-200 to-yellow-100 dark:from-pink-900/70 dark:to-yellow-800/70 rounded-sm shadow-[3px_5px_12px_rgba(0,0,0,0.15)] transform ${rotateClass} transition-transform hover:rotate-0 hover:z-20 cursor-pointer border border-white/40 dark:border-white/10 group">
-                <!-- Jarum Pin (Thumbtack) -->
-                <div class="absolute -top-2 left-1/2 -translate-x-1/2 w-3.5 h-3.5 bg-amber-300 rounded-full shadow-[0_2px_5px_rgba(0,0,0,0.4)] border border-amber-500 z-10 flex items-center justify-center">
-                   <div class="w-1 h-1 bg-white rounded-full absolute top-[1.5px] left-[1.5px] opacity-80"></div>
+            <div class="relative w-full max-w-[140px] mx-auto p-2 sm:p-2.5 bg-gradient-to-br from-pink-200 to-yellow-100 dark:from-pink-900/70 dark:to-yellow-800/70 rounded-sm shadow-[3px_5px_12px_rgba(0,0,0,0.15)] transform ${rotateClass} transition-transform hover:rotate-0 hover:z-20 cursor-pointer border border-white/40 dark:border-white/10 group">
+                <div class="absolute -top-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-amber-300 rounded-full shadow-[0_2px_5px_rgba(0,0,0,0.4)] border border-amber-500 z-10 flex items-center justify-center">
+                   <div class="w-1 h-1 bg-white rounded-full absolute top-[1px] left-[1px] opacity-80"></div>
                 </div>
                 <div class="absolute -top-3 left-1/2 translate-x-1.5 w-1.5 h-4 bg-black/20 rounded-full blur-[1px] -z-10 transform rotate-[30deg]"></div>
                 
-                <!-- Teks Sticky Note -->
-                <p class="text-[9px] sm:text-[10px] font-bold font-sans text-slate-800 dark:text-zinc-100 text-center leading-tight drop-shadow-sm group-hover:scale-105 transition-transform break-words line-clamp-6">
+                <ul class="font-semibold text-slate-700 dark:text-zinc-200 text-left drop-shadow-sm group-hover:scale-105 transition-transform w-full list-disc pl-3 m-0 mt-1" 
+                    style="font-family: 'PaperNotes', cursive; line-height: 1.25; letter-spacing: 0.2px; font-size: clamp(5px, 2.5vw, 7.2px);">
                     ${namesHtml}
-                </p>
+                </ul>
             </div>
           `;
       };
@@ -2437,9 +2457,15 @@ if (last.verifier && last.verifiedAt) {
           const vDate = new Date(last.verifiedAt);
           const tStr = String(vDate.getHours()).padStart(2, '0') + ':' + String(vDate.getMinutes()).padStart(2, '0');
           const dStr = String(vDate.getDate()).padStart(2, '0') + '/' + String(vDate.getMonth() + 1).padStart(2, '0') + '/' + vDate.getFullYear();
-          document.getElementById('dashLastActVer').innerHTML = `<i data-lucide="shield-check" class="w-3.5 h-3.5 text-ios-blue"></i> Diverifikasi oleh <strong>${last.verifier}</strong> (${dStr} ${tStr})`;
+          document.getElementById('dashLastActVer').innerHTML = `
+            <i data-lucide="shield-check" class="w-4 h-4 text-ios-blue shrink-0 mt-0.5 sm:mt-0"></i> 
+            <div class="flex flex-col sm:flex-row sm:flex-wrap items-start sm:items-center gap-1">
+              <span class="text-[10px] sm:text-xs text-slate-500">Diverifikasi oleh</span> 
+              <strong class="text-[10px] sm:text-xs text-slate-700 dark:text-zinc-200 break-all">${last.verifier}</strong> 
+              <span class="text-[9px] sm:text-[10px] bg-slate-200/50 dark:bg-zinc-700 px-1.5 py-0.5 rounded-md">(${dStr} ${tStr})</span>
+            </div>`;
         } else {
-          document.getElementById('dashLastActVer').innerHTML = `<i data-lucide="shield-check" class="w-3.5 h-3.5 text-ios-blue"></i> Riwayat terdahulu`;
+          document.getElementById('dashLastActVer').innerHTML = `<i data-lucide="shield-check" class="w-4 h-4 text-ios-blue shrink-0 mt-0.5 sm:mt-0"></i> <div class="text-[10px] sm:text-xs">Riwayat terdahulu</div>`;
         }
         
         if (last.absentCount > 0) {
@@ -3979,12 +4005,23 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
         }
      
         listHtml += `
-          <div class="grid grid-cols-5 gap-4 items-center py-3 px-4 border-b dark:border-zinc-800/60 text-sm">
-            <div class="col-span-2 font-bold text-slate-900 dark:text-white">${k.prodiName}</div>
-            <div><input type="date" value="${k.date}" id="dep-date-${trueIdx}" ${disabledAttr} class="w-full px-2 py-1.5 rounded bg-white dark:bg-zinc-900 border dark:border-zinc-700 text-slate-900 dark:text-white text-xs outline-none focus:ring-1 focus:ring-ios-blue"></div>
-            <div><input type="time" value="${k.time}" id="dep-time-${trueIdx}" ${disabledAttr} class="w-full px-2 py-1.5 rounded bg-white dark:bg-zinc-900 border dark:border-zinc-700 text-slate-900 dark:text-white text-xs outline-none focus:ring-1 focus:ring-ios-blue"></div>
-            <div><textarea id="dep-status-${trueIdx}" ${disabledAttr} class="w-full px-2 py-1.5 rounded bg-white dark:bg-zinc-900 border dark:border-zinc-700 text-slate-900 dark:text-white text-[10px] outline-none focus:ring-1 focus:ring-ios-blue resize-none h-24 leading-relaxed">${displayStatus}</textarea></div>
-            <div class="text-right">${canEdit ? `<button onclick="saveDepartureRow(${trueIdx}, '${k.prodiName}')" class="px-4 py-1.5 bg-ios-blue text-white rounded text-xs font-bold hover:opacity-90">Simpan</button>` : '<span class="inline-block px-3 py-1 bg-slate-100 dark:bg-zinc-800 text-slate-400 text-[10px] font-black uppercase rounded-full">READ ONLY</span>'}</div>
+          <div class="flex flex-col md:grid md:grid-cols-6 gap-2 md:gap-4 items-start md:items-center py-3 px-3 md:px-4 border-b border-slate-100 dark:border-zinc-800/60 bg-white dark:bg-zinc-900 transition-colors hover:bg-slate-50 dark:hover:bg-zinc-800/40">
+            <div class="md:col-span-2 w-full flex justify-between items-center mb-1 md:mb-0">
+               <span class="font-extrabold text-slate-900 dark:text-white text-sm bg-slate-100 dark:bg-zinc-800 px-2 py-1 rounded md:bg-transparent md:px-0 md:py-0">${k.prodiName}</span>
+            </div>
+            
+            <div class="w-full flex gap-2 md:flex-col md:gap-1">
+              <input type="date" value="${k.date}" id="dep-date-${trueIdx}" ${disabledAttr} class="w-1/2 md:w-full px-2 py-1.5 rounded border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-slate-900 dark:text-white text-[11px] outline-none focus:ring-1 focus:ring-ios-blue">
+              <input type="time" value="${k.time}" id="dep-time-${trueIdx}" ${disabledAttr} class="w-1/2 md:w-full px-2 py-1.5 rounded border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-slate-900 dark:text-white text-[11px] outline-none focus:ring-1 focus:ring-ios-blue">
+            </div>
+            
+            <div class="w-full md:col-span-2">
+              <textarea id="dep-status-${trueIdx}" ${disabledAttr} class="w-full px-2 py-1.5 rounded border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-slate-900 dark:text-white text-[10px] outline-none focus:ring-1 focus:ring-ios-blue resize-none h-[4.5rem] leading-snug">${displayStatus}</textarea>
+            </div>
+            
+            <div class="w-full md:text-right flex justify-end mt-1 md:mt-0">
+              ${canEdit ? `<button onclick="saveDepartureRow(${trueIdx}, '${k.prodiName}')" class="w-full md:w-auto px-4 py-2 md:py-1.5 bg-ios-blue text-white rounded text-xs font-bold hover:opacity-90 active:scale-95 transition-all shadow-sm">Simpan</button>` : '<span class="w-full md:w-auto text-center inline-block px-3 py-1.5 bg-slate-100 dark:bg-zinc-800 text-slate-400 text-[10px] font-black uppercase rounded md:rounded-full">READ ONLY</span>'}
+            </div>
           </div>
         `;
       });
