@@ -378,7 +378,7 @@
           </div>
 
           <div class="flex gap-3 mt-2">
-  <button type="submit" id="loginSubmitBtn" class="relative flex-1 bg-gradient-to-r from-ios-blue via-blue-600 to-indigo-600 text-white font-bold py-3.5 rounded-ios-md hover:opacity-90 active:scale-95 transition-all shadow-md shadow-blue-500/20 flex items-center justify-center">
+  <button type="submit" id="loginSubmitBtn" class="relative flex-1 bg-gradient-to-r from-[#53b0ae] to-[#3b9c9a] text-white font-bold py-3.5 rounded-ios-md hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-[#53b0ae]/30 flex items-center justify-center">
   <i data-lucide="log-in" class="absolute left-6 w-5 h-5"></i>
   <span>Masuk</span>
 </button>
@@ -2550,7 +2550,7 @@ updateDashboardPendataan();
       const activities = [...new Set(appData.schedules.map(s => s.title))];
       
       activities.forEach(act => select.innerHTML += `<option value="${act}">${act}</option>`);
-      select.innerHTML += `<option value="kustom">Tambahan Kegiatan Lainnya...</option>`;
+      select.innerHTML += `<option value="kustom">Tambahkan Kegiatan Lainnya...</option>`;
       
       statSelect.innerHTML += `<option value="semua" selected>Semua Kegiatan</option>`;
       activities.forEach(act => statSelect.innerHTML += `<option value="${act}">${act}</option>`);
