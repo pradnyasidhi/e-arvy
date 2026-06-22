@@ -518,8 +518,8 @@
               
               <div class="grid grid-cols-3 min-h-[160px] relative">
                 <!-- Background dekoratif samar -->
-                <div class="absolute inset-0 opacity-10 flex items-center justify-center pointer-events-none">
-                   <i data-lucide="heart" class="w-24 h-24 text-pink-500 fill-pink-500"></i>
+                <div class="absolute inset-0 opacity-15 flex items-center justify-center pointer-events-none">
+                   <i data-lucide="gift" class="w-24 h-24 text-pink-500"></i>
                 </div>
                 
                 <div class="border-r border-black dark:border-white p-2">
@@ -845,6 +845,15 @@
             </button>
           </div>
           
+
+          <div class="flex flex-col gap-1.5 max-w-xs">
+            <label class="text-[10px] font-black uppercase tracking-widest text-slate-400">Pilih Tanggal</label>
+            <input type="date" id="announceScheduleDate" onchange="loadAnnounceSchedules()" class="w-full px-4 py-2.5 rounded-ios-md glass-input text-sm text-slate-950 dark:text-white focus:outline-none">
+          </div>
+
+          <div id="announceSchedulesList" class="flex flex-col gap-3 mt-2"></div>
+        </div>
+
 <!-- BLOK ULANG TAHUN KADET -->
         <div class="p-6 bg-white/85 dark:bg-zinc-900/85 backdrop-blur-md rounded-ios-lg shadow-xl flex flex-col gap-4">
           <div class="pb-2 border-b border-slate-100 dark:border-zinc-800 flex items-center gap-2">
@@ -858,14 +867,6 @@
             <!-- Render via JS -->
             <p class="text-xs italic text-slate-400">Memuat data kelahiran...</p>
           </div>
-        </div>
-
-          <div class="flex flex-col gap-1.5 max-w-xs">
-            <label class="text-[10px] font-black uppercase tracking-widest text-slate-400">Pilih Tanggal</label>
-            <input type="date" id="announceScheduleDate" onchange="loadAnnounceSchedules()" class="w-full px-4 py-2.5 rounded-ios-md glass-input text-sm text-slate-950 dark:text-white focus:outline-none">
-          </div>
-
-          <div id="announceSchedulesList" class="flex flex-col gap-3 mt-2"></div>
         </div>
 
         <div class="p-6 bg-white/85 dark:bg-zinc-900/85 backdrop-blur-md rounded-ios-lg shadow-xl flex flex-col gap-5">
@@ -4779,7 +4780,7 @@ const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 window.fetchDataKadetDariSupabase = async function() {
   try {
     // 1. Tarik data termasuk tempat_lahir dan tanggal_lahir
-    const { data: kadetData, error } = await supabaseClient
+    const { data: KadetData, error } = await supabaseClient
       .from('DataKadet')
       .select('nama_kadet, prodi, gender, tempat_lahir, tanggal_lahir')
       .order('prodi', { ascending: true })
@@ -4787,18 +4788,28 @@ window.fetchDataKadetDariSupabase = async function() {
 
     if (error) throw error;
 
-    if (kadetData && kadetData.length > 0) {
+    if (KadetData && KadetData.length > 0) {
       const formattedCadets = {};
-      const allCadetsFlat = []; // Untuk memudahkan filter ulang tahun
+      const allCadetsFlat = [];
 
-      kadetData.forEach((kadet) => {
+      KadetData.forEach((kadet) => {
         const prodiName = kadet.prodi;
         if (!formattedCadets[prodiName]) formattedCadets[prodiName] = [];
         
+        // --- LOGIKA NORMALISASI GENDER (ANTI-BUG) ---
+        // Ubah apapun input dari database menjadi huruf kecil semua dulu
+        let rawGender = (kadet.gender || "laki-laki").toLowerCase().trim();
+        let finalGender = "Laki-Laki"; // Defaultnya laki-laki
+        
+        // Cek jika ada unsur kata perempuan/putri di database
+        if (rawGender.includes("perempuan") || rawGender.includes("putri") || rawGender === "pi" || rawGender === "p") {
+            finalGender = "Perempuan";
+        }
+
         const cadetObj = {
           no: formattedCadets[prodiName].length + 1,
           name: kadet.nama_kadet,
-          gender: kadet.gender || "Laki-Laki",
+          gender: finalGender, // Masukkan gender yang sudah dinormalkan
           tempat_lahir: kadet.tempat_lahir || "Tidak diketahui",
           tanggal_lahir: kadet.tanggal_lahir || ""
         };
@@ -4862,7 +4873,7 @@ window.fetchDataKadetDariSupabase = async function() {
 <script>
 
 // --- UBAH ANGKA INI SETIAP KALI AKU DEPLOY HTML BARU ---
-const APP_VERSION = "v1.0.2"; 
+const APP_VERSION = "v1.0.4"; 
 // -------------------------------------------------------------------
 
 function forceClearCacheOnUpdate() {
