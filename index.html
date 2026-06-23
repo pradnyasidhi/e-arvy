@@ -988,6 +988,12 @@
           <div class="md:col-span-2 p-6 bg-white dark:bg-zinc-900 rounded-ios-lg shadow-lg flex flex-col gap-4">
             <h3 class="font-extrabold text-lg text-slate-900 dark:text-white">Riwayat Aktivitas</h3>
             <div id="activityLogsWrapper" class="flex flex-col gap-2 max-h-[300px] overflow-y-auto no-scrollbar"></div>
+<!-- TOMBOL DARURAT HARD RESET -->
+            <div class="mt-4 pt-4 border-t border-slate-100 dark:border-zinc-800">
+              <button onclick="manualHardReset()" class="w-full flex items-center justify-center gap-2 py-3 rounded-ios-md bg-rose-50 dark:bg-rose-950/30 text-ios-red font-bold text-sm border border-rose-200 dark:border-rose-900 hover:bg-rose-100 transition-colors">
+                <i data-lucide="refresh-ccw" class="w-4 h-4"></i> Bersihkan Cache & Perbarui Aplikasi
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -1795,6 +1801,21 @@ storage.removeItem('e_arvy_session');
       }
     }
 
+function manualHardReset() {
+      if(confirm('Aplikasi terasa nyangkut atau error? Ini akan membersihkan memori HP dan memuat ulang ke versi paling baru.')) {
+        if ('caches' in window) { 
+            caches.keys().then(names => names.forEach(n => caches.delete(n))); 
+        }
+        if ('serviceWorker' in navigator) { 
+            navigator.serviceWorker.getRegistrations().then(regs => {
+              regs.forEach(r => r.unregister());
+            }); 
+        }
+        localStorage.removeItem('e_arvy_app_version'); 
+        window.location.href = window.location.origin + window.location.pathname + "?force_reload=" + new Date().getTime();
+      }
+    }
+
     function enableSoundContext() {
       try {
         const testAudio = new Audio('./sounds/stealing.mp3');         testAudio.volume = 0.01; // Volume nyaris tak terdengar
@@ -1998,7 +2019,7 @@ setTimeout(checkSoundPermission, 2000); // Tunda 2 detik agar munculnya halus
         if (currentAnnouncement.toUpperCase().includes("APEL LUAR BIASA")) {
           sendDesktopNotification("PERINGATAN: APEL LUAR BIASA!", currentAnnouncement, "stealing");
         } else {
-          sendDesktopNotification("Pengumuman Diperbarui", currentAnnouncement, "bell");
+          sendDesktopNotification("Pengumuman", currentAnnouncement, "bell");
         }
         
         lastAnnouncementText = currentAnnouncement; // Update memori
@@ -2045,6 +2066,14 @@ setTimeout(checkSoundPermission, 2000); // Tunda 2 detik agar munculnya halus
         const secs = String(now.getSeconds()).padStart(2, '0');
         document.getElementById('realTimeClock').innerText = `${hrs}:${mins}:${secs}`;
         
+// Tarik jadwal dari Supabase setiap tepat jam 00:00 tengah malam
+        if (hrs === "00" && mins === "00" && secs === "00") {
+          if (typeof window.fetchJadwalDefaultDariSupabase === 'function') {
+            window.fetchJadwalDefaultDariSupabase();
+            showToast('Hari Baru', 'Jadwal default harian telah diperbarui.', 'info');
+          }
+        }
+
         if (hrs === "03" && mins === "00" && secs === "00" && !isKepulanganResetToday) {
           appData.kepulangan = [];
           storage.setItem('e_arvy_kepulangan', JSON.stringify([]));
@@ -2081,8 +2110,8 @@ setTimeout(checkSoundPermission, 2000); // Tunda 2 detik agar munculnya halus
             const diffMs = eventTime - now;
             const diffMins = Math.floor(diffMs / 60000);
 
-            // Jika selisih waktu persis 30 menit sebelumnya
-            if (diffMins === 30 && diffMs > 0) {
+            // Jika selisih waktu persis 45 menit sebelumnya
+            if (diffMins === 45 && diffMs > 0) {
               let soundType = 'default';
               
               // Jika judul jadwal adalah Rukan Malam, gunakan suara khusus
@@ -2092,7 +2121,7 @@ setTimeout(checkSoundPermission, 2000); // Tunda 2 detik agar munculnya halus
 
               sendDesktopNotification(
                 "Persiapan Kegiatan!", 
-                `"${s.title}" akan dimulai 30 menit lagi (${s.time} WIB) di ${s.location || 'lokasi yang ditentukan'}.`,
+                `${s.title} akan dimulai 45 menit lagi (${s.time} WIB) di ${s.location || 'lokasi yang ditentukan'}.`,
                 soundType
               );
               // Tandai agar tidak melakukan spam notifikasi setiap detik
@@ -2653,6 +2682,23 @@ function saveLastSelectedActivity() {
         if (select.value === 'kustom') {
           storage.setItem('e_arvy_last_custom_activity', document.getElementById('customActivityName').value);
         }
+        
+        // --- LOGIKA BARU: Tandai jika user sengaja menolak jadwal saat ini ---
+        if (appData && appData.schedules) {
+          const now = new Date();
+          const todayStr = getLocalDateString(now);
+          const todaySchedules = appData.schedules.filter(s => s.date === todayStr);
+          const sorted = [...todaySchedules].sort((a,b) => a.time.localeCompare(b.time));
+          const currentTimeStr = String(now.getHours()).padStart(2, '0') + ":" + String(now.getMinutes()).padStart(2, '0');
+          
+          let expectedTitle = null;
+          for (let i = 0; i < sorted.length; i++) {
+            if (currentTimeStr >= sorted[i].time) expectedTitle = sorted[i].title;
+          }
+          if (expectedTitle) {
+             storage.setItem('e_arvy_manual_override', todayStr + "_" + expectedTitle);
+          }
+        }
       }
     }
 
@@ -2667,30 +2713,37 @@ function saveLastSelectedActivity() {
 
       let activeTitle = null;
       for (let i = 0; i < sorted.length; i++) {
-        // Cek kegiatan apa yang jam mulainya sudah terlewati saat ini
         if (currentTimeStr >= sorted[i].time) activeTitle = sorted[i].title;
       }
 
       if (activeTitle) {
+        // Gabungkan tanggal agar tiap hari memori auto-event tidak nyangkut
+        const currentEventSignature = todayStr + "_" + activeTitle;
         const lastAutoEvent = storage.getItem('e_arvy_last_auto_event');
-        // PENTING: Hanya lompat otomatis JIKA ada jadwal kegiatan yang BARU SAJA dimulai
-        if (activeTitle !== lastAutoEvent) {
-          const select = document.getElementById('presensiActivitySelect');
+        const manualOverride = storage.getItem('e_arvy_manual_override');
+        
+        const select = document.getElementById('presensiActivitySelect');
+        const currentDropdownValue = select ? select.value : null;
+
+        // PEMICU OTOMATIS: Jalan jika jadwal baru saja berganti, ATAU jika halaman 
+        // baru direfresh dan dropdown belum sesuai (dan tidak ada penolakan manual dari user)
+        if (
+            (currentEventSignature !== lastAutoEvent) || 
+            (currentDropdownValue !== activeTitle && currentDropdownValue !== 'kustom' && manualOverride !== currentEventSignature)
+        ) {
           if (select) {
             let exists = Array.from(select.options).some(opt => opt.value === activeTitle);
             if (exists) {
               select.value = activeTitle;
-              // Simpan sebagai memori sistem
               storage.setItem('e_arvy_last_activity', activeTitle);
-              storage.setItem('e_arvy_last_auto_event', activeTitle);
+              storage.setItem('e_arvy_last_auto_event', currentEventSignature);
               
               document.getElementById('customActivityWrapper').classList.add('hidden');
               
-              // Jika user sedang berada di halaman kehadiran, render ulang tabelnya seketika!
               if (document.getElementById('view-kehadiran').classList.contains('active')) {
                  renderAttendanceList();
               }
-              showToast('Jadwal Berganti', `Formulir otomatis beralih ke: ${activeTitle}`, 'info');
+              showToast('Menyesuaikan Jadwal', `Otomatis beralih ke: ${activeTitle}`, 'info');
             }
           }
         }
@@ -2882,7 +2935,7 @@ function toggleSelectAll(prodiId, isChecked) {
       }
     }
 
-    function applyBulkAction(prodiId) {
+    async function applyBulkAction(prodiId) {
       if (!bulkSelection[prodiId] || bulkSelection[prodiId].size === 0) return;
       
       const status = document.getElementById(`bulk-status-${prodiId}`).value;
@@ -2893,12 +2946,12 @@ function toggleSelectAll(prodiId, isChecked) {
       let activityName = document.getElementById('presensiActivitySelect').value;
       if (activityName === 'kustom') activityName = document.getElementById('customActivityName').value || 'Kegiatan Kustom';
 
-      const processBulk = (base64) => {
+      const processBulk = (finalProofString) => {
         bulkSelection[prodiId].forEach(no => {
           document.getElementById(`cadet-status-${prodiId}-${no}`).value = status;
           storage.setItem(`draft_status_${dateStr}_${activityName}_${prodiId}_${no}`, status);
           
-          if (status !== 'Hadir') {
+          if (status !== 'HADIR') {
             document.getElementById(`absence-detail-${prodiId}-${no}`).classList.remove('hidden');
             document.getElementById(`absence-detail-${prodiId}-${no}`).classList.add('flex');
             
@@ -2910,11 +2963,9 @@ function toggleSelectAll(prodiId, isChecked) {
                 }
             }
 
-            if (base64) {
-              storage.setItem(`draft_proof_${dateStr}_${activityName}_${prodiId}_${no}`, base64);
-              const img = document.getElementById(`proof-preview-${prodiId}-${no}`);
-              img.src = base64; img.classList.remove('hidden');
-              document.getElementById(`proof-base64-${prodiId}-${no}`).value = base64;
+            if (finalProofString) {
+              storage.setItem(`draft_proof_${dateStr}_${activityName}_${prodiId}_${no}`, finalProofString);
+              document.getElementById(`proof-base64-${prodiId}-${no}`).value = finalProofString;
             }
           } else {
             document.getElementById(`absence-detail-${prodiId}-${no}`).classList.add('hidden');
@@ -2940,13 +2991,22 @@ function toggleSelectAll(prodiId, isChecked) {
         updateProdiSummary(prodiId);
         updateAllKompisCumulativeAbsents();
         markAsUnsaved(prodiId);
+        
+        // Render ulang untuk memunculkan gambar
+        renderAttendanceList();
         showToast('Terapkan Masal', `Berhasil menerapkan status dan alasan.`, 'success');
       };
 
-      if (fileInput.files && fileInput.files[0]) {
-        const reader = new FileReader();
-        reader.onload = e => processBulk(e.target.result);
-        reader.readAsDataURL(fileInput.files[0]);
+      if (fileInput.files && fileInput.files.length > 0) {
+        showToast('Mengunggah...', `Memproses ${fileInput.files.length} foto masal ke Cloud...`, 'info');
+        let uploadedUrls = [];
+        
+        for (let i = 0; i < fileInput.files.length; i++) {
+            const compressedBase64 = await new Promise((resolve) => compressImage(fileInput.files[i], 100, resolve));
+            const cloudUrl = await window.uploadFileToCloudStorage(compressedBase64, 'absensi_bukti', `bulk_${prodiId}_${Date.now()}_${i}`);
+            uploadedUrls.push(cloudUrl);
+        }
+        processBulk(uploadedUrls.join(','));
       } else {
         processBulk("");
       }
@@ -3076,7 +3136,7 @@ function toggleSelectAll(prodiId, isChecked) {
                       <div class="flex items-center justify-end gap-2 w-full">
                         <label id="bulk-file-lbl-${prodi.prodiId}" class="shrink-0 px-2.5 py-1.5 rounded bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-[10px] font-bold text-slate-600 dark:text-zinc-300 cursor-pointer hover:bg-slate-50 transition-colors">
                            <i data-lucide="image" class="w-3.5 h-3.5 inline"></i> <span id="bulk-file-txt-${prodi.prodiId}">Foto</span>
-                           <input type="file" id="bulk-file-${prodi.prodiId}" accept="image/*" class="hidden" onchange="document.getElementById('bulk-file-txt-${prodi.prodiId}').innerText='1 File'; this.parentElement.classList.add('text-ios-blue', 'border-blue-300');">
+                           <input type="file" id="bulk-file-${prodi.prodiId}" accept="image/*" multiple class="hidden" onchange="document.getElementById('bulk-file-txt-${prodi.prodiId}').innerText=this.files.length + ' Foto'; this.parentElement.classList.add('text-ios-blue', 'border-blue-300');">
                         </label>
                         
                         <button type="button" onclick="applyBulkAction(${prodi.prodiId})" class="shrink-0 px-4 py-1.5 bg-ios-blue text-white rounded text-[10px] font-black shadow-sm hover:opacity-90 active:scale-95 transition-all">Terapkan Masal</button>
@@ -3631,18 +3691,66 @@ function switchRecapTab(tab) {
       
       if (!absentsArray || absentsArray.length === 0) {
         evContainer.innerHTML = `<div class="col-span-full flex flex-col items-center justify-center py-12 text-slate-400"><i data-lucide="shield-check" class="w-12 h-12 mb-3 text-ios-green"></i><p class="font-bold text-sm">Lengkap Hadir.</p><p class="text-xs">Tidak ada bukti ketidakhadiran.</p></div>`;
-        lucide.createIcons(); return;
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+        return;
       }
 
-     absentsArray.forEach(a => {
+      // 1. KELOMPOKKAN BERDASARKAN PRODI DULU
+      const groupedByProdi = {};
+      absentsArray.forEach(a => {
+        if (!groupedByProdi[a.prodiName]) groupedByProdi[a.prodiName] = [];
+        groupedByProdi[a.prodiName].push(a);
+      });
+
+      let targetGender = null;
+      let mode = currentViewedLog ? currentViewedLog.category : activeCategory;
+      if (mode === 'Putra') targetGender = 'Laki-Laki';
+      if (mode === 'Putri') targetGender = 'Perempuan';
+
+      let finalCardsData = [];
+
+      for (const prodiName in groupedByProdi) {
+        const pAbsents = groupedByProdi[prodiName];
+        const pCadets = (appData.cadets[prodiName] || []).filter(c => !targetGender || c.gender === targetGender);
+        const pTotal = pCadets.length;
+
+        // Cek apakah seluruh prodi keterangannya SAMA PERSIS
+        const allSameReasonAndStatus = pAbsents.length === pTotal && pTotal > 0 && pAbsents.every(a => a.status === pAbsents[0].status && a.reason === pAbsents[0].reason);
+
+        if (allSameReasonAndStatus) {
+          // JADIKAN SATU KARTU SAJA UNTUK SATU PRODI
+          finalCardsData.push({
+            isWholeProdi: true,
+            title: `SELURUH ${prodiName}`,
+            prodiName: prodiName,
+            status: pAbsents[0].status,
+            reason: pAbsents[0].reason,
+            attachmentBase64: pAbsents[0].attachmentBase64 // Cukup ambil foto pertama saja
+          });
+        } else {
+          // RENDER SATU PER SATU JIKA ALASANNYA BEDA-BEDA
+          pAbsents.forEach(a => {
+            finalCardsData.push({
+              isWholeProdi: false,
+              title: a.cadetName,
+              prodiName: a.prodiName,
+              status: a.status,
+              reason: a.reason,
+              attachmentBase64: a.attachmentBase64
+            });
+          });
+        }
+      }
+
+      // 2. RENDER KARTU KE LAYAR
+      finalCardsData.forEach(a => {
         let photoHtml = '';
         if (a.attachmentBase64) {
            const urls = a.attachmentBase64.split(',');
            if (urls.length === 1) {
-               photoHtml = `<img src="${urls[0]}" class="w-full h-32 object-cover rounded mt-2 border border-slate-200 dark:border-zinc-700 cursor-zoom-in hover:opacity-90 transition-opacity" onclick="viewDocumentedPhoto('${a.cadetName.replace(/'/g, "\\'")}', '${urls[0]}')">`;
+               photoHtml = `<img src="${urls[0]}" class="w-full h-32 object-cover rounded mt-2 border border-slate-200 dark:border-zinc-700 cursor-zoom-in hover:opacity-90 transition-opacity" onclick="viewDocumentedPhoto('${a.title.replace(/'/g, "\\'")}', '${urls[0]}')">`;
            } else {
-               // Render Grid jika foto lebih dari 1
-               const gridItems = urls.map(url => `<img src="${url}" class="w-full h-16 object-cover rounded border border-slate-200 dark:border-zinc-700 cursor-zoom-in hover:opacity-90 transition-opacity" onclick="viewDocumentedPhoto('${a.cadetName.replace(/'/g, "\\'")}', '${url}')">`).join('');
+               const gridItems = urls.map(url => `<img src="${url}" class="w-full h-16 object-cover rounded border border-slate-200 dark:border-zinc-700 cursor-zoom-in hover:opacity-90 transition-opacity" onclick="viewDocumentedPhoto('${a.title.replace(/'/g, "\\'")}', '${url}')">`).join('');
                photoHtml = `<div class="grid grid-cols-2 gap-1 mt-2">${gridItems}</div>`;
            }
         } else {
@@ -3650,9 +3758,9 @@ function switchRecapTab(tab) {
         }
 
         evContainer.innerHTML += `
-          <div class="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 p-3 rounded-ios-md flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow">
+          <div class="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 p-3 rounded-ios-md flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow ${a.isWholeProdi ? 'ring-2 ring-ios-blue/30 bg-blue-50/20 dark:bg-blue-900/10' : ''}">
             <div class="text-xs">
-              <span class="font-black text-slate-800 dark:text-white block truncate" title="${a.cadetName}">${a.cadetName}</span>
+              <span class="font-black text-slate-800 dark:text-white block truncate ${a.isWholeProdi ? 'text-ios-blue text-sm' : ''}" title="${a.title}">${a.title}</span>
               <div class="flex items-center justify-between mt-0.5">
                 <span class="text-slate-500 font-semibold">${a.prodiName}</span>
                 <span class="font-bold text-[10px] uppercase tracking-wider text-ios-red bg-rose-50 dark:bg-rose-950/30 px-1.5 py-0.5 rounded">${a.status}</span>
@@ -3663,7 +3771,7 @@ function switchRecapTab(tab) {
           </div>
         `;
       });
-      lucide.createIcons();
+      if (typeof lucide !== 'undefined') lucide.createIcons();
     }
 
     function applyRecapFilter(mode) {
@@ -4097,15 +4205,48 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
       const content = document.getElementById('detailAbsModalContent'); content.innerHTML = '';
       if (!item.absents || item.absents.length === 0) { content.innerHTML = `<div class="text-center py-8 text-slate-400 italic">Hadir Lengkap.</div>`; openModal('detailAbsentsModal'); return; }
 
-     
       const isAuthorized = ['Admin', 'Piket', 'Pokdo', 'Pengasuh'].includes(currentUser.role);
 
-      const grouped = {}; item.absents.forEach(a => { if(!grouped[a.status]) grouped[a.status] = []; grouped[a.status].push(a); });
+      // --- 1. LOGIKA PENYEDERHANAAN "SELURUH PRODI" ---
+      let targetGender = null;
+      if (item.category === 'Putra') targetGender = 'Laki-Laki';
+      if (item.category === 'Putri') targetGender = 'Perempuan';
+
+      const groupedByProdi = {};
+      item.absents.forEach(a => {
+        if (!groupedByProdi[a.prodiName]) groupedByProdi[a.prodiName] = [];
+        groupedByProdi[a.prodiName].push(a);
+      });
+
+      const consolidatedAbsents = [];
+      for (const prodiName in groupedByProdi) {
+        const pAbsents = groupedByProdi[prodiName];
+        const pCadets = (appData.cadets[prodiName] || []).filter(c => !targetGender || c.gender === targetGender);
+        const pTotal = pCadets.length;
+
+        const allSameReasonAndStatus = pAbsents.length === pTotal && pTotal > 0 && pAbsents.every(a => a.status === pAbsents[0].status && a.reason === pAbsents[0].reason);
+
+        if (allSameReasonAndStatus) {
+          consolidatedAbsents.push({
+            cadetName: `SELURUH ${prodiName}`,
+            prodiName: prodiName,
+            status: pAbsents[0].status,
+            reason: pAbsents[0].reason,
+            attachmentBase64: pAbsents[0].attachmentBase64
+          });
+        } else {
+          pAbsents.forEach(a => consolidatedAbsents.push(a));
+        }
+      }
+      // -------------------------------------------------
+
+      // 2. KELOMPOKKAN BERDASARKAN STATUS (Sakit, Izin, dsb)
+      const grouped = {}; 
+      consolidatedAbsents.forEach(a => { if(!grouped[a.status]) grouped[a.status] = []; grouped[a.status].push(a); });
+      
       for (const status in grouped) {
         let listHtml = '';
           grouped[status].forEach(cad => {
-            
-          
             let imgHtml = '';
             if (cad.attachmentBase64 && isAuthorized) {
                 const urls = cad.attachmentBase64.split(',');
@@ -4117,10 +4258,11 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
             }
           
             const cleanReason = (cad.reason && typeof cad.reason === 'string' && cad.reason.trim() !== '' && cad.reason !== 'undefined' && cad.reason !== 'null') ? cad.reason.trim() : null;
-            
             const reasonHtml = cleanReason ? `<span class="text-[10px] text-slate-500 block mt-0.5">Keterangan: ${cleanReason}</span>` : '';
             
-            listHtml += `<div class="text-xs leading-relaxed pl-1 border-l-2 border-ios-blue/40 mt-2"><div><span class="font-extrabold text-slate-900 dark:text-white">${cad.cadetName}</span>${reasonHtml}</div>${imgHtml}</div>`;
+            const nameColorClass = cad.cadetName.startsWith('SELURUH') ? 'text-ios-blue font-black' : 'text-slate-900 dark:text-white font-extrabold';
+
+            listHtml += `<div class="text-xs leading-relaxed pl-1 border-l-2 border-ios-blue/40 mt-2 mb-3"><div><span class="${nameColorClass}">${cad.cadetName}</span>${reasonHtml}</div>${imgHtml}</div>`;
           });
           content.innerHTML += `<div class="flex flex-col gap-2 p-3 bg-slate-50 dark:bg-zinc-800/60 dark:border-zinc-700/60 rounded-ios-md border"><div class="border-b dark:border-zinc-700 pb-1.5 font-black text-ios-blue text-xs uppercase">${status} (${grouped[status].length})</div>${listHtml}</div>`;
       }
@@ -5080,6 +5222,59 @@ window.fetchDataKadetDariSupabase = async function() {
     console.error("Gagal menarik tabel DataKadet dari Supabase:", error);
   }
 };
+
+window.fetchJadwalDefaultDariSupabase = async function() {
+  try {
+    const { data: JadwalData, error } = await supabaseClient
+      .from('JadwalDefault')
+      .select('*')
+      .order('waktu', { ascending: true });
+
+    if (error) throw error;
+
+    if (JadwalData && JadwalData.length > 0) {
+      const todayStr = getLocalDateString();
+      let schedules = JSON.parse(localStorage.getItem('e_arvy_schedules') || '[]');
+
+      // Cek apakah sudah ada jadwal yang tersimpan untuk hari ini
+      const todaySchedules = schedules.filter(s => s.date === todayStr);
+      
+      // Jika kosong, masukkan jadwal default dari Supabase
+      if (todaySchedules.length === 0) {
+        JadwalData.forEach(jdwl => {
+          schedules.push({
+            date: todayStr,
+            time: jdwl.waktu.substring(0, 5), // Potong "05:00:00" menjadi "05:00"
+            title: jdwl.nama_kegiatan,
+            location: jdwl.lokasi || "",
+            photoUrl: ""
+          });
+        });
+
+        // Urutkan jadwal berdasarkan jam
+        schedules.sort((a,b) => a.time.localeCompare(b.time));
+
+        // Simpan ke memori lokal
+        appData.schedules = schedules;
+        localStorage.setItem('e_arvy_schedules', JSON.stringify(schedules));
+        
+        // Simpan ke Cloud e-Arvy
+        if (typeof window.syncLocalStorageToCloud === 'function') {
+          window.syncLocalStorageToCloud('e_arvy_schedules');
+        }
+
+        // Refresh tampilan UI jadwal secara otomatis
+        if (typeof loadAnnounceSchedules === 'function') loadAnnounceSchedules();
+        if (typeof renderDashboardSchedules === 'function') renderDashboardSchedules(new Date());
+        if (typeof renderAnnounceLatestSchedule === 'function') renderAnnounceLatestSchedule(new Date());
+        
+        console.log("Jadwal default hari ini berhasil ditarik dari Supabase.");
+      }
+    }
+  } catch (error) {
+    console.error("Gagal menarik tabel JadwalDefault dari Supabase:", error);
+  }
+};
  
   window.uploadFileToCloudStorage = async function(base64Data, folderPath, fileName) {
     if (!base64Data || !base64Data.startsWith("data:")) return base64Data;
@@ -5115,13 +5310,75 @@ window.fetchDataKadetDariSupabase = async function() {
       return base64Data; 
     }
   };
+// --- RADAR SINKRONISASI LIVE (SUPABASE REALTIME) ---
+  window.initSupabaseRealtime = function() {
+    if (!supabaseClient) return;
+
+    // 1. Pantau ketikan sementara (Draft / Pengumuman)
+    supabaseClient
+      .channel('realtime-arvy-data')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'DataArvy' }, payload => {
+        const newData = payload.new;
+        if (newData && newData.kunci && newData.jsonString) {
+          
+          // Jangan timpa jika user ini sendiri yang sedang upload (mencegah loop)
+          if (window.isUploadingData) return;
+
+          localStorage.setItem(newData.kunci, newData.jsonString);
+
+          // Jika ada Piket lain yang klik "Simpan" sementara
+          if (newData.kunci.startsWith("saved_bundle_")) {
+            try {
+              const bundle = JSON.parse(newData.jsonString);
+              localStorage.setItem(`saved_present_cnt_${bundle.dateStr}_${bundle.act}_${bundle.prodiId}`, bundle.presentCnt);
+              localStorage.setItem(`saved_absent_cnt_${bundle.dateStr}_${bundle.act}_${bundle.prodiId}`, bundle.absentCnt);
+              localStorage.setItem(`saved_total_cnt_${bundle.dateStr}_${bundle.act}_${bundle.prodiId}`, bundle.totalCnt);
+              localStorage.setItem(`saved_${bundle.dateStr}_${bundle.act}_${bundle.prodiName}`, 'true');
+
+              if (bundle.cadets) {
+                bundle.cadets.forEach(c => {
+                  if (c.status) localStorage.setItem(`draft_status_${bundle.dateStr}_${bundle.act}_${bundle.prodiId}_${c.no}`, c.status);
+                  if (c.reason) localStorage.setItem(`draft_reason_${bundle.dateStr}_${bundle.act}_${bundle.prodiId}_${c.no}`, c.reason);
+                  if (c.proof) localStorage.setItem(`draft_proof_${bundle.dateStr}_${bundle.act}_${bundle.prodiId}_${c.no}`, c.proof);
+                });
+              }
+            } catch(e) {}
+          }
+
+          // Segarkan UI secara ajaib tanpa refresh halaman
+          const activeTab = storage.getItem('e_arvy_active_tab') || 'dashboard';
+          if (activeTab === 'kehadiran' && newData.kunci.startsWith("saved_bundle_")) {
+              if (typeof renderAttendanceList === 'function') renderAttendanceList();
+          } else if (['dashboard', 'announce'].includes(activeTab)) {
+              if (typeof loadDashboardAndAppData === 'function') loadDashboardAndAppData();
+          }
+        }
+      })
+      .subscribe();
+
+    // 2. Pantau jika ada Piket yang menekan "Verifikasi Permanen"
+    supabaseClient
+      .channel('realtime-presensi-log')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'LogPresensi' }, payload => {
+         if (window.isUploadingData) return;
+         window.fetchDatabaseFromCloud().then(() => {
+            const activeTab = storage.getItem('e_arvy_active_tab');
+            if (['dashboard', 'statistik', 'kehadiran'].includes(activeTab)) {
+               if (typeof loadDashboardAndAppData === 'function') loadDashboardAndAppData();
+               showToast('Data Masuk!', 'Piket lain baru saja memverifikasi laporan presensi.', 'success');
+               sendDesktopNotification("Laporan Presensi Masuk", "Ada laporan kehadiran baru yang terverifikasi.", "bell");
+            }
+         });
+      })
+      .subscribe();
+  };
 
 </script>
 
 <script>
 
 // --- UBAH ANGKA INI SETIAP KALI AKU DEPLOY HTML BARU ---
-const APP_VERSION = "v1.1.2"; 
+const APP_VERSION = "v1.1.1"; 
 // -------------------------------------------------------------------
 
 function forceClearCacheOnUpdate() {
@@ -5182,6 +5439,9 @@ const aDate = document.getElementById('announceScheduleDate'); if(aDate) aDate.v
       
       if (typeof checkLoginSession === 'function') checkLoginSession();
       if (typeof startRealTimeClock === 'function') startRealTimeClock();
+      
+      // Nyalakan Radar Realtime
+      if (typeof window.initSupabaseRealtime === 'function') window.initSupabaseRealtime();
 
    
       setTimeout(() => document.getElementById('app-preloader')?.classList.add('preloader-hidden'), 200);
@@ -5190,6 +5450,7 @@ const aDate = document.getElementById('announceScheduleDate'); if(aDate) aDate.v
      if (window.fetchDatabaseFromCloud) {
         window.fetchDatabaseFromCloud().then(async () => { // <--- Tambahkan async
           await window.fetchDataKadetDariSupabase(); // <--- Tambahkan await
+	await window.fetchJadwalDefaultDariSupabase();
           if (icon) icon.classList.remove('animate-spin');
           if (typeof currentUser !== 'undefined' && currentUser && typeof loadDashboardAndAppData === 'function') {
             loadDashboardAndAppData();
@@ -5205,6 +5466,7 @@ const aDate = document.getElementById('announceScheduleDate'); if(aDate) aDate.v
            if (activeTab === 'dashboard') {
              window.fetchDatabaseFromCloud().then(async () => {
                await window.fetchDataKadetDariSupabase();
+await window.fetchJadwalDefaultDariSupabase();
                const currentActive = storage.getItem('e_arvy_active_tab') || 'dashboard';
                if (currentActive === 'dashboard' && typeof loadDashboardAndAppData === 'function') {
                   loadDashboardAndAppData(); 
@@ -5227,6 +5489,7 @@ const aDate = document.getElementById('announceScheduleDate'); if(aDate) aDate.v
           
           window.fetchDatabaseFromCloud().then(async () => {
             await window.fetchDataKadetDariSupabase();
+await window.fetchJadwalDefaultDariSupabase();
             const currentActive = storage.getItem('e_arvy_active_tab') || 'dashboard';
             if (currentActive === 'dashboard') loadDashboardAndAppData();
             if (icon) icon.classList.remove('animate-spin');
