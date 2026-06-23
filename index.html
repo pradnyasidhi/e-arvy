@@ -2055,8 +2055,9 @@ setTimeout(checkSoundPermission, 2000); // Tunda 2 detik agar munculnya halus
         if (hrs === "04") isKepulanganResetToday = false;
 
         renderDashboardSchedules(now);
-	    updatePendataanCountdowns();
-renderAnnounceLatestSchedule(now);
+        updatePendataanCountdowns();
+        renderAnnounceLatestSchedule(now);
+        checkAndAutoSelectActivity(now);
 
         if (currentUser && appData.schedules) {
           const todayStr = getLocalDateString(now);
@@ -2645,6 +2646,56 @@ function handleProfilePhotoUpload(event) {
         }
       }
     }
+function saveLastSelectedActivity() {
+      const select = document.getElementById('presensiActivitySelect');
+      if (select) {
+        storage.setItem('e_arvy_last_activity', select.value);
+        if (select.value === 'kustom') {
+          storage.setItem('e_arvy_last_custom_activity', document.getElementById('customActivityName').value);
+        }
+      }
+    }
+
+    function checkAndAutoSelectActivity(now = new Date()) {
+      if (!appData || !appData.schedules) return;
+      const todayStr = getLocalDateString(now);
+      const todaySchedules = appData.schedules.filter(s => s.date === todayStr);
+      if (todaySchedules.length === 0) return;
+
+      const sorted = [...todaySchedules].sort((a,b) => a.time.localeCompare(b.time));
+      const currentTimeStr = String(now.getHours()).padStart(2, '0') + ":" + String(now.getMinutes()).padStart(2, '0');
+
+      let activeTitle = null;
+      for (let i = 0; i < sorted.length; i++) {
+        // Cek kegiatan apa yang jam mulainya sudah terlewati saat ini
+        if (currentTimeStr >= sorted[i].time) activeTitle = sorted[i].title;
+      }
+
+      if (activeTitle) {
+        const lastAutoEvent = storage.getItem('e_arvy_last_auto_event');
+        // PENTING: Hanya lompat otomatis JIKA ada jadwal kegiatan yang BARU SAJA dimulai
+        if (activeTitle !== lastAutoEvent) {
+          const select = document.getElementById('presensiActivitySelect');
+          if (select) {
+            let exists = Array.from(select.options).some(opt => opt.value === activeTitle);
+            if (exists) {
+              select.value = activeTitle;
+              // Simpan sebagai memori sistem
+              storage.setItem('e_arvy_last_activity', activeTitle);
+              storage.setItem('e_arvy_last_auto_event', activeTitle);
+              
+              document.getElementById('customActivityWrapper').classList.add('hidden');
+              
+              // Jika user sedang berada di halaman kehadiran, render ulang tabelnya seketika!
+              if (document.getElementById('view-kehadiran').classList.contains('active')) {
+                 renderAttendanceList();
+              }
+              showToast('Jadwal Berganti', `Formulir otomatis beralih ke: ${activeTitle}`, 'info');
+            }
+          }
+        }
+      }
+    }
 
     function checkCustomActivity() {
       const select = document.getElementById('presensiActivitySelect');
@@ -3078,11 +3129,10 @@ if (isEditable) {
                       (draftReason ? `<div class="text-[10px] font-bold text-rose-700 dark:text-rose-400 flex-1 px-1 truncate">Ket: ${draftReason}</div><input type="hidden" id="absence-reason-${prodi.prodiId}-${c.no}" value="${draftReason}">` : `<input type="hidden" id="absence-reason-${prodi.prodiId}-${c.no}" value="">`)
                     }
                     <div class="flex items-center gap-1.5 shrink-0">
-                      ${isEditable ? `<div class="flex items-center gap-1.5 shrink-0">
-                      ${isEditable ? `<label class="px-2 py-0.5 rounded bg-white dark:bg-zinc-800 dark:border-zinc-700 dark:text-white border border-slate-200 text-[9px] font-bold cursor-pointer hover:bg-slate-50 dark:hover:bg-zinc-700 shrink-0"><i data-lucide="upload" class="w-3 h-3 inline"></i> <input type="file" accept="image/*" multiple class="hidden" onchange="handleProofPhotoUpload(event, ${prodi.prodiId}, ${c.no}, '${c.name.replace(/'/g, "\\'")}')"></label>` : ''}
+                      ${isEditable ? `<label class="px-2 py-0.5 rounded bg-white dark:bg-zinc-800 dark:border-zinc-700 dark:text-white border border-slate-200 text-[9px] font-bold cursor-pointer hover:bg-slate-50 dark:hover:bg-zinc-700 shrink-0"><i data-lucide="upload" class="w-3 h-3 inline"></i> <input type="file" accept="image/*" multiple class="hidden" onchange="handleProofPhotoUpload(event, ${prodi.prodiId}, ${c.no}, '${c.name.replace(/\x27/g, "\\'")}')"></label>` : ''}
                       
                       <div id="proof-preview-container-${prodi.prodiId}-${c.no}" class="flex gap-1 overflow-x-auto no-scrollbar max-w-[120px]">
-                         ${draftProof ? draftProof.split(',').map(url => `<img src="${url}" class="h-5 w-8 object-cover rounded border shadow-sm cursor-zoom-in shrink-0" onclick="viewDocumentedPhoto('${c.name.replace(/'/g, "\\'")}', '${url}')">`).join('') : ''}
+                         ${draftProof ? draftProof.split(',').map(url => `<img src="${url}" class="h-5 w-8 object-cover rounded border shadow-sm cursor-zoom-in shrink-0" onclick="viewDocumentedPhoto('${c.name.replace(/\x27/g, "\\'")}', '${url}')">`).join('') : ''}
                       </div>
                     </div>
                     <input type="hidden" id="proof-base64-${prodi.prodiId}-${c.no}" value="${draftProof}">
@@ -5048,7 +5098,7 @@ window.fetchDataKadetDariSupabase = async function() {
 <script>
 
 // --- UBAH ANGKA INI SETIAP KALI AKU DEPLOY HTML BARU ---
-const APP_VERSION = "v1.1.1"; 
+const APP_VERSION = "v1.1.2"; 
 // -------------------------------------------------------------------
 
 function forceClearCacheOnUpdate() {
