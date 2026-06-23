@@ -2794,7 +2794,7 @@ function copyPreviousAbsences() {
       // 3. Minta konfirmasi
       if (!confirm(`Salin ${absents.length} data ketidakhadiran beserta fotonya dari kegiatan "${lastLog.activityName}" ke draf "${currentAct}"?`)) return;
 
-      // 4. Eksekusi penyalinan ke Local Storage draf saat ini
+      // 4. Eksekusi penyalinan ke Local Storage DAN update UI langsung
       let copyCount = 0;
       absents.forEach(a => {
         const prodiObj = appData.prodis.find(p => p.currentName === a.prodiName);
@@ -2802,11 +2802,27 @@ function copyPreviousAbsences() {
           const prodiId = prodiObj.prodiId;
           const cadetNo = a.cadetNo;
           
+          // Simpan ke storage
           storage.setItem(`draft_status_${dateStr}_${currentAct}_${prodiId}_${cadetNo}`, a.status);
           if (a.reason) storage.setItem(`draft_reason_${dateStr}_${currentAct}_${prodiId}_${cadetNo}`, a.reason);
           if (a.attachmentBase64) storage.setItem(`draft_proof_${dateStr}_${currentAct}_${prodiId}_${cadetNo}`, a.attachmentBase64);
           
-          markAsUnsaved(prodiId); // Tandai prodi ini belum di-save
+          // --- KODE BARU: Update UI Secara Instan ---
+          const statusDropdown = document.getElementById(`cadet-status-${prodiId}-${cadetNo}`);
+          if (statusDropdown) {
+            statusDropdown.value = a.status; // Mengubah status di dropdown
+          }
+          
+          // Update tampilan keterangan (detail-row) agar muncul
+          const detailRow = document.getElementById(`absence-detail-${prodiId}-${cadetNo}`);
+          if (detailRow) {
+             detailRow.classList.remove('hidden');
+             detailRow.classList.add('flex');
+             const reasonInput = document.getElementById(`absence-reason-${prodiId}-${cadetNo}`);
+             if (reasonInput) reasonInput.value = a.reason || '';
+          }
+          
+          markAsUnsaved(prodiId);
           copyCount++;
         }
       });
@@ -5407,7 +5423,7 @@ console.log("Memicu render ulang tabel kehadiran...");
 <script>
 
 // --- UBAH ANGKA INI SETIAP KALI AKU DEPLOY HTML BARU ---
-const APP_VERSION = "v1.1.6"; 
+const APP_VERSION = "v1.1.7"; 
 // -------------------------------------------------------------------
 
 function forceClearCacheOnUpdate() {
