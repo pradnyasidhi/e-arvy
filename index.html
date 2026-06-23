@@ -5415,9 +5415,49 @@ window.fetchJadwalDefaultDariSupabase = async function() {
 
           // Segarkan UI secara ajaib tanpa refresh halaman
           const activeTab = storage.getItem('e_arvy_active_tab') || 'dashboard';
-          if (activeTab === 'kehadiran' && newData.kunci.startsWith("saved_bundle_")) {
-console.log("Memicu render ulang tabel kehadiran...");
-              if (typeof renderAttendanceList === 'function') renderAttendanceList();
+          
+          if (activeTab === 'kehadiran') {
+              // 1. Jika teman klik "Simpan"
+              if (newData.kunci.startsWith("saved_bundle_")) {
+                  if (typeof renderAttendanceList === 'function') renderAttendanceList();
+              } 
+              // 2. EFEK GOOGLE DOCS: Teman mengubah Dropdown Status
+              else if (newData.kunci.startsWith("draft_status_")) {
+                  const parts = newData.kunci.split('_');
+                  const prodiId = parts[parts.length - 2];
+                  const cadetNo = parts[parts.length - 1];
+                  
+                  const statusDropdown = document.getElementById(`cadet-status-${prodiId}-${cadetNo}`);
+                  const detailRow = document.getElementById(`absence-detail-${prodiId}-${cadetNo}`);
+                  
+                  if (statusDropdown) {
+                      statusDropdown.value = newData.jsonString;
+                      // Otomatis buka/tutup kolom alasan di layar kita
+                      if (newData.jsonString !== 'Hadir') {
+                          detailRow.classList.remove('hidden');
+                          detailRow.classList.add('flex');
+                      } else {
+                          detailRow.classList.add('hidden');
+                          detailRow.classList.remove('flex');
+                      }
+                      updateProdiSummary(prodiId);
+                      updateAllKompisCumulativeAbsents();
+                  }
+              } 
+              // 3. EFEK GOOGLE DOCS: Teman sedang mengetik Alasan
+              else if (newData.kunci.startsWith("draft_reason_")) {
+                  const parts = newData.kunci.split('_');
+                  const prodiId = parts[parts.length - 2];
+                  const cadetNo = parts[parts.length - 1];
+                  
+                  const reasonInput = document.getElementById(`absence-reason-${prodiId}-${cadetNo}`);
+                  
+                  // Anti-Tabrakan: Cek apakah kita sedang ngetik di kotak yang sama
+                  if (reasonInput && document.activeElement !== reasonInput) {
+                      reasonInput.value = newData.jsonString;
+                      updateProdiSummary(prodiId);
+                  }
+              }
           } else if (['dashboard', 'announce'].includes(activeTab)) {
               if (typeof loadDashboardAndAppData === 'function') loadDashboardAndAppData();
           }
@@ -5428,7 +5468,7 @@ console.log("Memicu render ulang tabel kehadiran...");
     // 2. Pantau jika ada Piket yang menekan "Verifikasi Permanen"
     supabaseClient
       .channel('realtime-presensi-log')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'LogPresensi' }, payload => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'LogPresensi' }, payload => {
          if (window.isUploadingData) return;
          window.fetchDatabaseFromCloud().then(() => {
             const activeTab = storage.getItem('e_arvy_active_tab');
@@ -5447,7 +5487,7 @@ console.log("Memicu render ulang tabel kehadiran...");
 <script>
 
 // --- UBAH ANGKA INI SETIAP KALI AKU DEPLOY HTML BARU ---
-const APP_VERSION = "v1.1.7"; 
+const APP_VERSION = "v1.1.8"; 
 // -------------------------------------------------------------------
 
 function forceClearCacheOnUpdate() {
