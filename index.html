@@ -1529,7 +1529,13 @@ originalSetItem('e_arvy_initialized_real_data_v6', 'true');
                 textRecap += `\n`;
             }
         }
-        
+        if (params.category === 'Batalyon') {
+          textRecap += `- Palestina:\nJumlah: 22\nKurang: -\nHadir: 22\nKet: Lengkap\n\n`;
+        } else if (params.category === 'Putra') {
+          textRecap += `- Palestina:\nJumlah: 12\nKurang: -\nHadir: 12\nKet: Lengkap\n\n`;
+        } else if (params.category === 'Putri') {
+          textRecap += `- Palestina:\nJumlah: 10\nKurang: -\nHadir: 10\nKet: Lengkap\n\n`;
+        }
         textRecap += `REKAPITULASI PRODI:\n\n`;
         
         const cadetsData = JSON.parse(storage.getItem('e_arvy_cadets') || '{}');
@@ -2953,7 +2959,7 @@ function toggleSelectAll(prodiId, isChecked) {
       container.innerHTML += lockBannerHtml;
 
       const absenceStatuses = JSON.parse(storage.getItem('e_arvy_absence_statuses') || '["Sakit", "Izin", "Alpa", "Dinas"]');
-      let statusOptionsHtml = `<option value="Hadir">Hadir</option>`;
+      let statusOptionsHtml = `<option value="Hadir">HADIR</option>`;
       absenceStatuses.forEach(st => statusOptionsHtml += `<option value="${st}">${st}</option>`);
 
       const kompis = {};
@@ -2977,6 +2983,8 @@ function toggleSelectAll(prodiId, isChecked) {
               <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400"></i>
             </div>
           </div>
+          <div id="kompi-sum-detail-${k}" class="px-3 py-2 bg-slate-50 dark:bg-zinc-800/50 text-[10px] rounded border border-slate-200 dark:border-zinc-700 mt-1 hidden transition-all"></div>
+          
           <div class="flex flex-col gap-3 mt-1" id="company-body-${k}"></div>
         `;
 
@@ -3040,7 +3048,7 @@ if (isEditable) {
               const draftReason = storage.getItem(`draft_reason_${dateStr}_${activityName}_${prodi.prodiId}_${c.no}`) || '';
               const draftProof = storage.getItem(`draft_proof_${dateStr}_${activityName}_${prodi.prodiId}_${c.no}`) || '';
               
-              let selectOptionsSpecific = `<option value="Hadir" ${draftStatus === 'Hadir' ? 'selected' : ''}>Hadir</option>`;
+              let selectOptionsSpecific = `<option value="Hadir" ${draftStatus === 'Hadir' ? 'selected' : ''}>HADIR</option>`;
               absenceStatuses.forEach(st => selectOptionsSpecific += `<option value="${st}" ${draftStatus === st ? 'selected' : ''}>${st}</option>`);
 
               const checkboxHtml = isEditable ? `<input type="checkbox" data-no="${c.no}" class="bulk-cb-${prodi.prodiId} w-3.5 h-3.5 rounded border-gray-300 text-ios-blue focus:ring-ios-blue cursor-pointer" onchange="toggleBulkCheck(${prodi.prodiId}, ${c.no}, this.checked)">` : '';
@@ -3070,8 +3078,12 @@ if (isEditable) {
                       (draftReason ? `<div class="text-[10px] font-bold text-rose-700 dark:text-rose-400 flex-1 px-1 truncate">Ket: ${draftReason}</div><input type="hidden" id="absence-reason-${prodi.prodiId}-${c.no}" value="${draftReason}">` : `<input type="hidden" id="absence-reason-${prodi.prodiId}-${c.no}" value="">`)
                     }
                     <div class="flex items-center gap-1.5 shrink-0">
-                      ${isEditable ? `<label class="px-2 py-0.5 rounded bg-white dark:bg-zinc-800 dark:border-zinc-700 dark:text-white border border-slate-200 text-[9px] font-bold cursor-pointer hover:bg-slate-50 dark:hover:bg-zinc-700"><i data-lucide="upload" class="w-3 h-3 inline"></i> <input type="file" accept="image/*" class="hidden" onchange="handleProofPhotoUpload(event, ${prodi.prodiId}, ${c.no})"></label>` : ''}
-                      <img id="proof-preview-${prodi.prodiId}-${c.no}" src="${draftProof}" class="h-5 w-8 object-cover rounded border shadow-sm ${draftProof ? '' : 'hidden'} cursor-zoom-in" onclick="if('${draftProof}') viewDocumentedPhoto('${c.name}', '${draftProof}')">
+                      ${isEditable ? `<div class="flex items-center gap-1.5 shrink-0">
+                      ${isEditable ? `<label class="px-2 py-0.5 rounded bg-white dark:bg-zinc-800 dark:border-zinc-700 dark:text-white border border-slate-200 text-[9px] font-bold cursor-pointer hover:bg-slate-50 dark:hover:bg-zinc-700 shrink-0"><i data-lucide="upload" class="w-3 h-3 inline"></i> <input type="file" accept="image/*" multiple class="hidden" onchange="handleProofPhotoUpload(event, ${prodi.prodiId}, ${c.no}, '${c.name.replace(/'/g, "\\'")}')"></label>` : ''}
+                      
+                      <div id="proof-preview-container-${prodi.prodiId}-${c.no}" class="flex gap-1 overflow-x-auto no-scrollbar max-w-[120px]">
+                         ${draftProof ? draftProof.split(',').map(url => `<img src="${url}" class="h-5 w-8 object-cover rounded border shadow-sm cursor-zoom-in shrink-0" onclick="viewDocumentedPhoto('${c.name.replace(/'/g, "\\'")}', '${url}')">`).join('') : ''}
+                      </div>
                     </div>
                     <input type="hidden" id="proof-base64-${prodi.prodiId}-${c.no}" value="${draftProof}">
                   </div>
@@ -3316,18 +3328,44 @@ function markAsUnsaved(prodiId) {
       let act = document.getElementById('presensiActivitySelect').value;
       if (act === 'kustom') act = document.getElementById('customActivityName').value || 'Kegiatan Kustom';
 
+      let absentList = [];
+
       prodis.forEach(p => {
         const cadets = (appData.cadets[p.currentName] || []).filter(c => activeCategory === 'Batalyon' || (activeCategory === 'Putra' && c.gender === 'Laki-Laki') || (activeCategory === 'Putri' && c.gender === 'Perempuan'));
         total += cadets.length;
         cadets.forEach(c => {
           const status = storage.getItem(`draft_status_${dateStr}_${act}_${p.prodiId}_${c.no}`) || 'Hadir';
-          if (status === 'Hadir') present++; else absent++;
+          if (status === 'Hadir') present++; 
+          else { 
+            absent++;
+            const reason = storage.getItem(`draft_reason_${dateStr}_${act}_${p.prodiId}_${c.no}`) || '';
+            absentList.push({ name: c.name, status: status, reason: reason });
+          }
         });
       });
 
       const hp = document.getElementById(`kompi-hdr-present-${k}`); if(hp) hp.innerText = `Hadir: ${present}`;
       const ha = document.getElementById(`kompi-hdr-absent-${k}`); if(ha) ha.innerText = `Kurang: ${absent}`;
       const ht = document.getElementById(`kompi-hdr-total-${k}`); if(ht) ht.innerText = `Total: ${total}`;
+
+      const detailEl = document.getElementById(`kompi-sum-detail-${k}`);
+      if (detailEl) {
+         if (total === 0) {
+             detailEl.classList.add('hidden');
+         } else {
+             detailEl.classList.remove('hidden');
+             let detailsHtml = 'Lengkap';
+             if (absent > 0) {
+                const allSameReasonAndStatus = absent === total && absentList.every(a => a.status === absentList[0].status && a.reason === absentList[0].reason);
+                if (allSameReasonAndStatus) {
+                    detailsHtml = `SELURUH KOMPI ${k} ${absentList[0].status.toUpperCase()}${absentList[0].reason ? ' (' + absentList[0].reason.toUpperCase() + ')' : ''}`;
+                } else {
+                    detailsHtml = absentList.map(a => `• ${a.name} (${a.status}${a.reason ? ': ' + a.reason.toUpperCase() : ''})`).join('<br>');
+                }
+             }
+             detailEl.innerHTML = `<strong class="text-[9px] uppercase tracking-wider text-slate-500">Keterangan Kompi ${k}:</strong><p class="${absent > 0 ? 'text-ios-red font-semibold' : 'text-slate-400 italic'} mt-0.5 text-[10px] leading-snug">${detailsHtml}</p>`;
+         }
+      }
     }
 
     function updateAllKompisCumulativeAbsents() { for (let k = 1; k <= 6; k++) updateSingleKompiCumulativeHdr(k); }
@@ -3523,10 +3561,20 @@ function switchRecapTab(tab) {
         lucide.createIcons(); return;
       }
 
-      absentsArray.forEach(a => {
-        const photoHtml = a.attachmentBase64 
-          ? `<img src="${a.attachmentBase64}" class="w-full h-32 object-cover rounded mt-2 border border-slate-200 dark:border-zinc-700 cursor-zoom-in hover:opacity-90 transition-opacity" onclick="viewDocumentedPhoto('${a.cadetName}', '${a.attachmentBase64}')">` 
-          : `<div class="w-full h-32 bg-slate-100 dark:bg-zinc-800/80 rounded mt-2 flex flex-col items-center justify-center text-slate-400 text-[10px] italic border border-slate-200 dark:border-zinc-700"><i data-lucide="image-off" class="w-6 h-6 mb-1 opacity-50"></i> Tanpa Foto</div>`;
+     absentsArray.forEach(a => {
+        let photoHtml = '';
+        if (a.attachmentBase64) {
+           const urls = a.attachmentBase64.split(',');
+           if (urls.length === 1) {
+               photoHtml = `<img src="${urls[0]}" class="w-full h-32 object-cover rounded mt-2 border border-slate-200 dark:border-zinc-700 cursor-zoom-in hover:opacity-90 transition-opacity" onclick="viewDocumentedPhoto('${a.cadetName.replace(/'/g, "\\'")}', '${urls[0]}')">`;
+           } else {
+               // Render Grid jika foto lebih dari 1
+               const gridItems = urls.map(url => `<img src="${url}" class="w-full h-16 object-cover rounded border border-slate-200 dark:border-zinc-700 cursor-zoom-in hover:opacity-90 transition-opacity" onclick="viewDocumentedPhoto('${a.cadetName.replace(/'/g, "\\'")}', '${url}')">`).join('');
+               photoHtml = `<div class="grid grid-cols-2 gap-1 mt-2">${gridItems}</div>`;
+           }
+        } else {
+           photoHtml = `<div class="w-full h-32 bg-slate-100 dark:bg-zinc-800/80 rounded mt-2 flex flex-col items-center justify-center text-slate-400 text-[10px] italic border border-slate-200 dark:border-zinc-700"><i data-lucide="image-off" class="w-6 h-6 mb-1 opacity-50"></i> Tanpa Foto</div>`;
+        }
 
         evContainer.innerHTML += `
           <div class="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 p-3 rounded-ios-md flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow">
@@ -3606,6 +3654,14 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
         }
       }
 
+      if (mode === 'Batalyon') {
+        text += `- Palestina:\nJumlah: 22\nKurang: -\nHadir: 22\nKet: Lengkap\n\n`;
+      } else if (mode === 'Putra') {
+        text += `- Palestina:\nJumlah: 12\nKurang: -\nHadir: 12\nKet: Lengkap\n\n`;
+      } else if (mode === 'Putri') {
+        text += `- Palestina:\nJumlah: 10\nKurang: -\nHadir: 10\nKet: Lengkap\n\n`;
+      }
+     
       text += `REKAPITULASI PRODI (${mode.toUpperCase()}):\n\n`;
 
       appData.prodis.forEach(p => {
@@ -3977,8 +4033,15 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
           grouped[status].forEach(cad => {
             
           
-            const imgHtml = (cad.attachmentBase64 && isAuthorized) ? `<div class="mt-2 w-36 h-20 border dark:border-zinc-700 rounded cursor-zoom-in" onclick="viewDocumentedPhoto('${cad.cadetName}', '${cad.attachmentBase64}')"><img src="${cad.attachmentBase64}" class="w-full h-full object-cover"></div>` : '';
-            
+            let imgHtml = '';
+            if (cad.attachmentBase64 && isAuthorized) {
+                const urls = cad.attachmentBase64.split(',');
+                imgHtml = `<div class="mt-2 flex gap-2 overflow-x-auto no-scrollbar">`;
+                urls.forEach(url => {
+                   imgHtml += `<div class="w-36 h-20 shrink-0 border dark:border-zinc-700 rounded cursor-zoom-in" onclick="viewDocumentedPhoto('${cad.cadetName.replace(/'/g, "\\'")}', '${url}')"><img src="${url}" class="w-full h-full object-cover"></div>`;
+                });
+                imgHtml += `</div>`;
+            }
           
             const cleanReason = (cad.reason && typeof cad.reason === 'string' && cad.reason.trim() !== '' && cad.reason !== 'undefined' && cad.reason !== 'null') ? cad.reason.trim() : null;
             
@@ -5065,13 +5128,16 @@ const aDate = document.getElementById('announceScheduleDate'); if(aDate) aDate.v
 
       setInterval(() => {
          if (window.fetchDatabaseFromCloud && typeof currentUser !== 'undefined' && currentUser) {
-           window.fetchDatabaseFromCloud().then(async () => { // <--- Tambahkan async
-             await window.fetchDataKadetDariSupabase(); // <--- Tambahkan await
-             const activeTab = storage.getItem('e_arvy_active_tab') || 'dashboard';
-             if (['dashboard', 'statistik', 'profile'].includes(activeTab)) {
-                 if (typeof loadDashboardAndAppData === 'function') loadDashboardAndAppData(); 
-             }
-           });
+           const activeTab = storage.getItem('e_arvy_active_tab') || 'dashboard';
+           if (activeTab === 'dashboard') {
+             window.fetchDatabaseFromCloud().then(async () => {
+               await window.fetchDataKadetDariSupabase();
+               const currentActive = storage.getItem('e_arvy_active_tab') || 'dashboard';
+               if (currentActive === 'dashboard' && typeof loadDashboardAndAppData === 'function') {
+                  loadDashboardAndAppData(); 
+               }
+             });
+           }
          }
       }, 10000);
     } catch (e) {
@@ -5080,46 +5146,66 @@ const aDate = document.getElementById('announceScheduleDate'); if(aDate) aDate.v
     };
 
     document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "visible" && currentUser && window.fetchDatabaseFromCloud) {
-      const icon = document.getElementById('localRefreshIcon');
-      if (icon) icon.classList.add('animate-spin');
-      
-      window.fetchDatabaseFromCloud().then(async () => { // <--- Tambahkan async
-        await window.fetchDataKadetDariSupabase(); // <--- Tambahkan await
+      if (document.visibilityState === "visible" && currentUser && window.fetchDatabaseFromCloud) {
         const activeTab = storage.getItem('e_arvy_active_tab') || 'dashboard';
-        if (['dashboard', 'statistik', 'profile'].includes(activeTab)) {
-            loadDashboardAndAppData();
+        if (activeTab === 'dashboard') {
+          const icon = document.getElementById('localRefreshIcon');
+          if (icon) icon.classList.add('animate-spin');
+          
+          window.fetchDatabaseFromCloud().then(async () => {
+            await window.fetchDataKadetDariSupabase();
+            const currentActive = storage.getItem('e_arvy_active_tab') || 'dashboard';
+            if (currentActive === 'dashboard') loadDashboardAndAppData();
+            if (icon) icon.classList.remove('animate-spin');
+          }).catch(() => {
+            if (icon) icon.classList.remove('animate-spin');
+          });
         }
-        if (icon) icon.classList.remove('animate-spin');
-      }).catch(() => {
-        if (icon) icon.classList.remove('animate-spin');
-      });
-    }
-  });
+      }
+    });
 
 
   const originalHandleProofPhotoUpload = handleProofPhotoUpload;
 
-  handleProofPhotoUpload = function(event, prodiId, cadetNo) {
-    const file = event.target.files[0];
-    if (file && window.uploadFileToCloudStorage) {
-      compressImage(file, 100, async function(compressedBase64) {
-        showToast('Mengunggah...', 'Mengirim dokumen fisik ke Cloud...', 'info');
-        const cloudUrl = await window.uploadFileToCloudStorage(compressedBase64, 'absensi_bukti', `cadet_${prodiId}_${cadetNo}`);
-        
-        const dateStr = document.getElementById('presensiDate').value;
-        let activityName = document.getElementById('presensiActivitySelect').value;
-        if (activityName === 'kustom') activityName = document.getElementById('customActivityName').value || 'Kustom';
-        
-        const img = document.getElementById(`proof-preview-${prodiId}-${cadetNo}`);
-        img.src = cloudUrl; img.classList.remove('hidden');
-        document.getElementById(`proof-base64-${prodiId}-${cadetNo}`).value = cloudUrl;
-        storage.setItem(`draft_proof_${dateStr}_${activityName}_${prodiId}_${cadetNo}`, cloudUrl);
-        
-        updateProdiSummary(prodiId);
-        markAsUnsaved(prodiId);
-        showToast('Selesai', 'Bukti berhasil disimpan di cloud.', 'success');
-      });
+  handleProofPhotoUpload = async function(event, prodiId, cadetNo, cadetName = 'Kadet') {
+    const files = event.target.files;
+    if (!files || files.length === 0) {
+      markAsUnsaved(prodiId);
+      return;
+    }
+
+    if (window.uploadFileToCloudStorage) {
+      showToast('Mengunggah...', `Memproses ${files.length} dokumen fisik ke Cloud...`, 'info');
+      
+      const dateStr = document.getElementById('presensiDate').value;
+      let activityName = document.getElementById('presensiActivitySelect').value;
+      if (activityName === 'kustom') activityName = document.getElementById('customActivityName').value || 'Kustom';
+      
+      // Ambil foto yang sudah ada sebelumnya (jika mau ditambah, bukan ditiban murni)
+      let existingProof = storage.getItem(`draft_proof_${dateStr}_${activityName}_${prodiId}_${cadetNo}`) || "";
+      let uploadedUrls = existingProof ? existingProof.split(',') : [];
+
+      // Loop pengompresan dan unggahan
+      for (let i = 0; i < files.length; i++) {
+        const compressedBase64 = await new Promise((resolve) => compressImage(files[i], 100, resolve));
+        const cloudUrl = await window.uploadFileToCloudStorage(compressedBase64, 'absensi_bukti', `cadet_${prodiId}_${cadetNo}_${Date.now()}_${i}`);
+        uploadedUrls.push(cloudUrl);
+      }
+
+      // Gabungkan semua URL dengan koma
+      const finalProofString = uploadedUrls.join(',');
+      storage.setItem(`draft_proof_${dateStr}_${activityName}_${prodiId}_${cadetNo}`, finalProofString);
+      document.getElementById(`proof-base64-${prodiId}-${cadetNo}`).value = finalProofString;
+
+      // Render ulang wadah preview UI
+      const previewContainer = document.getElementById(`proof-preview-container-${prodiId}-${cadetNo}`);
+      if (previewContainer) {
+         previewContainer.innerHTML = uploadedUrls.map(url => `<img src="${url}" class="h-5 w-8 object-cover rounded border shadow-sm cursor-zoom-in shrink-0" onclick="viewDocumentedPhoto('${cadetName}', '${url}')">`).join('');
+      }
+
+      updateProdiSummary(prodiId);
+      markAsUnsaved(prodiId);
+      showToast('Selesai', `${files.length} Bukti foto berhasil ditambahkan.`, 'success');
     } else {
       markAsUnsaved(prodiId);
     }
