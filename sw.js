@@ -1,110 +1,77 @@
-const CACHE_NAME = 'e-arvy-cache-v1';
+// Ganti nama cache ini jika kamu melakukan perombakan besar di masa depan
+const CACHE_NAME = 'earvy-cache-v2'; 
+const DYNAMIC_CACHE = 'earvy-dynamic-v2';
 
-// Daftar file statis utama yang akan disimpan ke memori perangkat
-const urlsToCache = [
+const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './manifest.json'
-  // Jika Anda punya file ikon, hapus tanda // di bawah ini dan sesuaikan namanya:
-  // './icon-192.png',
-  // './icon-512.png'
 ];
 
-// 1. Event INSTALL: Menyimpan file-file penting ke Cache saat aplikasi pertama kali diakses
-self.addEventListener('install', event => {
+// 1. INSTALASI: Paksa Service Worker baru langsung aktif
+self.addEventListener('install', (event) => {
+  self.skipWaiting(); // <--- KUNCI PENTING: Jangan menunggu tab ditutup
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        console.log('[Service Worker] Membuka cache dan menyimpan aset...');
-        return cache.addAll(urlsToCache);
-      })
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(ASSETS_TO_CACHE);
+    })
   );
-  // Memaksa service worker baru untuk langsung aktif tanpa menunggu halaman ditutup
-  self.skipWaiting();
 });
 
-// 2. Event ACTIVATE: Membersihkan cache versi lama jika Anda mengubah CACHE_NAME
-self.addEventListener('activate', event => {
-  const cacheWhitelist = [CACHE_NAME];
+// 2. AKTIVASI: Hapus semua cache nyangkut dari versi lama
+self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then(cacheNames => {
+    caches.keys().then((cacheNames) => {
       return Promise.all(
-        cacheNames.map(cacheName => {
-          if (cacheWhitelist.indexOf(cacheName) === -1) {
-            console.log('[Service Worker] Menghapus cache lama:', cacheName);
-            return caches.delete(cacheName);
+        cacheNames.map((cache) => {
+          if (cache !== CACHE_NAME && cache !== DYNAMIC_CACHE) {
+            console.log('[Service Worker] Menghapus cache lama:', cache);
+            return caches.delete(cache);
           }
         })
       );
-    })
+    }).then(() => self.clients.claim()) // <--- Ambil alih kontrol tab secara instan
   );
-  // Mengambil alih kontrol semua halaman web yang terbuka saat ini
-  self.clients.claim();
 });
 
-// 3. Event FETCH: Syarat WAJIB PWA. Strategi: Cache First, Fallback to Network
-self.addEventListener('fetch', event => {
-  // Hanya memproses request dengan metode GET (mengabaikan POST ke API/Cloud)
-  if (event.request.method !== 'GET') return;
+// 3. STRATEGI FETCH: Jantung dari sistem pembaruan otomatis
+self.addEventListener('fetch', (event) => {
+  // A. BYPASS: Jangan pernah cache request ke database Supabase atau Google
+  if (event.request.url.includes('supabase.co') || event.request.url.includes('google.com')) {
+    return; // Biarkan browser mengurusnya secara real-time
+  }
 
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        // Jika file ditemukan di Cache, langsung tampilkan! (Sangat Cepat)
-        if (response) {
-          return response;
-        }
-
-        // Jika tidak ada di Cache, coba ambil dari internet (Network)
-        return fetch(event.request).then(networkResponse => {
-          // Validasi respon dari internet
-          if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
+  // B. NETWORK FIRST: Khusus untuk HTML (Biar update versi terbaca)
+  if (event.request.mode === 'navigate' || event.request.headers.get('accept').includes('text/html')) {
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => {
+          // Jika sukses ambil dari internet, simpan ke cache
+          return caches.open(DYNAMIC_CACHE).then((cache) => {
+            cache.put(event.request, networkResponse.clone());
             return networkResponse;
-          }
+          });
+        })
+        .catch(() => {
+          // Jika OFFLINE / internet mati, baru gunakan cache
+          return caches.match(event.request); 
+        })
+    );
+    return;
+  }
 
-          // Simpan file baru dari internet ke dalam Cache untuk digunakan nanti
-          const responseToCache = networkResponse.clone();
-          caches.open(CACHE_NAME)
-            .then(cache => {
-              // Hanya men-cache file dari domain aplikasi itu sendiri (menghindari error CDN luar)
-              if (event.request.url.startsWith(self.location.origin)) {
-                cache.put(event.request, responseToCache);
-              }
-            });
-
-          return networkResponse;
+  // C. STALE-WHILE-REVALIDATE: Untuk file Gambar, CSS, Icon (Tampil instan, update di background)
+  event.respondWith(
+    caches.match(event.request).then((cachedResponse) => {
+      const fetchPromise = fetch(event.request).then((networkResponse) => {
+        caches.open(DYNAMIC_CACHE).then((cache) => {
+          cache.put(event.request, networkResponse.clone());
         });
-      }).catch(() => {
-        // Jika sedang offline dan file tidak ada di cache, Anda bisa merender halaman fallback offline di sini.
-        console.log('[Service Worker] Jaringan terputus dan tidak ada cache.');
-      })
-  ); // <-- KURUNG INI YANG SEBELUMNYA HILANG
-}); // <-- DAN KURUNG INI YANG SEBELUMNYA HILANG
+        return networkResponse;
+      }).catch(() => { /* Abaikan error jika offline */ });
 
-
-// --- EVENT KLIK NOTIFIKASI PWA ---
-self.addEventListener('notificationclick', function(event) {
-  // 1. Tutup notifikasi setelah diklik
-  event.notification.close();
-
-  // 2. Tentukan URL yang akan difokuskan/dibuka (root URL aplikasi Anda)
-  const targetUrl = self.location.origin + '/'; // Sesuaikan jika aplikasi ada di dalam sub-folder
-
-  event.waitUntil(
-    // Cari semua window/tab browser yang sedang terbuka
-    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(clientList) {
-      // Cek apakah aplikasi e-Arvy sudah terbuka di salah satu window/tab
-      for (let i = 0; i < clientList.length; i++) {
-        let client = clientList[i];
-        // Jika sudah terbuka, langsung fokuskan (jangan buka tab ganda)
-        if (client.url.includes(self.location.origin) && 'focus' in client) {
-          return client.focus();
-        }
-      }
-      // Jika aplikasi sedang tertutup penuh, buka window baru
-      if (clients.openWindow) {
-        return clients.openWindow(targetUrl);
-      }
+      // Langsung tampilkan yang ada di memori, SAMBIL background narik data baru
+      return cachedResponse || fetchPromise; 
     })
   );
 });
