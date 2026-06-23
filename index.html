@@ -1368,7 +1368,7 @@ storage.removeItem = function(key) {
     profilePhoto: '' 
   }));
 
-  storage.setItem('e_arvy_users_v6', JSON.stringify(users))
+  originalSetItem('e_arvy_users_v6', JSON.stringify(users))
 originalSetItem('e_arvy_settings', JSON.stringify(appData.settings));
 
         const todayStr = getLocalDateString();
@@ -5482,7 +5482,7 @@ window.fetchJadwalDefaultDariSupabase = async function() {
 <script>
 
 // --- UBAH ANGKA INI SETIAP KALI AKU DEPLOY HTML BARU ---
-const APP_VERSION = "v1.2.1"; 
+const APP_VERSION = "v1.2.2"; 
 // -------------------------------------------------------------------
 
 function forceClearCacheOnUpdate() {
