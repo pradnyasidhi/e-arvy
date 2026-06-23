@@ -3299,9 +3299,15 @@ if (isEditable) {
       });
 
       setTimeout(() => {
-        window.scrollTo(0, scrollPos);
-      }, 10);
-    }
+        // Cek apakah ada rekaman posisi scroll dari sebelum refresh
+        const savedScroll = sessionStorage.getItem('e_arvy_saved_scroll');
+        if (savedScroll) {
+           window.scrollTo(0, parseInt(savedScroll));
+           sessionStorage.removeItem('e_arvy_saved_scroll'); // Langsung hapus agar tidak nyangkut
+        } else {
+           window.scrollTo(0, scrollPos); // Posisi scroll saat mengklik dropdown prodi
+        }
+      }, 50);
 
     function isProdiEditableForCurrentUser(prodi) {
       const dateStr = document.getElementById('presensiDate').value;
@@ -5487,7 +5493,7 @@ window.fetchJadwalDefaultDariSupabase = async function() {
 <script>
 
 // --- UBAH ANGKA INI SETIAP KALI AKU DEPLOY HTML BARU ---
-const APP_VERSION = "v1.1.8"; 
+const APP_VERSION = "v1.1.9"; 
 // -------------------------------------------------------------------
 
 function forceClearCacheOnUpdate() {
@@ -5533,13 +5539,7 @@ function forceClearCacheOnUpdate() {
 
 const originalOnload = window.onload;
 window.onload = function() {
-const isManual = sessionStorage.getItem('is_manual_refresh');
-  
-  if (!isManual) {
-        storage.removeItem('e_arvy_manual_override');
-    console.log("Halaman dimuat ulang (bukan tombol refresh), reset manual override.");
-  }
-  forceClearCacheOnUpdate(); 
+forceClearCacheOnUpdate(); 
 };
     try {
       if (typeof renderApplicationLogos === 'function') renderApplicationLogos();
@@ -5573,7 +5573,12 @@ const aDate = document.getElementById('announceScheduleDate'); if(aDate) aDate.v
         }).catch(err => {
           if (icon) icon.classList.remove('animate-spin');
         });
+
       }
+
+    window.addEventListener('beforeunload', () => {
+      sessionStorage.setItem('e_arvy_saved_scroll', window.scrollY);
+    });
 
       setInterval(() => {
          if (window.fetchDatabaseFromCloud && typeof currentUser !== 'undefined' && currentUser) {
