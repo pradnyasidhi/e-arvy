@@ -439,7 +439,7 @@
         
         <div class="p-5 md:p-6 rounded-2xl bg-gradient-to-r from-[#3b9c9a] to-[#25706e] text-white flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-[0_8px_30px_rgba(37,112,110,0.4)]">
           <div class="flex flex-col gap-1.5">
-            <h2 class="text-2xl sm:text-3xl font-black tracking-tight">Portal e-Arvy #6 (Tahap Pengembangan)</h2>
+            <h2 class="text-2xl sm:text-3xl font-black tracking-tight">Portal e-Arvy #6</h2>
             <p class="text-sm text-blue-100 font-medium">Batalyon Nara Arvyaksa - Sistem Interoperabilitas & Presensi Terpadu</p>
           </div>
           <button onclick="switchTab('kehadiran')" class="px-5 py-2.5 bg-white text-ios-blue font-bold text-sm rounded-xl hover:scale-105 active:scale-95 transition-all shadow-md">
@@ -3378,26 +3378,51 @@ function markAsUnsaved(prodiId) {
       let act = document.getElementById('presensiActivitySelect').value;
       if (act === 'kustom') act = document.getElementById('customActivityName').value || 'Kegiatan Kustom';
 
-      let absentList = [];
+      let absentDetails = []; // Wadah penyimpan teks keterangan
 
       prodis.forEach(p => {
+        // Ambil data kadet spesifik di prodi ini
         const cadets = (appData.cadets[p.currentName] || []).filter(c => activeCategory === 'Batalyon' || (activeCategory === 'Putra' && c.gender === 'Laki-Laki') || (activeCategory === 'Putri' && c.gender === 'Perempuan'));
-        total += cadets.length;
+        
+        let prodiTotal = cadets.length;
+        let prodiAbsentList = [];
+
+        total += prodiTotal;
+
+        // Cek status per individu di dalam prodi
         cadets.forEach(c => {
           const status = storage.getItem(`draft_status_${dateStr}_${act}_${p.prodiId}_${c.no}`) || 'Hadir';
-          if (status === 'Hadir') present++; 
-          else { 
+          if (status === 'Hadir') {
+              present++; 
+          } else { 
             absent++;
             const reason = storage.getItem(`draft_reason_${dateStr}_${act}_${p.prodiId}_${c.no}`) || '';
-            absentList.push({ name: c.name, status: status, reason: reason });
+            prodiAbsentList.push({ name: c.name, status: status, reason: reason });
           }
         });
+
+        // LOGIKA KECERDASAN: Evaluasi apakah SATU PRODI absen dengan alasan yang SAMA PERSIS
+        if (prodiAbsentList.length > 0) {
+            const allSameReasonAndStatus = prodiAbsentList.length === prodiTotal && prodiAbsentList.every(a => a.status === prodiAbsentList[0].status && a.reason === prodiAbsentList[0].reason);
+            
+            if (allSameReasonAndStatus) {
+                // Jika iya, cetak format: SELURUH PRODI
+                absentDetails.push(`• SELURUH ${p.currentName} ${prodiAbsentList[0].status.toUpperCase()}${prodiAbsentList[0].reason ? ' (' + prodiAbsentList[0].reason.toUpperCase() + ')' : ''}`);
+            } else {
+                // Jika tidak/bercampur, cetak nama per individu
+                prodiAbsentList.forEach(a => {
+                    absentDetails.push(`• ${a.name} (${a.status.toUpperCase()}${a.reason ? ': ' + a.reason.toUpperCase() : ''})`);
+                });
+            }
+        }
       });
 
+      // Update Angka di Header Card Kompi
       const hp = document.getElementById(`kompi-hdr-present-${k}`); if(hp) hp.innerText = `Hadir: ${present}`;
       const ha = document.getElementById(`kompi-hdr-absent-${k}`); if(ha) ha.innerText = `Kurang: ${absent}`;
       const ht = document.getElementById(`kompi-hdr-total-${k}`); if(ht) ht.innerText = `Total: ${total}`;
 
+      // Update Teks Keterangan di Card Kompi
       const detailEl = document.getElementById(`kompi-sum-detail-${k}`);
       if (detailEl) {
          if (total === 0) {
@@ -3405,14 +3430,12 @@ function markAsUnsaved(prodiId) {
          } else {
              detailEl.classList.remove('hidden');
              let detailsHtml = 'Lengkap';
+             
              if (absent > 0) {
-                const allSameReasonAndStatus = absent === total && absentList.every(a => a.status === absentList[0].status && a.reason === absentList[0].reason);
-                if (allSameReasonAndStatus) {
-                    detailsHtml = `SELURUH KOMPI ${k} ${absentList[0].status.toUpperCase()}${absentList[0].reason ? ' (' + absentList[0].reason.toUpperCase() + ')' : ''}`;
-                } else {
-                    detailsHtml = absentList.map(a => `• ${a.name} (${a.status}${a.reason ? ': ' + a.reason.toUpperCase() : ''})`).join('<br>');
-                }
+                 // Gabungkan semua keterangan yang sudah dievaluasi tadi
+                 detailsHtml = absentDetails.join('<br>');
              }
+             
              detailEl.innerHTML = `<strong class="text-[9px] uppercase tracking-wider text-slate-500">Keterangan Kompi ${k}:</strong><p class="${absent > 0 ? 'text-ios-red font-semibold' : 'text-slate-400 italic'} mt-0.5 text-[10px] leading-snug">${detailsHtml}</p>`;
          }
       }
