@@ -1536,11 +1536,11 @@ originalSetItem('e_arvy_initialized_real_data_v6', 'true');
             }
         }
         if (params.category === 'Batalyon') {
-          textRecap += `- Palestina:\nJumlah: 22\nKurang: -\nHadir: 22\nKet: Lengkap\n\n`;
+          textRecap += `- PALESTINA:\nJUMLAH: 22\nKURANG: -\nHADIR: 22\nKETERANGAN: LENGKAP\n\n`;
         } else if (params.category === 'Putra') {
-          textRecap += `- Palestina:\nJumlah: 12\nKurang: -\nHadir: 12\nKet: Lengkap\n\n`;
+          textRecap += `- PALESTINA:\nJUMLAH: 12\nKURANG: -\nHADIR: 12\nKETERANGAN: LENGKAP\n\n`;
         } else if (params.category === 'Putri') {
-          textRecap += `- Palestina:\nJumlah: 10\nKurang: -\nHadir: 10\nKet: Lengkap\n\n`;
+          textRecap += `- PALESTINE:\nJUMLAH: 10\nKURANG: -\nHADIRr: 10\nKETERANGAN: LENGKAP\n\n`;
         }
         textRecap += `REKAPITULASI PRODI:\n\n`;
         
@@ -2574,6 +2574,7 @@ sessionStorage.setItem('is_manual_refresh', 'true');
           if (icon) icon.classList.remove('animate-spin');
         });
       }
+}
 
     function populatePresensiActivities() {
       const select = document.getElementById('presensiActivitySelect');
@@ -3851,14 +3852,14 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
         }
       }
 
-      if (mode === 'Batalyon') {
-        text += `- Palestina:\nJumlah: 22\nKurang: -\nHadir: 22\nKet: Lengkap\n\n`;
-      } else if (mode === 'Putra') {
-        text += `- Palestina:\nJumlah: 12\nKurang: -\nHadir: 12\nKet: Lengkap\n\n`;
-      } else if (mode === 'Putri') {
-        text += `- Palestina:\nJumlah: 10\nKurang: -\nHadir: 10\nKet: Lengkap\n\n`;
-      }
-     
+         if (mode === 'Batalyon') {
+          text += `- PALESTINA:\nJUMLAH: 22\nKURANG: -\nHADIR: 22\nKETERANGAN: LENGKAP\n\n`;
+        } else if (mode === 'Putra') {
+          text += `- PALESTINA:\nJUMLAH: 12\nKURANG: -\nHADIR: 12\nKETERANGAN: LENGKAP\n\n`;
+        } else if (mode === 'Putri') {
+          text += `- PALESTINE:\nJUMLAH: 10\nKURANG: -\nHADIRr: 10\nKETERANGAN: LENGKAP\n\n`;
+        }
+
       text += `REKAPITULASI PRODI (${mode.toUpperCase()}):\n\n`;
 
       appData.prodis.forEach(p => {
@@ -4055,7 +4056,7 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
         }
       });
 
-      const pieLabels = ['Hadir', ...absenceStatuses];
+      const pieLabels = ['HADIR', ...absenceStatuses.map(st => st.toUpperCase())];
       const pieData = [statusCounts['Hadir'], ...absenceStatuses.map(st => statusCounts[st])];
       const actualColors = pieLabels.map((_, i) => bgColors[i % bgColors.length]);
 
@@ -5400,7 +5401,7 @@ window.fetchJadwalDefaultDariSupabase = async function() {
 <script>
 
 // --- UBAH ANGKA INI SETIAP KALI AKU DEPLOY HTML BARU ---
-const APP_VERSION = "v1.1.3"; 
+const APP_VERSION = "v1.1.4"; 
 // -------------------------------------------------------------------
 
 function forceClearCacheOnUpdate() {
