@@ -2638,6 +2638,10 @@ function handleProfilePhotoUpload(event) {
           callServer('updateProfilePhoto', { username: currentUser.username, photoBase64: cloudUrl }, () => {
             currentUser.profilePhoto = cloudUrl; 
             storage.setItem('e_arvy_session', JSON.stringify(currentUser)); 
+
+if (window.syncLocalStorageToCloud) {
+        window.syncLocalStorageToCloud('e_arvy_users_v6'); 
+    }
             
             updateProfilePage(); 
             
@@ -4583,13 +4587,14 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
     }
 
     function updateProfilePage() {
-          try {
-        const users = JSON.parse(storage.getItem('e_arvy_users_v6') || '[]');
-        const dbUser = users.find(u => u.username === currentUser.username);
-        if (dbUser && dbUser.profilePhoto) {
-           currentUser.profilePhoto = dbUser.profilePhoto;
-           storage.setItem('e_arvy_session', JSON.stringify(currentUser));         }
-      } catch(e) {}
+  try {
+    const users = JSON.parse(storage.getItem('e_arvy_users_v6') || '[]');
+    const dbUser = users.find(u => u.username === currentUser.username);
+    if (dbUser && dbUser.profilePhoto) {
+       currentUser.profilePhoto = dbUser.profilePhoto;
+       storage.setItem('e_arvy_session', JSON.stringify(currentUser)); // Memperbarui session
+    }
+  } catch(e) {}
 
       document.getElementById('profileUsername').innerText = currentUser.username; 
       document.getElementById('profileRoleBadge').innerText = currentUser.role;
@@ -5401,7 +5406,7 @@ window.fetchJadwalDefaultDariSupabase = async function() {
 <script>
 
 // --- UBAH ANGKA INI SETIAP KALI AKU DEPLOY HTML BARU ---
-const APP_VERSION = "v1.1.4"; 
+const APP_VERSION = "v1.1.5"; 
 // -------------------------------------------------------------------
 
 function forceClearCacheOnUpdate() {
