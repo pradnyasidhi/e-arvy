@@ -1263,6 +1263,7 @@ else if (soundType === 'rukanmalam') audioFile = './sounds/rukanmalam.mp3';
       removeItem(key) { try { window.localStorage.removeItem(key); } catch(e) { delete this._data[key]; } }
     }
 
+let cloudSyncTimeouts = {}; // Memori peredam spam
 const originalSetItem = storage.setItem.bind(storage);
 const originalRemoveItem = storage.removeItem.bind(storage);
 
@@ -1271,13 +1272,15 @@ storage.setItem = function(key, val) {
 
   const localOnlyKeys = ['e_arvy_session', 'e_arvy_active_tab', 'e_arvy_initialized_real_data'];
 
-  if (window.syncLocalStorageToCloud && !key.startsWith('draft_') && !localOnlyKeys.includes(key)) {
-    setTimeout(() => {
+  // KUNCI REALTIME: '!key.startsWith("draft_")' SUDAH DIHAPUS
+  if (window.syncLocalStorageToCloud && !localOnlyKeys.includes(key)) {
+    // Sistem anti-spam: Tunggu user berhenti ngetik selama 0.4 detik baru kirim ke radar
+    clearTimeout(cloudSyncTimeouts[key]);
+    cloudSyncTimeouts[key] = setTimeout(() => {
       window.syncLocalStorageToCloud(key);
-    }, 100);
+    }, 400);
   }
 };
-
 
 storage.removeItem = function(key) {
   originalRemoveItem(key);
@@ -5493,7 +5496,7 @@ window.fetchJadwalDefaultDariSupabase = async function() {
 <script>
 
 // --- UBAH ANGKA INI SETIAP KALI AKU DEPLOY HTML BARU ---
-const APP_VERSION = "v1.1.9"; 
+const APP_VERSION = "v1.2.0"; 
 // -------------------------------------------------------------------
 
 function forceClearCacheOnUpdate() {
