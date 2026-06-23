@@ -3654,7 +3654,31 @@ function markAsUnsaved(prodiId) {
 
       const btn = document.querySelector('#verificationPanel button');
       btn.innerHTML = '<i data-lucide="loader" class="animate-spin w-4.5 h-4.5"></i> Memproses...';
-      callServer('saveAttendance', { date: dateStr, activityName: act, category: activeCategory, totalCadets: totalQuota, absents, verifier: currentUser.username }, (res) => {
+      callServer('saveAttendance', { 
+          date: dateStr, 
+          activityName: act, 
+          category: activeCategory, 
+          totalCadets: totalQuota, 
+          absents, 
+          verifier: currentUser.username 
+      }, (res) => {
+        // --- KODE PENTING DI SINI ---
+        // Setelah sukses simpan ke LocalStorage, kirim ke Supabase
+        if (window.savePresensiKeCloud) {
+           const logEntry = { 
+              logId: res.logId, 
+              date: dateStr, 
+              activityName: act, 
+              category: activeCategory, 
+              totalCadets: totalQuota, 
+              presentCount: totalQuota - absents.length, 
+              absentCount: absents.length, 
+              recapText: res.recapText, 
+              verifier: currentUser.username, 
+              absents: absents 
+           };
+           window.savePresensiKeCloud(logEntry);
+        }
       btn.innerHTML = '<i data-lucide="check-circle2" class="w-4.5 h-4.5"></i> Verifikasi & Simpan';
       appData.prodis.forEach(p => storage.setItem(`saved_${dateStr}_${act}_${p.currentName}`, 'true'));
       
