@@ -5376,6 +5376,7 @@ window.fetchJadwalDefaultDariSupabase = async function() {
           // Segarkan UI secara ajaib tanpa refresh halaman
           const activeTab = storage.getItem('e_arvy_active_tab') || 'dashboard';
           if (activeTab === 'kehadiran' && newData.kunci.startsWith("saved_bundle_")) {
+console.log("Memicu render ulang tabel kehadiran...");
               if (typeof renderAttendanceList === 'function') renderAttendanceList();
           } else if (['dashboard', 'announce'].includes(activeTab)) {
               if (typeof loadDashboardAndAppData === 'function') loadDashboardAndAppData();
@@ -5406,7 +5407,7 @@ window.fetchJadwalDefaultDariSupabase = async function() {
 <script>
 
 // --- UBAH ANGKA INI SETIAP KALI AKU DEPLOY HTML BARU ---
-const APP_VERSION = "v1.1.5"; 
+const APP_VERSION = "v1.1.6"; 
 // -------------------------------------------------------------------
 
 function forceClearCacheOnUpdate() {
