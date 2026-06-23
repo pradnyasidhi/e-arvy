@@ -2717,20 +2717,21 @@ function saveLastSelectedActivity() {
       }
 
       if (activeTitle) {
-        // Gabungkan tanggal agar tiap hari memori auto-event tidak nyangkut
         const currentEventSignature = todayStr + "_" + activeTitle;
         const lastAutoEvent = storage.getItem('e_arvy_last_auto_event');
-        const manualOverride = storage.getItem('e_arvy_manual_override');
+        const manualOverride = storage.getItem('e_arvy_manual_override'); // Format: YYYY-MM-DD_JudulKegiatan
         
         const select = document.getElementById('presensiActivitySelect');
         const currentDropdownValue = select ? select.value : null;
 
-        // PEMICU OTOMATIS: Jalan jika jadwal baru saja berganti, ATAU jika halaman 
-        // baru direfresh dan dropdown belum sesuai (dan tidak ada penolakan manual dari user)
-        if (
-            (currentEventSignature !== lastAutoEvent) || 
-            (currentDropdownValue !== activeTitle && currentDropdownValue !== 'kustom' && manualOverride !== currentEventSignature)
-        ) {
+        // LOGIKA KESOPANAN:
+        // 1. Jika user sudah melakukan override (memilih manual) untuk kegiatan yang SAMA, JANGAN paksa pindah.
+        if (manualOverride === currentEventSignature) {
+            return; // Keluar dari fungsi, biarkan user tetap di pilihan manualnya.
+        }
+
+        // 2. Jika kegiatan berganti (Misal: dari Makan Siang -> Kuliah)
+        if (currentEventSignature !== lastAutoEvent) {
           if (select) {
             let exists = Array.from(select.options).some(opt => opt.value === activeTitle);
             if (exists) {
@@ -5233,46 +5234,52 @@ window.fetchJadwalDefaultDariSupabase = async function() {
     if (error) throw error;
 
     if (JadwalData && JadwalData.length > 0) {
-      const todayStr = getLocalDateString();
       let schedules = JSON.parse(localStorage.getItem('e_arvy_schedules') || '[]');
+      let updated = false;
 
-      // Cek apakah sudah ada jadwal yang tersimpan untuk hari ini
-      const todaySchedules = schedules.filter(s => s.date === todayStr);
-      
-      // Jika kosong, masukkan jadwal default dari Supabase
-      if (todaySchedules.length === 0) {
-        JadwalData.forEach(jdwl => {
-          schedules.push({
-            date: todayStr,
-            time: jdwl.waktu.substring(0, 5), // Potong "05:00:00" menjadi "05:00"
-            title: jdwl.nama_kegiatan,
-            location: jdwl.lokasi || "",
-            photoUrl: ""
+      // Loop untuk mengisi jadwal 7 hari ke depan mulai dari hari ini
+      for (let i = 0; i < 7; i++) {
+        let dateObj = new Date();
+        dateObj.setDate(dateObj.getDate() + i);
+        const targetDateStr = getLocalDateString(dateObj);
+
+        // Cek apakah hari ini+i sudah punya jadwal
+        const alreadyHasSchedule = schedules.some(s => s.date === targetDateStr);
+        
+        if (!alreadyHasSchedule) {
+          JadwalData.forEach(jdwl => {
+            schedules.push({
+              date: targetDateStr,
+              time: jdwl.waktu.substring(0, 5),
+              title: jdwl.nama_kegiatan,
+              location: jdwl.lokasi || "",
+              photoUrl: ""
+            });
           });
-        });
+          updated = true;
+        }
+      }
 
+      if (updated) {
         // Urutkan jadwal berdasarkan jam
-        schedules.sort((a,b) => a.time.localeCompare(b.time));
+        schedules.sort((a,b) => (a.date + a.time).localeCompare(b.date + b.time));
 
         // Simpan ke memori lokal
         appData.schedules = schedules;
         localStorage.setItem('e_arvy_schedules', JSON.stringify(schedules));
         
-        // Simpan ke Cloud e-Arvy
+        // Sinkronisasi ke Cloud
         if (typeof window.syncLocalStorageToCloud === 'function') {
           window.syncLocalStorageToCloud('e_arvy_schedules');
         }
 
-        // Refresh tampilan UI jadwal secara otomatis
+        // Refresh UI
         if (typeof loadAnnounceSchedules === 'function') loadAnnounceSchedules();
-        if (typeof renderDashboardSchedules === 'function') renderDashboardSchedules(new Date());
-        if (typeof renderAnnounceLatestSchedule === 'function') renderAnnounceLatestSchedule(new Date());
-        
-        console.log("Jadwal default hari ini berhasil ditarik dari Supabase.");
+        showToast('Jadwal Diperbarui', 'Jadwal rutin 7 hari ke depan telah disiapkan.', 'success');
       }
     }
   } catch (error) {
-    console.error("Gagal menarik tabel JadwalDefault dari Supabase:", error);
+    console.error("Gagal menarik tabel JadwalDefault:", error);
   }
 };
  
@@ -5378,7 +5385,7 @@ window.fetchJadwalDefaultDariSupabase = async function() {
 <script>
 
 // --- UBAH ANGKA INI SETIAP KALI AKU DEPLOY HTML BARU ---
-const APP_VERSION = "v1.1.1"; 
+const APP_VERSION = "v1.1.0"; 
 // -------------------------------------------------------------------
 
 function forceClearCacheOnUpdate() {
