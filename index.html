@@ -1,4 +1,7 @@
 <!DOCTYPE html>
+
+//PR NYA SISA PECAH FILENYA BIAR RAPI, TRUS WADAN MINTA FITUR CEK RIWAYAT KEHADIRAN PER NAMA
+
 <html lang="id" class="scroll-smooth">
 <head>
   <meta charset="UTF-8">
@@ -1242,7 +1245,7 @@ else if (soundType === 'rukanmalam') audioFile = './sounds/rukanmalam.mp3';
           navigator.serviceWorker.ready.then(function(registration) {
             registration.showNotification(title, {
               body: message,
-              icon: 'https://www.image2url.com/r2/default/images/1781409226493-1bc2a13a-36c6-4972-9a1c-6114ed273acc.png',
+              icon: './logowalrusearvy.png',
               vibrate: soundType === 'peluit' ? [300, 100, 300, 100, 300] : [200, 100, 200], 
               requireInteraction: true 
             });
@@ -1251,7 +1254,7 @@ else if (soundType === 'rukanmalam') audioFile = './sounds/rukanmalam.mp3';
         else {
           const notif = new Notification(title, {
             body: message,
-            icon: 'https://www.image2url.com/r2/default/images/1781409226493-1bc2a13a-36c6-4972-9a1c-6114ed273acc.png'
+            icon: './logowalrusearvy.png'
           });
           
           notif.onclick = function() {
@@ -1262,8 +1265,10 @@ else if (soundType === 'rukanmalam') audioFile = './sounds/rukanmalam.mp3';
       }
     }
 
-    const DEFAULT_SVG_LOGO_LOGIN = `<img src="https://www.image2url.com/r2/default/images/1781409226493-1bc2a13a-36c6-4972-9a1c-6114ed273acc.png" class="w-14 h-14 object-contain rounded drop-shadow-lg" alt="Logo Login">`;
-    const DEFAULT_SVG_LOGO = `<img src="https://www.image2url.com/r2/default/images/1781409226493-1bc2a13a-36c6-4972-9a1c-6114ed273acc.png" class="w-14 h-14 object-contain rounded drop-shadow-lg" alt="Logo Header">`;
+    const DEFAULT_SVG_LOGO_LOGIN = `<img src="./logowalrusearvy.png"
+class="w-14 h-14 object-contain rounded drop-shadow-lg" alt="Logo Login">`;
+    const DEFAULT_SVG_LOGO = `<img src="./logowalrusearvy.png"
+class="w-14 h-14 object-contain rounded drop-shadow-lg" alt="Logo Header">`;
 
     let appData = {
       settings: { total_batalyon: 598, total_putra: 332, total_putri: 266, general_announcement: "Selamat datang di E-Arvy. Silakan laksanakan presensi harian tepat waktu.", custom_logo: "" },
@@ -5535,7 +5540,7 @@ window.fetchJadwalDefaultDariSupabase = async function() {
 <script>
 
 // --- UBAH ANGKA INI SETIAP KALI AKU DEPLOY HTML BARU ---
-const APP_VERSION = "v1.2.8"; 
+const APP_VERSION = "v1.2.9"; 
 // -------------------------------------------------------------------
 
 function forceClearCacheOnUpdate() {
