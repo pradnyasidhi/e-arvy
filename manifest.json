@@ -7,16 +7,15 @@
   "theme_color": "#ffffff",
   "description": "Sistem Interoperabilitas & Presensi Terpadu Batalyon",
   "icons": [
-    {
-      "src": 
-"https://www.image2url.com/r2/default/images/1781749042714-46243562-dd72-41e0-ba80-cc5cf3240d6a.png", //ini yang ios kotak
-      "sizes": "733x733",
-      "type": "image/png"
-    },
-    {
-      "src": "https://www.image2url.com/r2/default/images/1781749042714-46243562-dd72-41e0-ba80-cc5cf3240d6a.png", // ini yang png shield ajee
-      "sizes": "any",
-      "purpose": "any maskable"
-    }
+      {
+        "src": "./logowalrusearvy.png",
+        "sizes": "192x192",
+        "type": "image/png"
+      },
+      {
+        "src": "./logowalrusearvy.png",
+        "sizes": "512x512",
+        "type": "image/png"
+      }
   ]
 }
