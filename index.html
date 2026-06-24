@@ -1756,7 +1756,7 @@ originalSetItem('e_arvy_initialized_real_data_v6', 'true');
 
 // --- MESIN GALERI LOGIN ---
     let currentLoginSlide = 0;
-    const totalLoginSlides = 3;
+    const totalLoginSlides = 6;
     let loginSlideInterval;
 
     function changeLoginSlide(index) {
@@ -1783,7 +1783,7 @@ originalSetItem('e_arvy_initialized_real_data_v6', 'true');
       loginSlideInterval = setInterval(() => {
         let next = (currentLoginSlide + 1) % totalLoginSlides;
         changeLoginSlide(next);
-      }, 2000); // Gambar akan berganti otomatis setiap 3 detik
+      }, 2000); // Gambar akan berganti otomatis setiap 2 detik
     }
     // ---------------------------
 
@@ -5536,7 +5536,7 @@ window.fetchJadwalDefaultDariSupabase = async function() {
 <script>
 
 // --- UBAH ANGKA INI SETIAP KALI AKU DEPLOY HTML BARU ---
-const APP_VERSION = "v1.2.6"; 
+const APP_VERSION = "v1.2.7"; 
 // -------------------------------------------------------------------
 
 function forceClearCacheOnUpdate() {
