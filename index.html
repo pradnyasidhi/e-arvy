@@ -2964,7 +2964,7 @@ function generateAndCopyShareLink() {
        
       if (navigator.clipboard && window.isSecureContext) {
         navigator.clipboard.writeText(shareUrl).then(() => {
-          showToast('Tautan Disalin', 'Link presensi siap dibagikan ke WhatsApp!', 'success');
+          showToast('Tautan Disalin', 'Link presensi siap dibagikan!', 'success');
         }).catch(err => {
           fallbackCopyTextToClipboard(shareUrl);
         });
