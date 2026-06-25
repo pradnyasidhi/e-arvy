@@ -678,21 +678,20 @@
       <section id="view-kehadiran" class="view-screen hidden flex flex-col gap-6 transition-all-300">
         
         <div class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg border border-slate-200/60 shadow-lg flex flex-col gap-6">
-          <div class="flex items-center gap-2">
-  <h3 class="font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">Formulir Presensi Kehadiran</h3>
-  <button onclick="openModal('quickAttendanceToolsModal'); populateConvertDropdowns();" class="p-1.5 bg-slate-100 dark:bg-zinc-800 text-slate-500 hover:text-ios-blue hover:bg-blue-50 dark:hover:bg-zinc-700 rounded-md transition-colors" title="Pengaturan Cepat">
-    <i data-lucide="wrench" class="w-4 h-4"></i>
-  </button>
-</div>
+          <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-3 gap-3">
             
-            
+            <div class="flex items-center gap-2">
+              <h3 class="font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">Formulir Presensi Kehadiran</h3>
+              <button onclick="openModal('quickAttendanceToolsModal'); populateConvertDropdowns();" class="p-1.5 bg-slate-100 dark:bg-zinc-800 text-slate-500 hover:text-ios-blue hover:bg-blue-50 dark:hover:bg-zinc-700 rounded-md transition-colors" title="Pengaturan Cepat">
+                <i data-lucide="wrench" class="w-4 h-4"></i>
+              </button>
+            </div>
+
             <div class="relative w-full md:w-64">
-  <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
-  
-  <input type="text" id="searchCadetInput" oninput="handleSearchInput()" class="w-full pl-10 pr-4 py-2 rounded-ios-md glass-input text-sm focus:outline-none" placeholder="Cari Nama Kadet">
-  
-  <div id="searchSuggestionsBox" class="hidden absolute top-full left-0 mt-2 w-full bg-white dark:bg-zinc-800 rounded-ios-md border border-slate-200 dark:border-zinc-700 shadow-xl max-h-60 overflow-y-auto z-[100] flex-col"></div>
-</div>
+              <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+              <input type="text" id="searchCadetInput" oninput="handleSearchInput()" class="w-full pl-10 pr-4 py-2 rounded-ios-md glass-input text-sm focus:outline-none" placeholder="Cari Nama Kadet">
+              <div id="searchSuggestionsBox" class="hidden absolute top-full left-0 mt-2 w-full bg-white dark:bg-zinc-800 rounded-ios-md border border-slate-200 dark:border-zinc-700 shadow-xl max-h-60 overflow-y-auto z-[100] flex-col"></div>
+            </div>
           </div>
           
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -737,7 +736,7 @@
         </div>
 
         <div id="kompiGroupWrapper" class="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
-          </div>
+        </div>
 
         <div id="verificationPanel" class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg shadow-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4 transition-all-300">
           <div class="flex flex-col gap-1">
@@ -748,6 +747,7 @@
             <i data-lucide="check-circle2" class="w-4.5 h-4.5"></i> Verifikasi Semua & Simpan Permanen
           </button>
         </div>
+        
       </section>
 
 
@@ -2309,7 +2309,6 @@ function renderBirthdays() {
       const buildStickyNote = (namesArray, rotateClass) => {
           if (namesArray.length === 0) return '';
           
-          // Logika Pemisah Suku Kata Bahasa Indonesia Otomatis
           const syllabify = (text) => {
               const v = '[aeiouAIUEO]'; 
               const c = '[bcdfghjklmnpqrstvwxyzBCDFGHJKLMNPQRSTVWXYZ]'; 
@@ -2321,19 +2320,17 @@ function renderBirthdays() {
 
           const namesHtml = namesArray.map(name => {
               const processedName = name.split(' ').map(word => syllabify(word)).join(' ');
-              
               return `<div class="pb-1.5 mb-1.5 lg:pb-1 lg:mb-1 border-b border-black/10 dark:border-white/10 last:border-0 last:mb-0 last:pb-0 leading-snug w-full" style="word-break: normal; overflow-wrap: break-word; hyphens: auto; -webkit-hyphens: auto;">${processedName}</div>`;
           }).join('');
           
           return `
-            <div class="relative w-[98%] max-w-[180px] sm:max-w-[130px] lg:max-w-[140px] mx-auto p-1.5 sm:p-2 bg-yellow-200 dark:bg-yellow-700/80 rounded-sm shadow-[3px_5px_12px_rgba(0,0,0,0.15)] transform ${rotateClass} transition-transform hover:rotate-0 hover:z-20 cursor-pointer border border-white/40 dark:border-white/10 group flex flex-col items-center">
-                <div class="absolute -top-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-amber-300 rounded-full shadow-[0_2px_5px_rgba(0,0,0,0.4)] border border-amber-500 z-10 flex items-center justify-center">
+            <div class="relative w-[98%] max-w-[180px] sm:max-w-[130px] lg:max-w-[140px] mx-auto p-1.5 sm:p-2 bg-yellow-100 dark:bg-yellow-700/80 rounded-sm shadow-[3px_5px_12px_rgba(0,0,0,0.15)] transform ${rotateClass} transition-transform hover:rotate-0 hover:z-20 cursor-pointer border border-white/40 dark:border-white/10 group flex flex-col items-center">
+                <div class="absolute -top-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-sky-300 rounded-full shadow-[0_2px_5px_rgba(0,0,0,0.4)] border border-sky-400 z-10 flex items-center justify-center">
                    <div class="w-1 h-1 bg-white rounded-full absolute top-[1px] left-[1px] opacity-80"></div>
                 </div>
                 <div class="absolute -top-3 left-1/2 translate-x-1.5 w-1.5 h-4 bg-black/20 rounded-full blur-[1px] -z-10 transform rotate-[30deg]"></div>
                 
-                <div class="font-bold font-sans text-slate-800 dark:text-zinc-200 text-center drop-shadow-sm group-hover:scale-105 transition-transform w-full mt-2 text-[11.5px] sm:text-[10px] md:text-[9.5px] lg:text-[10px]" 
-                    style="letter-spacing: 0.2px;">
+                <div class="font-bold font-sans text-slate-800 dark:text-zinc-200 text-center drop-shadow-sm group-hover:scale-105 transition-transform w-full mt-2 text-[11.5px] sm:text-[10px] md:text-[9.5px] lg:text-[10px]" style="letter-spacing: 0.2px;">
                     ${namesHtml}
                 </div>
             </div>
@@ -4564,18 +4561,28 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
       
       let tableHtml = '';       
       filtered.forEach(l => {
-          tableHtml += `
-          <tr class="border-b dark:border-zinc-800/60 text-xs">
-            <td class="py-2.5 px-3">${l.date}</td><td class="py-2.5 px-3 font-extrabold">${l.prodiName}</td><td class="py-2.5 px-3 font-bold text-ios-blue">${l.time}</td>
-            
-            <td class="py-2.5 px-3"><div class="p-2 rounded text-[10px] font-semibold leading-relaxed ${l.videoUrl ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800' : 'bg-slate-50 text-slate-700 dark:bg-zinc-800/50 dark:text-zinc-300 border border-slate-200 dark:border-zinc-700'} whitespace-pre-wrap">${l.status}</div></td>
-            
-            <td class="py-2.5 px-3">
-              ${['Admin', 'Piket'].includes(currentUser.role) ? `<button onclick="deleteDepartureLog('${l.date}', '${l.prodiName}')" class="px-2 py-1 bg-rose-100 text-rose-600 hover:bg-rose-200 rounded text-[10px] font-bold transition-colors"><i data-lucide="trash" class="w-3 h-3"></i></button>` : '-'}
-            </td>
-          </tr>
-        `;
-      });
+        tableHtml += `
+        <tr class="border-b dark:border-zinc-800/60 text-xs hover:bg-slate-50 dark:hover:bg-zinc-800/40 transition-colors">
+          
+          <td class="py-2.5 px-3">
+            <span class="block font-bold text-slate-900 dark:text-white">${l.date}</span>
+            <span class="text-[10px] text-slate-500 font-semibold flex items-center gap-1 mt-0.5">
+              <i data-lucide="clock" class="w-3 h-3"></i> ${l.time} WIB
+            </span>
+          </td>
+          
+          <td class="py-2.5 px-3 font-extrabold">${l.prodiName}</td>
+          
+          <td class="py-2.5 px-3 font-bold text-ios-blue">${l.time}</td>
+          
+          <td class="py-2.5 px-3"><div class="p-2 rounded text-[10px] font-semibold leading-relaxed ${l.videoUrl ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800' : 'bg-slate-50 text-slate-700 dark:bg-zinc-800/50 dark:text-zinc-300 border border-slate-200 dark:border-zinc-700'} whitespace-pre-wrap">${l.status}</div></td>
+          
+          <td class="py-2.5 px-3">
+            ${['Admin', 'Piket'].includes(currentUser.role) ? `<button onclick="deleteDepartureLog('${l.date}', '${l.prodiName}')" class="px-2 py-1 bg-rose-100 text-rose-600 hover:bg-rose-200 rounded text-[10px] font-bold transition-colors"><i data-lucide="trash" class="w-3 h-3"></i></button>` : '-'}
+          </td>
+        </tr>
+      `;
+    });
       
       tbody.innerHTML = tableHtml; 
       lucide.createIcons();
@@ -5587,7 +5594,7 @@ window.fetchJadwalDefaultDariSupabase = async function() {
           const activeTab = storage.getItem('e_arvy_active_tab') || 'dashboard';
           
           if (activeTab === 'kehadiran') {
-              // 1. Jika teman klik "Simpan"
+              // 1. Jika klik "Simpan"
               if (newData.kunci.startsWith("saved_bundle_")) {
                   if (typeof renderAttendanceList === 'function') renderAttendanceList();
               } 
@@ -5622,8 +5629,7 @@ window.fetchJadwalDefaultDariSupabase = async function() {
                   
                   const reasonInput = document.getElementById(`absence-reason-${prodiId}-${cadetNo}`);
                   
-                  // Anti-Tabrakan: Cek apakah kita sedang ngetik di kotak yang sama
-                  if (reasonInput && document.activeElement !== reasonInput) {
+                                    if (reasonInput && document.activeElement !== reasonInput) {
                       reasonInput.value = newData.jsonString;
                       updateProdiSummary(prodiId);
                   }
@@ -5638,14 +5644,18 @@ window.fetchJadwalDefaultDariSupabase = async function() {
     // 2. Pantau jika ada Piket yang menekan "Verifikasi Permanen"
     supabaseClient
       .channel('realtime-presensi-log')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'LogPresensi' }, payload => {
-         if (window.isUploadingData) return;
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'LogPresensi' }, payload => {
+         
+                  if (payload.new && payload.new.verifikator === currentUser.username) return;
+
          window.fetchDatabaseFromCloud().then(() => {
             const activeTab = storage.getItem('e_arvy_active_tab');
             if (['dashboard', 'statistik', 'kehadiran'].includes(activeTab)) {
-               if (typeof loadDashboardAndAppData === 'function') loadDashboardAndAppData();
-               showToast('Data Masuk!', 'Piket lain baru saja memverifikasi laporan presensi.', 'success');
-               sendDesktopNotification("Laporan Presensi Masuk", "Ada laporan kehadiran baru yang terverifikasi.", "bell");
+                              if (typeof loadDashboardAndAppData === 'function') loadDashboardAndAppData();
+                            if (currentUser && currentUser.role !== 'Kopral Kadet') {
+                   showToast('Data Masuk!', 'Piket lain baru saja memverifikasi laporan presensi.', 'success');
+                   sendDesktopNotification("Laporan Presensi Masuk", "Ada laporan kehadiran baru yang terverifikasi.", "bell");
+               }
             }
          });
       })
@@ -5657,7 +5667,7 @@ window.fetchJadwalDefaultDariSupabase = async function() {
 <script>
 
 // --- UBAH ANGKA INI SETIAP KALI AKU DEPLOY HTML BARU ---
-const APP_VERSION = "v1.2.9"; 
+const APP_VERSION = "v1.3.0"; 
 // -------------------------------------------------------------------
 
 function forceClearCacheOnUpdate() {
