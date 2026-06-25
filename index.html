@@ -1742,21 +1742,33 @@ originalSetItem('e_arvy_initialized_real_data_v6', 'true');
         logLocalActivity(params.username, `Update pengumuman`);
         return { success: true };
       }
-      if (methodName === 'saveSchedule') {
-  const list = JSON.parse(storage.getItem('e_arvy_schedules') || '[]');
-        if (params.action === 'add') list.push({ date: params.date, time: params.time, title: params.title, location: params.location, photoUrl: params.photoUrl });
+
+     if (methodName === 'saveSchedule') {
+        const list = JSON.parse(storage.getItem('e_arvy_schedules') || '[]');
+        let actionStr = "Update";
+        
+        if (params.action === 'add') {
+            list.push({ date: params.date, time: params.time, title: params.title, location: params.location, photoUrl: params.photoUrl });
+            actionStr = "Tambah";
+        }
         else if (params.action === 'edit') {
           const idx = list.findIndex(s => s.date === params.oldDate && s.time === params.oldTime && s.title === params.oldTitle);
           if (idx !== -1) list[idx] = { date: params.date, time: params.time, title: params.title, location: params.location, photoUrl: params.photoUrl };
+          actionStr = "Ubah";
         } else if (params.action === 'delete') {
           const idx = list.findIndex(s => s.date === params.date && s.time === params.time && s.title === params.title);
           if (idx !== -1) list.splice(idx, 1);
+          actionStr = "Hapus";
         }
+        
         list.sort((a,b) => a.time.localeCompare(b.time));
         storage.setItem('e_arvy_schedules', JSON.stringify(list));
-        logLocalActivity(params.username, `Update jadwal: ${params.title}`);
+        
+        // Catat riwayat aktivitas dengan spesifik
+        logLocalActivity(params.username, `${actionStr} jadwal: ${params.title}`);
         return { success: true };
       }
+
       if (methodName === 'updateTotalCadets') {
         const settings = JSON.parse(storage.getItem('e_arvy_settings') || '{}');
         
@@ -2053,8 +2065,9 @@ function checkNotificationPermission() {
       const adminPiket = document.querySelectorAll('.admin-piket-only');
       if (['Admin', 'Piket', 'Pokdo', 'Pengasuh'].includes(currentUser.role)) {
         adminPiket.forEach(el => { 
-    el.classList.remove('hidden'); 
-    el.classList.add('flex');});
+          el.classList.remove('hidden'); 
+          el.classList.add('flex');
+        });
         document.getElementById('verificationPanel').classList.remove('hidden');
         document.getElementById('announceConfigForm').classList.remove('hidden'); document.getElementById('announceConfigForm').classList.add('flex');
         document.getElementById('announceConfigViewer').classList.add('hidden');
@@ -2065,7 +2078,7 @@ function checkNotificationPermission() {
         document.getElementById('announceConfigViewer').classList.remove('hidden');
       }
 
-            const announcePakaianInput = document.getElementById('announcePakaian');
+      const announcePakaianInput = document.getElementById('announcePakaian');
       if (announcePakaianInput) {
         if (['Admin', 'Piket', 'Pokdo', 'Pengasuh'].includes(currentUser.role)) {
           announcePakaianInput.removeAttribute('disabled'); 
@@ -2075,10 +2088,16 @@ function checkNotificationPermission() {
       }
 
       loadDashboardAndAppData();
-const lastActiveTab = storage.getItem('e_arvy_active_tab') || 'dashboard';
+
+      // --- PERBAIKAN: Penangkap URL Parameter untuk Tab ---
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlTab = urlParams.get('tab');
+      const lastActiveTab = urlTab ? urlTab : (storage.getItem('e_arvy_active_tab') || 'dashboard');
+      
       switchTab(lastActiveTab);
-setTimeout(checkNotificationPermission, 1500); // <-- TAMBAHKAN BARIS INI
-setTimeout(checkSoundPermission, 2000); // Tunda 2 detik agar munculnya halus
+
+      setTimeout(checkNotificationPermission, 1500);
+      setTimeout(checkSoundPermission, 2000); 
     }
 
     function renderApplicationLogos() {
@@ -2728,8 +2747,18 @@ storage.removeItem('e_arvy_manual_override');  storage.removeItem('e_arvy_last_a
       const statSelect = document.getElementById('statActivitySelect');
       if (!select) return;
 
- 
-      const currentAct = select.value || storage.getItem('e_arvy_last_activity');
+      // --- PERBAIKAN: Penangkap URL Parameter Kegiatan & Tanggal ---
+      const urlParams = new URLSearchParams(window.location.search);
+      const linkAct = urlParams.get('act');
+      const linkDate = urlParams.get('date');
+      
+      if (linkDate) {
+          const pDate = document.getElementById('presensiDate');
+          if (pDate) pDate.value = linkDate;
+      }
+
+      // Prioritaskan kegiatan dari URL Link, jika tidak ada gunakan draf terakhir
+      const currentAct = linkAct ? linkAct : (select.value || storage.getItem('e_arvy_last_activity'));
       const currentStatAct = statSelect.value;
 
       select.innerHTML = ''; statSelect.innerHTML = '';
@@ -2741,7 +2770,19 @@ storage.removeItem('e_arvy_manual_override');  storage.removeItem('e_arvy_last_a
       statSelect.innerHTML += `<option value="semua" selected>Semua Kegiatan</option>`;
       activities.forEach(act => statSelect.innerHTML += `<option value="${act}">${act}</option>`);
       
-      if (currentAct) select.value = currentAct;
+      if (currentAct) {
+         // Cek apakah kegiatan dari link ada di dropdown
+         let exists = Array.from(select.options).some(opt => opt.value === currentAct);
+         if (exists) {
+            select.value = currentAct;
+         } else {
+            // Jika kegiatan spesifik tidak ada di kalender, lempar ke input Kustom
+            select.value = 'kustom';
+            const customInput = document.getElementById('customActivityName');
+            if (customInput) customInput.value = currentAct;
+         }
+      }
+      
       if (currentStatAct) statSelect.value = currentStatAct;
 
       checkCustomActivity();
@@ -4917,12 +4958,22 @@ if (window.syncLocalStorageToCloud) window.syncLocalStorageToCloud('e_arvy_absen
         callServer('saveSchedule', { action: scheduleModalMode, oldDate: editingOldDate, oldTime: editingOldTime, oldTitle: editingOldTitle, date, time, title, location, photoUrl: base64, username: currentUser.username }, () => {
           if (scheduleModalMode === 'add') appData.schedules.push({ date, time, title, location, photoUrl: base64 });
           else { const idx = appData.schedules.findIndex(s => s.date === editingOldDate && s.time === editingOldTime && s.title === editingOldTitle); if(idx !== -1) appData.schedules[idx] = { date, time, title, location, photoUrl: base64 }; }
-          appData.schedules.sort((a,b) => a.time.localeCompare(b.time)); closeModal('scheduleModal'); loadDashboardAndAppData(); loadAnnounceSchedules(); showToast('Tersimpan', `Kegiatan disimpan.`, 'success');
+          appData.schedules.sort((a,b) => a.time.localeCompare(b.time)); 
+          closeModal('scheduleModal'); 
+          
+          // PAKSA SINKRONISASI JADWAL KE CLOUD SUPABASE
+          if (window.syncLocalStorageToCloud) {
+             window.syncLocalStorageToCloud('e_arvy_schedules');
+          }
+
+          loadDashboardAndAppData(); 
+          loadAnnounceSchedules(); 
+          showToast('Tersimpan', `Kegiatan disimpan.`, 'success');
         });
       };
       
       if (fileInput.files && fileInput.files[0]) {
-                compressImage(fileInput.files[0], 100, async function(compressedBase64) {
+        compressImage(fileInput.files[0], 100, async function(compressedBase64) {
           showToast('Mengunggah...', 'Menyimpan foto jadwal ke Cloud...', 'info');
           const cloudUrl = await window.uploadFileToCloudStorage(compressedBase64, 'jadwal_foto', 'jadwal_' + Date.now());
           processSave(cloudUrl);
@@ -4930,11 +4981,19 @@ if (window.syncLocalStorageToCloud) window.syncLocalStorageToCloud('e_arvy_absen
       } else processSave("");
     }
 
+
     function deleteSchedule(date, time, title) {
       if (confirm(`Hapus kegiatan "${title}"?`)) {
         callServer('saveSchedule', { action: 'delete', date, time, title, username: currentUser.username }, () => {
           appData.schedules = appData.schedules.filter(s => !(s.date === date && s.time === time && s.title === title));
-          loadDashboardAndAppData(); loadAnnounceSchedules(); showToast('Dihapus', 'Kegiatan dihapus.', 'info');
+          
+          if (window.syncLocalStorageToCloud) {
+             window.syncLocalStorageToCloud('e_arvy_schedules');
+          }
+          
+          loadDashboardAndAppData(); 
+          loadAnnounceSchedules(); 
+          showToast('Dihapus', 'Kegiatan dihapus.', 'info');
         });
       }
     }
@@ -5836,7 +5895,7 @@ window.fetchJadwalDefaultDariSupabase = async function() {
 <script>
 
 // --- UBAH ANGKA INI SETIAP KALI AKU DEPLOY HTML BARU ---
-const APP_VERSION = "v1.3.6"; 
+const APP_VERSION = "v1.3.7"; 
 // -------------------------------------------------------------------
 
 function forceClearCacheOnUpdate() {
