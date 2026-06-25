@@ -745,18 +745,23 @@
             <input type="text" id="customActivityName" onblur="this.value = standardizeEYD(this.value); renderAttendanceList();" oninput="renderAttendanceList()" class="w-full px-4 py-2.5 rounded-ios-md glass-input text-sm text-slate-900 dark:text-white focus:outline-none" placeholder="Masukkan nama kegiatan baru...">
           </div>
 
-<div id="miniRecapCard" class="hidden mt-4 p-4 bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900 rounded-ios-md justify-between items-center transition-all animate-fadeIn">
-  <div class="flex items-center gap-3">
-    <div class="p-2 bg-rose-100 dark:bg-rose-900/50 rounded-full text-ios-red">
-      <i data-lucide="user-minus" class="w-5 h-5"></i>
-    </div>
-    <div class="flex flex-col">
-      <span class="text-sm font-bold text-slate-900 dark:text-white">Total Kurang Hadir</span>
-      <span class="text-[10px] text-slate-500 font-medium">Berdasarkan filter aktif saat ini</span>
-    </div>
+<div id="customActivityWrapper" class="hidden flex flex-col gap-1.5 animate-fadeIn">
+  <label class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Nama Kegiatan Tambahan</label>
+  <input type="text" id="customActivityName" onblur="this.value = standardizeEYD(this.value); renderAttendanceList();" oninput="renderAttendanceList()" class="w-full px-4 py-2.5 rounded-ios-md glass-input text-sm text-slate-900 dark:text-white focus:outline-none" placeholder="Masukkan nama kegiatan baru...">
+</div>
+
+<div id="miniRecapCard" class="hidden grid-cols-3 gap-3 mt-3 p-2 bg-slate-50 dark:bg-zinc-800/40 rounded-ios-md border border-slate-200/60 dark:border-zinc-700/60 shadow-sm animate-fadeIn">
+  <div class="bg-white dark:bg-zinc-900 py-2 px-1.5 rounded border border-slate-100 dark:border-zinc-800 flex flex-col items-center justify-center text-center">
+    <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">KUOTA</span>
+    <strong id="miniRecapQuota" class="text-base sm:text-lg font-black text-slate-800 dark:text-white">0</strong>
   </div>
-  <div class="text-2xl font-black text-ios-red" id="miniRecapCount">
-    0
+  <div class="bg-white dark:bg-zinc-900 py-2 px-1.5 rounded border border-slate-100 dark:border-zinc-800 flex flex-col items-center justify-center text-center">
+    <span class="text-[9px] font-black uppercase tracking-wider text-ios-green">HADIR</span>
+    <strong id="miniRecapPresent" class="text-base sm:text-lg font-black text-ios-green">0</strong>
+  </div>
+  <div class="bg-white dark:bg-zinc-900 py-2 px-1.5 rounded border border-slate-100 dark:border-zinc-800 flex flex-col items-center justify-center text-center">
+    <span class="text-[9px] font-black uppercase tracking-wider text-ios-red">KURANG</span>
+    <strong id="miniRecapAbsent" class="text-base sm:text-lg font-black text-ios-red">0</strong>
   </div>
 </div>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1327,7 +1332,7 @@ function sendDesktopNotification(title, message, soundType = 'default') {
           body: message,
           icon: './logowalrusearvy.png',
           tag: 'earvy_pengumuman', // <--- Mencegah notifikasi numpuk di tray OS
-          vibrate: soundType === 'peluit' ? [300, 100, 300, 100, 300] : [200, 100, 200], 
+          vibrate: soundType === 'bell' ? [300, 100, 300, 100, 300] : [200, 100, 200], 
           requireInteraction: true 
         });
       });
@@ -1707,7 +1712,20 @@ originalSetItem('e_arvy_initialized_real_data_v6', 'true');
       if (methodName === 'saveDeparture') {
         const list = JSON.parse(storage.getItem('e_arvy_kepulangan'));
         const idx = list.findIndex(k => k.prodiName === params.prodiName && k.date === params.date);
-        const entry = { prodiName: params.prodiName, date: params.date, time: params.time, status: params.attendanceInfo, videoUrl: params.videoBase64 ? "https://placehold.co/640x360?text=Video" : params.existingVideoUrl };
+        
+        // --- TAMBAHKAN PENCATAT WAKTU REAL-TIME ---
+        const timestamp = new Date().toISOString(); 
+        
+        // Masukkan 'submittedAt' ke dalam objek data
+        const entry = { 
+          prodiName: params.prodiName, 
+          date: params.date, 
+          time: params.time, 
+          status: params.attendanceInfo, 
+          videoUrl: params.videoBase64 ? "https://placehold.co/640x360?text=Video" : params.existingVideoUrl,
+          submittedAt: timestamp 
+        };
+        
         if (idx !== -1) list[idx] = entry; else list.push(entry);
         storage.setItem('e_arvy_kepulangan', JSON.stringify(list));
         
@@ -1719,6 +1737,7 @@ originalSetItem('e_arvy_initialized_real_data_v6', 'true');
         logLocalActivity(params.username, `Update kepulangan prodi ${params.prodiName}`);
         return { success: true, videoUrl: entry.videoUrl };
       }
+
       if (methodName === 'saveAnnouncement') {
         const list = JSON.parse(storage.getItem('e_arvy_announcements') || '[]');
         const idx = list.findIndex(a => a.date === params.date);
@@ -3204,7 +3223,7 @@ function toggleSelectAll(prodiId, isChecked) {
         updateProdiSummary(prodiId);
         updateAllKompisCumulativeAbsents();
         markAsUnsaved(prodiId);
-updateMiniRecapCard();
+
         
         // Render ulang untuk memunculkan gambar
         renderAttendanceList();
@@ -3228,42 +3247,51 @@ updateMiniRecapCard();
 
 function updateMiniRecapCard() {
   const card = document.getElementById('miniRecapCard');
-  const countText = document.getElementById('miniRecapCount');
-  if (!card || !countText) return;
+  if (!card) return;
 
   const dateStr = document.getElementById('presensiDate').value;
   let act = document.getElementById('presensiActivitySelect').value;
   if (act === 'kustom') act = document.getElementById('customActivityName').value;
   
-  // Sembunyikan jika kegiatan belum dipilih
-  if (!act) { 
-    card.classList.add('hidden'); 
-    card.classList.remove('flex'); 
-    return; 
-  }
-
-  let totalKurang = 0;
-  
-  // Kalkulasi total yang statusnya bukan 'HADIR'
-  appData.prodis.forEach(p => {
-    const cadets = (appData.cadets[p.currentName] || []).filter(c => activeCategory === 'Batalyon' || (activeCategory === 'Putra' && c.gender === 'Laki-Laki') || (activeCategory === 'Putri' && c.gender === 'Perempuan'));
-    cadets.forEach(c => {
-      const status = storage.getItem(`draft_status_${dateStr}_${act}_${p.prodiId}_${c.no}`) || 'HADIR';
-      if (status !== 'HADIR') totalKurang++;
-    });
-  });
-
-  // Tampilkan card hanya jika ada yang kurang hadir
-  if (totalKurang > 0) {
-    countText.innerText = totalKurang;
-    card.classList.remove('hidden');
-    card.classList.add('flex');
-  } else {
+  // Jika nama kegiatan kosong, sembunyikan card rekap
+  if (!act) {
     card.classList.add('hidden');
-    card.classList.remove('flex');
+    card.classList.remove('grid');
+    return;
   }
-}
-    function renderAttendanceList() {
+
+  // Ambil kuota keseluruhan berdasarkan kategori yang sedang dipilih saat ini
+  let totalQuota = parseInt(document.getElementById('presensiTotalQuota').value) || 0;
+  let totalAbsent = 0;
+
+  // Hitung semua kadet yang memiliki draf status selain HADIR
+  appData.prodis.forEach(p => {
+    const cadets = (appData.cadets[p.currentName] || []).filter(c => 
+      activeCategory === 'Batalyon' || 
+      (activeCategory === 'Putra' && c.gender === 'Laki-Laki') || 
+      (activeCategory === 'Putri' && c.gender === 'Perempuan')
+    );
+    
+    cadets.forEach(c => {
+      const rawStatus = storage.getItem(`draft_status_${dateStr}_${act}_${p.prodiId}_${c.no}`) || 'HADIR';
+      const status = rawStatus.trim().toUpperCase() === 'HADIR' ? 'HADIR' : rawStatus;
+
+      if (status !== 'HADIR') totalAbsent++;
+    });
+
+  let totalPresent = totalQuota - totalAbsent;
+
+  // Masukkan angka hasil kalkulasi ke UI mini card
+  document.getElementById('miniRecapQuota').innerText = totalQuota;
+  document.getElementById('miniRecapPresent').innerText = totalPresent;
+  document.getElementById('miniRecapAbsent').innerText = totalAbsent;
+
+  // Tampilkan komponen mini card dengan layout grid
+  card.classList.remove('hidden');
+  card.classList.add('grid');
+}   
+
+ function renderAttendanceList() {
       const container = document.getElementById('kompiGroupWrapper');
       if (!container) return;
 
@@ -3535,6 +3563,7 @@ selectOptionsSpecific += `<option value="TAMBAH_BARU" class="font-black text-ios
            window.scrollTo(0, scrollPos); // Posisi scroll saat mengklik dropdown prodi
         }
       }, 50);
+updateMiniRecapCard()
 }
     function isProdiEditableForCurrentUser(prodi) {
       const dateStr = document.getElementById('presensiDate').value;
@@ -3579,42 +3608,55 @@ selectOptionsSpecific += `<option value="TAMBAH_BARU" class="font-black text-ios
     function toggleProdiSection(prodiId) { document.getElementById(`prodi-body-${prodiId}`).classList.toggle('hidden'); document.getElementById(`prodi-body-${prodiId}`).classList.toggle('flex'); const chev = document.getElementById(`prodi-chevron-${prodiId}`); if(chev) chev.classList.toggle('rotate-180'); }
 
     function handleCadetStatusChange(prodiId, cadetNo) {
-      const dateStr = document.getElementById('presensiDate').value;
-      let activityName = document.getElementById('presensiActivitySelect').value;
-      if (activityName === 'kustom') activityName = document.getElementById('customActivityName').value || 'Kegiatan Kustom';
-      const status = document.getElementById(`cadet-status-${prodiId}-${cadetNo}`).value;
-if (status === 'TAMBAH_BARU') {
+  const dateStr = document.getElementById('presensiDate').value;
+  let activityName = document.getElementById('presensiActivitySelect').value;
+  if (activityName === 'kustom') activityName = document.getElementById('customActivityName').value || 'Kegiatan Kustom';
+  
+  let status = document.getElementById(`cadet-status-${prodiId}-${cadetNo}`).value;
+  
+  // KUNCI PERBAIKAN: Paksa kembalikan ke default jika mendeteksi variasi kata HADIR
+  if (status.trim().toUpperCase() === 'HADIR') status = 'HADIR';
+
+  if (status === 'TAMBAH_BARU') {
       const newStatus = prompt("Masukkan Status Ketidakhadiran Baru (Contoh: Cuti Khusus):");
       if (newStatus && newStatus.trim() !== '') {
           const formattedStatus = standardizeEYD(newStatus);
-          let statuses = JSON.parse(storage.getItem('e_arvy_absence_statuses') || '["Sakit", "Izin", "Alpa", "Dinas"]');
-          if (!statuses.includes(formattedStatus) && formattedStatus !== 'HADIR') {
-              statuses.push(formattedStatus);
-              storage.setItem('e_arvy_absence_statuses', JSON.stringify(statuses));
-              if (window.syncLocalStorageToCloud) window.syncLocalStorageToCloud('e_arvy_absence_statuses');
+          
+          // Blokir user yang menambahkan kata "HADIR" sebagai status absen
+          if (formattedStatus.toUpperCase() === 'HADIR') {
+              storage.setItem(`draft_status_${dateStr}_${activityName}_${prodiId}_${cadetNo}`, 'HADIR');
+          } else {
+              let statuses = JSON.parse(storage.getItem('e_arvy_absence_statuses') || '["Sakit", "Izin", "Alpa", "Dinas"]');
+              if (!statuses.includes(formattedStatus)) {
+                  statuses.push(formattedStatus);
+                  storage.setItem('e_arvy_absence_statuses', JSON.stringify(statuses));
+                  if (window.syncLocalStorageToCloud) window.syncLocalStorageToCloud('e_arvy_absence_statuses');
+              }
+              storage.setItem(`draft_status_${dateStr}_${activityName}_${prodiId}_${cadetNo}`, formattedStatus);
           }
-          storage.setItem(`draft_status_${dateStr}_${activityName}_${prodiId}_${cadetNo}`, formattedStatus);
       } else {
           storage.setItem(`draft_status_${dateStr}_${activityName}_${prodiId}_${cadetNo}`, 'HADIR');
       }
       renderAttendanceList();
-      renderAbsenceStatusManager(); // Jika admin panel perlu direfresh
+      renderAbsenceStatusManager(); 
       return;
   }
-      const detailRow = document.getElementById(`absence-detail-${prodiId}-${cadetNo}`);
-      
-      storage.setItem(`draft_status_${dateStr}_${activityName}_${prodiId}_${cadetNo}`, status);
-      if (status !== 'HADIR') { detailRow.classList.remove('hidden'); detailRow.classList.add('flex'); } 
-      else {
-        detailRow.classList.add('hidden'); document.getElementById(`absence-reason-${prodiId}-${cadetNo}`).value = '';
-        storage.removeItem(`draft_reason_${dateStr}_${activityName}_${prodiId}_${cadetNo}`);
-        storage.removeItem(`draft_proof_${dateStr}_${activityName}_${prodiId}_${cadetNo}`);
-        document.getElementById(`proof-preview-${prodiId}-${cadetNo}`).classList.add('hidden');
-        document.getElementById(`proof-base64-${prodiId}-${cadetNo}`).value = '';
-      }
-      updateProdiSummary(prodiId); updateAllKompisCumulativeAbsents();
-markAsUnsaved(prodiId); updateMiniRecapCard();
-    }
+  
+  const detailRow = document.getElementById(`absence-detail-${prodiId}-${cadetNo}`);
+  
+  storage.setItem(`draft_status_${dateStr}_${activityName}_${prodiId}_${cadetNo}`, status);
+  if (status !== 'HADIR') { detailRow.classList.remove('hidden'); detailRow.classList.add('flex'); } 
+  else {
+    detailRow.classList.add('hidden'); document.getElementById(`absence-reason-${prodiId}-${cadetNo}`).value = '';
+    storage.removeItem(`draft_reason_${dateStr}_${activityName}_${prodiId}_${cadetNo}`);
+    storage.removeItem(`draft_proof_${dateStr}_${activityName}_${prodiId}_${cadetNo}`);
+    const previewEl = document.getElementById(`proof-preview-${prodiId}-${cadetNo}`);
+    if (previewEl) previewEl.classList.add('hidden');
+    document.getElementById(`proof-base64-${prodiId}-${cadetNo}`).value = '';
+  }
+  updateProdiSummary(prodiId); updateAllKompisCumulativeAbsents();
+  markAsUnsaved(prodiId); updateMiniRecapCard();
+}
 
     function syncDraftReason(prodiId, cadetNo) {
       const dateStr = document.getElementById('presensiDate').value;
@@ -3656,7 +3698,9 @@ markAsUnsaved(prodiId);
       let present = 0, absent = 0; const absentList = [];
 
       cadets.forEach(c => {
-        const status = storage.getItem(`draft_status_${dateStr}_${act}_${prodiId}_${c.no}`) || 'HADIR';
+        const rawStatus = storage.getItem(`draft_status_${dateStr}_${act}_${prodiId}_${c.no}`) || 'HADIR';
+        const status = rawStatus.trim().toUpperCase() === 'HADIR' ? 'HADIR' : rawStatus;
+
         if (status === 'HADIR') present++;
         else { 
           absent++; 
@@ -3739,7 +3783,9 @@ function markAsUnsaved(prodiId) {
 
         // Cek status per individu di dalam prodi
         cadets.forEach(c => {
-          const status = storage.getItem(`draft_status_${dateStr}_${act}_${p.prodiId}_${c.no}`) || 'HADIR';
+          const rawStatus = storage.getItem(`draft_status_${dateStr}_${act}_${p.prodiId}_${c.no}`) || 'HADIR';
+          const status = rawStatus.trim().toUpperCase() === 'HADIR' ? 'HADIR' : rawStatus;
+
           if (status === 'HADIR') {
               present++; 
           } else { 
@@ -3894,14 +3940,15 @@ function markAsUnsaved(prodiId) {
       appData.prodis.forEach(prodi => {
         const cadets = (appData.cadets[prodi.currentName] || []).filter(c => activeCategory === 'Batalyon' || (activeCategory === 'Putra' && c.gender === 'Laki-Laki') || (activeCategory === 'Putri' && c.gender === 'Perempuan'));
         cadets.forEach(c => {
-          const status = storage.getItem(`draft_status_${dateStr}_${act}_${prodi.prodiId}_${c.no}`) || 'HADIR';
+          const rawStatus = storage.getItem(`draft_status_${dateStr}_${act}_${prodi.prodiId}_${c.no}`) || 'HADIR';
+          const status = rawStatus.trim().toUpperCase() === 'HADIR' ? 'HADIR' : rawStatus;
+
           if (status !== 'HADIR') {
             const reason = storage.getItem(`draft_reason_${dateStr}_${act}_${prodi.prodiId}_${c.no}`) || '';
             const att = storage.getItem(`draft_proof_${dateStr}_${act}_${prodi.prodiId}_${c.no}`) || '';
             absents.push({ prodiName: prodi.currentName, cadetNo: c.no, cadetName: c.name, status, reason, attachmentBase64: att });
           }
         });
-      });
 
       const btn = document.querySelector('#verificationPanel button');
       btn.innerHTML = '<i data-lucide="loader" class="animate-spin w-4.5 h-4.5"></i> Memproses...';
@@ -4647,25 +4694,41 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
       const searchDate = document.getElementById('depLogSearchDate').value;
       const logs = JSON.parse(storage.getItem('e_arvy_departure_logs') || '[]');
       let filtered = searchDate ? logs.filter(l => l.date === searchDate) : logs;
-      filtered.sort((a, b) => new Date(b.date + ' ' + b.time) - new Date(a.date + ' ' + a.time));
+      
+      // Urutkan berdasarkan waktu submit terbaru (bukan jam pulang)
+      filtered.sort((a, b) => {
+          const timeA = a.submittedAt ? new Date(a.submittedAt).getTime() : new Date(a.date + ' ' + a.time).getTime();
+          const timeB = b.submittedAt ? new Date(b.submittedAt).getTime() : new Date(b.date + ' ' + b.time).getTime();
+          return timeB - timeA;
+      });
 
       if (filtered.length === 0) { tbody.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-slate-400 italic">Tidak ada log.</td></tr>`; return; }
       
       let tableHtml = '';       
       filtered.forEach(l => {
+        
+        // Format jam simpan asli
+        let submitTimeStr = l.time; // Fallback jika data lama belum punya 'submittedAt'
+        if (l.submittedAt) {
+          const sDate = new Date(l.submittedAt);
+          const hrs = String(sDate.getHours()).padStart(2, '0');
+          const mins = String(sDate.getMinutes()).padStart(2, '0');
+          submitTimeStr = `${hrs}:${mins}`;
+        }
+
         tableHtml += `
         <tr class="border-b dark:border-zinc-800/60 text-xs hover:bg-slate-50 dark:hover:bg-zinc-800/40 transition-colors">
           
           <td class="py-2.5 px-3">
             <span class="block font-bold text-slate-900 dark:text-white">${l.date}</span>
-            <span class="text-[10px] text-slate-500 font-semibold flex items-center gap-1 mt-0.5">
-              <i data-lucide="clock" class="w-3 h-3"></i> ${l.time} WIB
+            <span class="text-[10px] text-slate-500 font-semibold flex items-center gap-1 mt-0.5" title="Waktu Data Disimpan">
+              <i data-lucide="clock" class="w-3 h-3"></i> ${submitTimeStr} WIB
             </span>
           </td>
           
           <td class="py-2.5 px-3 font-extrabold">${l.prodiName}</td>
           
-          <td class="py-2.5 px-3 font-bold text-ios-blue">${l.time}</td>
+          <td class="py-2.5 px-3 font-bold text-ios-blue" title="Jam Kepulangan Kadet">${l.time}</td>
           
           <td class="py-2.5 px-3"><div class="p-2 rounded text-[10px] font-semibold leading-relaxed ${l.videoUrl ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800' : 'bg-slate-50 text-slate-700 dark:bg-zinc-800/50 dark:text-zinc-300 border border-slate-200 dark:border-zinc-700'} whitespace-pre-wrap">${l.status}</div></td>
           
@@ -5776,7 +5839,7 @@ window.fetchJadwalDefaultDariSupabase = async function() {
 <script>
 
 // --- UBAH ANGKA INI SETIAP KALI AKU DEPLOY HTML BARU ---
-const APP_VERSION = "v1.3.5"; 
+const APP_VERSION = "v1.3.6"; 
 // -------------------------------------------------------------------
 
 function forceClearCacheOnUpdate() {
