@@ -3945,6 +3945,7 @@ function markAsUnsaved(prodiId) {
             absents.push({ prodiName: prodi.currentName, cadetNo: c.no, cadetName: c.name, status, reason, attachmentBase64: att });
           }
         });
+});
 
       const btn = document.querySelector('#verificationPanel button');
       btn.innerHTML = '<i data-lucide="loader" class="animate-spin w-4.5 h-4.5"></i> Memproses...';
