@@ -745,11 +745,6 @@
             <input type="text" id="customActivityName" onblur="this.value = standardizeEYD(this.value); renderAttendanceList();" oninput="renderAttendanceList()" class="w-full px-4 py-2.5 rounded-ios-md glass-input text-sm text-slate-900 dark:text-white focus:outline-none" placeholder="Masukkan nama kegiatan baru...">
           </div>
 
-<div id="customActivityWrapper" class="hidden flex flex-col gap-1.5 animate-fadeIn">
-  <label class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Nama Kegiatan Tambahan</label>
-  <input type="text" id="customActivityName" onblur="this.value = standardizeEYD(this.value); renderAttendanceList();" oninput="renderAttendanceList()" class="w-full px-4 py-2.5 rounded-ios-md glass-input text-sm text-slate-900 dark:text-white focus:outline-none" placeholder="Masukkan nama kegiatan baru...">
-</div>
-
 <div id="miniRecapCard" class="hidden grid-cols-3 gap-3 mt-3 p-2 bg-slate-50 dark:bg-zinc-800/40 rounded-ios-md border border-slate-200/60 dark:border-zinc-700/60 shadow-sm animate-fadeIn">
   <div class="bg-white dark:bg-zinc-900 py-2 px-1.5 rounded border border-slate-100 dark:border-zinc-800 flex flex-col items-center justify-center text-center">
     <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">KUOTA</span>
@@ -3278,6 +3273,7 @@ function updateMiniRecapCard() {
 
       if (status !== 'HADIR') totalAbsent++;
     });
+});
 
   let totalPresent = totalQuota - totalAbsent;
 
