@@ -3016,22 +3016,36 @@ function resetCurrentAttendanceData() {
 
   appData.prodis.forEach(p => {
       const cadets = appData.cadets[p.currentName] || [];
+      
+    
       cadets.forEach(c => {
-          // Menghapus rekaman agar kembali ke default (Hadir)
           storage.removeItem(`draft_status_${dateStr}_${act}_${p.prodiId}_${c.no}`);
           storage.removeItem(`draft_reason_${dateStr}_${act}_${p.prodiId}_${c.no}`);
           storage.removeItem(`draft_proof_${dateStr}_${act}_${p.prodiId}_${c.no}`);
       });
       
-      updateProdiSummary(p.prodiId);
+           storage.removeItem(`saved_present_cnt_${dateStr}_${act}_${p.prodiId}`);
+      storage.removeItem(`saved_absent_cnt_${dateStr}_${act}_${p.prodiId}`);
+      storage.removeItem(`saved_total_cnt_${dateStr}_${act}_${p.prodiId}`);
+      storage.removeItem(`saved_${dateStr}_${act}_${p.currentName}`);
+
+          const bundleKey = `saved_bundle_${dateStr}_${act}_${p.prodiId}`;
+      storage.removeItem(bundleKey); // Hapus memori lokal
       
-      // BARIS BARU: Mengubah paksa indikator hijau (Tersimpan) menjadi oranye (Draf / Belum Disimpan)
+      if (window.syncLocalStorageToCloud) {
+                localStorage.setItem(bundleKey, "{}"); 
+        window.syncLocalStorageToCloud(bundleKey).then(() => {
+           localStorage.removeItem(bundleKey); // Setelah cloud kosong, buang sisa kuncinya
+        });
+      }
+
+      updateProdiSummary(p.prodiId);
       markAsUnsaved(p.prodiId);
   });
   
   renderAttendanceList();
   closeModal('quickAttendanceToolsModal');
-  showToast('Reset Berhasil', 'Seluruh status dikembalikan ke Hadir dan berstatus Draf.', 'success');
+  showToast('Reset Berhasil', 'Seluruh data dikembalikan ke Hadir dan dibersihkan dari server.', 'success');
 }
 
 function convertAttendanceStatus() {
@@ -5958,7 +5972,7 @@ window.fetchJadwalDefaultDariSupabase = async function() {
 <script>
 
 // --- UBAH ANGKA INI SETIAP KALI AKU DEPLOY HTML BARU ---
-const APP_VERSION = "v1.3.8"; 
+const APP_VERSION = "v1.3.9"; 
 // -------------------------------------------------------------------
 
 function forceClearCacheOnUpdate() {
