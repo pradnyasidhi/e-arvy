@@ -522,7 +522,7 @@
                     <strong id="dashLastActTotal" class="text-2xl sm:text-3xl font-black text-slate-800 dark:text-white">-</strong>
                   </div>
                   <div class="bg-white dark:bg-zinc-900 py-3 px-2 rounded-lg border border-slate-100 dark:border-zinc-800/60 flex flex-col items-center justify-center text-center shadow-sm">
-                    <span class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Hadir</span>
+                    <span class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">HADIR</span>
                     <strong id="dashLastActPresent" class="text-2xl sm:text-3xl font-black text-ios-green">-</strong>
                   </div>
                   <div class="bg-white dark:bg-zinc-900 py-3 px-2 rounded-lg border border-slate-100 dark:border-zinc-800/60 flex flex-col items-center justify-center text-center shadow-sm">
@@ -727,8 +727,8 @@
             </div>
             <div class="flex flex-col gap-1.5">
               <div class="flex justify-between items-center">
-                <label class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Kapasitas Quota</label>
-                <button onclick="enableQuotaEdit()" class="admin-piket-only hidden text-xs font-bold text-ios-blue hover:underline">Edit Quota</button>
+                <label class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Kapasitas Kuota</label>
+                <button onclick="enableQuotaEdit()" class="admin-piket-only hidden text-xs font-bold text-ios-blue hover:underline">Edit Kuota</button>
               </div>
               <input type="number" id="presensiTotalQuota" readonly class="w-full px-4 py-2.5 rounded-ios-md bg-slate-100 dark:bg-zinc-800 border text-slate-500 dark:text-zinc-400 outline-none">
             </div>
@@ -759,7 +759,7 @@
               <h3 class="font-black text-xl tracking-tight flex items-center gap-2">
                 <i data-lucide="calendar" class="w-5 h-5 text-ios-blue animate-pulse"></i> Jadwal Penuh Kegiatan Harian
               </h3>
-              <p class="text-xs text-slate-400 font-medium">Daftar keseluruhan jadwal kegiatan Batalyon dari pagi hingga malam.</p>
+              <p class="text-xs text-slate-400 font-medium">Daftar keseluruhan jadwal kegiatan Batalyon.</p>
             </div>
             <button onclick="openAddScheduleModal()" class="admin-piket-only hidden bg-ios-blue hover:opacity-90 text-white px-4 py-2 rounded-ios-sm text-xs font-bold transition-all shadow-md">
               + Tambah Kegiatan
@@ -964,8 +964,8 @@
         <div class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg shadow-lg flex flex-col gap-4">
           <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 pb-3 border-b border-slate-100 dark:border-zinc-800">
             <div>
-              <h3 class="font-extrabold text-lg text-slate-900 dark:text-white tracking-tight">Manajemen Kepulangan</h3>
-              <p class="text-xs text-slate-500 font-medium">Reset kepulangan prodi dilakukan secara otomatis pada 03:00 AM.</p>
+              <h3 class="font-extrabold text-lg text-slate-900 dark:text-white tracking-tight">Manajemen Kepulangan Prodi</h3>
+              <p class="text-xs text-slate-500 font-medium">Reset kepulangan prodi dilakukan secara otomatis pada 00:00 AM.</p>
             </div>
             <div class="flex flex-col gap-1 w-full sm:w-auto min-w-[180px]">
               <label class="text-[9px] font-black uppercase tracking-widest text-slate-400">Tanggal Kepulangan</label>
@@ -1450,62 +1450,59 @@ originalSetItem('e_arvy_initialized_real_data_v6', 'true');
       const cleanUser = username.replace('@', '').trim();
       if (!cleanUser) return;
       
-      // GANTI URL DI BAWAH DENGAN URL DARI GOOGLE APPS SCRIPT MILIKMU
       const GAS_URL = 'https://script.google.com/macros/s/AKfycby-FDhY3nasdOpPMpW7Us8tHwf8-coAa7EP-2IiVGoOm4bB7vdOKNpiKCkAv-H6-sKvPg/exec'; 
-      
-      // Tampilan sementara
-      let displayName = "Mencari data...";
-      let photoUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(cleanUser)}&background=random&color=fff`;
-      let profileLink = `https://t.me/${cleanUser}`;
 
       try {
-        // Panggil API buatan kita di Google
         const response = await fetch(`${GAS_URL}?username=${cleanUser}`);
         const data = await response.json();
         
-        if (data.success) {
-           displayName = data.name;
-           photoUrl = data.photo;
+        // HANYA TIMPA & KUNCI JIKA API BERHASIL MENDAPATKAN NAMA
+        if (data.success && data.name) {
+           const today = getLocalDateString();
+           let ann = appData.announcements.find(a => a.date === today);
+           if (!ann) {
+             ann = { date: today, pakaianInfo: "Seragam Hari Ini", piketBatalyonPutraName: "", piketBatalyonPutriName: "" };
+             appData.announcements.push(ann);
+           }
+
+           if (piketType === 'putra') {
+             ann.piketBatalyonPutraName = data.name;
+             ann.piketBatalyonPutraAvatar = data.photo;
+             ann.piketBatalyonPutraTelegram = `https://t.me/${cleanUser}`;
+           } else {
+             ann.piketBatalyonPutriName = data.name;
+             ann.piketBatalyonPutriAvatar = data.photo;
+             ann.piketBatalyonPutriTelegram = `https://t.me/${cleanUser}`;
+           }
+
+           localStorage.setItem('e_arvy_announcements', JSON.stringify(appData.announcements));
+           
+           if (window.syncLocalStorageToCloud) {
+               window.syncLocalStorageToCloud('e_arvy_announcements');
+           }
+           
+          
+           if (typeof updateDashboardDetails === 'function') {
+               updateDashboardDetails();
+           }
+           
+           showToast('Data Terkunci', `Profil Piket ${piketType === 'putra' ? 'Putra' : 'Putri'} berhasil ditarik dan dikunci ke server.`, 'success');
         } else {
-           displayName = cleanUser; // Rencana cadangan jika username tidak valid
+           console.warn("Scraper tidak menemukan data yang valid. Data piket lama dipertahankan.");
         }
       } catch (error) {
-        console.error("Gagal terhubung ke Google Apps Script:", error);
-        displayName = cleanUser;
+        console.error("Gagal terhubung ke API Telegram:", error);
       }
-
-      // Simpan ke Pengumuman e-Arvy
-      const today = getLocalDateString();
-      let ann = appData.announcements.find(a => a.date === today);
-      if (!ann) {
-        ann = { date: today, pakaianInfo: "Seragam Hari Ini", piketBatalyonPutraName: "", piketBatalyonPutriName: "" };
-        appData.announcements.push(ann);
-      }
-
-      if (piketType === 'putra') {
-        ann.piketBatalyonPutraName = displayName;
-        ann.piketBatalyonPutraAvatar = photoUrl;
-        ann.piketBatalyonPutraTelegram = profileLink;
-      } else {
-        ann.piketBatalyonPutriName = displayName;
-        ann.piketBatalyonPutriAvatar = photoUrl;
-        ann.piketBatalyonPutriTelegram = profileLink;
-      }
-
-      localStorage.setItem('e_arvy_announcements', JSON.stringify(appData.announcements));
-      if (window.syncLocalStorageToCloud) window.syncLocalStorageToCloud('e_arvy_announcements');
     }
 
     function simulateServerCall(methodName, params) {
       if (methodName === 'login') {
         const users = JSON.parse(storage.getItem('e_arvy_users_v6')) || [];
         
-        // JALUR 1: LOGIN KHUSUS PIKET (Deteksi dari Password)
         if (params.password === 'piketpa6' || params.password === 'piketpi6') {
-          // Tentukan gender berdasarkan password yang diketik
-          const piketType = (params.password === 'piketpa6') ? 'putra' : 'putri';
+                    const piketType = (params.password === 'piketpa6') ? 'putra' : 'putri';
           
-          // Jalankan mesin penarik data Telegram di latar belakang (tanpa membuat loading lama)
+        
           updatePiketProfileFromWeb(params.username, piketType);
           
           const userPiket = { 
@@ -2166,15 +2163,7 @@ setTimeout(checkSoundPermission, 2000); // Tunda 2 detik agar munculnya halus
           }
         }
 
-        if (hrs === "03" && mins === "00" && secs === "00" && !isKepulanganResetToday) {
-          appData.kepulangan = [];
-          storage.setItem('e_arvy_kepulangan', JSON.stringify([]));
-          renderKepulanganList();
-          isKepulanganResetToday = true;
-          showToast('Reset Otomatis', 'Data kepulangan telah di-reset pada 03:00 AM.', 'info');
-        }
-        if (hrs === "04") isKepulanganResetToday = false;
-
+       
         renderDashboardSchedules(now);
         updatePendataanCountdowns();
         renderAnnounceLatestSchedule(now);
@@ -2840,7 +2829,7 @@ function saveLastSelectedActivity() {
       else customWrapper.classList.add('hidden');
     }
 function populateConvertDropdowns() {
-  const statuses = ['Hadir', ...JSON.parse(storage.getItem('e_arvy_absence_statuses') || '["Sakit", "Izin", "Alpa", "Dinas"]')]
+  const statuses = ['HADIR', ...JSON.parse(storage.getItem('e_arvy_absence_statuses') || '["Sakit", "Izin", "Alpa", "Dinas"]')]
   let html = '';
   statuses.forEach(st => html += `<option value="${st}">${st}</option>`);
   document.getElementById('convertFromStatus').innerHTML = html;
@@ -2856,15 +2845,21 @@ function resetCurrentAttendanceData() {
   appData.prodis.forEach(p => {
       const cadets = appData.cadets[p.currentName] || [];
       cadets.forEach(c => {
+          // Menghapus rekaman agar kembali ke default (Hadir)
           storage.removeItem(`draft_status_${dateStr}_${act}_${p.prodiId}_${c.no}`);
           storage.removeItem(`draft_reason_${dateStr}_${act}_${p.prodiId}_${c.no}`);
           storage.removeItem(`draft_proof_${dateStr}_${act}_${p.prodiId}_${c.no}`);
       });
+      
       updateProdiSummary(p.prodiId);
+      
+      // BARIS BARU: Mengubah paksa indikator hijau (Tersimpan) menjadi oranye (Draf / Belum Disimpan)
+      markAsUnsaved(p.prodiId);
   });
+  
   renderAttendanceList();
   closeModal('quickAttendanceToolsModal');
-  showToast('Reset Berhasil', 'Seluruh status dikembalikan ke Hadir.', 'success');
+  showToast('Reset Berhasil', 'Seluruh status dikembalikan ke Hadir dan berstatus Draf.', 'success');
 }
 
 function convertAttendanceStatus() {
@@ -2880,10 +2875,10 @@ function convertAttendanceStatus() {
   appData.prodis.forEach(p => {
       const cadets = appData.cadets[p.currentName] || [];
       cadets.forEach(c => {
-          const currentStatus = storage.getItem(`draft_status_${dateStr}_${act}_${p.prodiId}_${c.no}`) || 'Hadir';
+          const currentStatus = storage.getItem(`draft_status_${dateStr}_${act}_${p.prodiId}_${c.no}`) || 'HADIR';
           if(currentStatus === fromStatus) {
               storage.setItem(`draft_status_${dateStr}_${act}_${p.prodiId}_${c.no}`, toStatus);
-              if(toStatus === 'Hadir') {
+              if(toStatus === 'HADIR') {
                   storage.removeItem(`draft_reason_${dateStr}_${act}_${p.prodiId}_${c.no}`);
                   storage.removeItem(`draft_proof_${dateStr}_${act}_${p.prodiId}_${c.no}`);
               }
@@ -3241,7 +3236,7 @@ function toggleSelectAll(prodiId, isChecked) {
       container.innerHTML += lockBannerHtml;
 
       const absenceStatuses = JSON.parse(storage.getItem('e_arvy_absence_statuses') || '["Sakit", "Izin", "Alpa", "Dinas"]');
-      let statusOptionsHtml = `<option value="Hadir">HADIR</option>`;
+      let statusOptionsHtml = `<option value="HADIR">HADIR</option>`;
       absenceStatuses.forEach(st => statusOptionsHtml += `<option value="${st}">${st}</option>`);
 
       const kompis = {};
@@ -3326,11 +3321,11 @@ if (isEditable) {
               `;
             }
             cadetsList.forEach(c => {
-              const draftStatus = storage.getItem(`draft_status_${dateStr}_${activityName}_${prodi.prodiId}_${c.no}`) || 'Hadir';
+              const draftStatus = storage.getItem(`draft_status_${dateStr}_${activityName}_${prodi.prodiId}_${c.no}`) || 'HADIR';
               const draftReason = storage.getItem(`draft_reason_${dateStr}_${activityName}_${prodi.prodiId}_${c.no}`) || '';
               const draftProof = storage.getItem(`draft_proof_${dateStr}_${activityName}_${prodi.prodiId}_${c.no}`) || '';
               
-              let selectOptionsSpecific = `<option value="Hadir" ${draftStatus === 'Hadir' ? 'selected' : ''}>HADIR</option>`;
+              let selectOptionsSpecific = `<option value="HADIR" ${draftStatus === 'HADIR' ? 'selected' : ''}>HADIR</option>`;
 absenceStatuses.forEach(st => selectOptionsSpecific += `<option value="${st}" ${draftStatus === st ? 'selected' : ''}>${st}</option>`);
 selectOptionsSpecific += `<option value="TAMBAH_BARU" class="font-black text-ios-blue">+ TAMBAH BARU...</option>`;
 
@@ -3354,7 +3349,7 @@ selectOptionsSpecific += `<option value="TAMBAH_BARU" class="font-black text-ios
                     </div>
                   </div>
                   
-                  <div id="absence-detail-${prodi.prodiId}-${c.no}" class="${(draftStatus !== 'Hadir' && (isEditable || draftReason || draftProof)) ? 'flex' : 'hidden'} mt-1 flex-row items-center gap-2 p-1.5 bg-rose-50/50 dark:bg-rose-950/20 rounded border border-dashed border-rose-200 dark:border-rose-900">
+                  <div id="absence-detail-${prodi.prodiId}-${c.no}" class="${(draftStatus !== 'HADIR' && (isEditable || draftReason || draftProof)) ? 'flex' : 'hidden'} mt-1 flex-row items-center gap-2 p-1.5 bg-rose-50/50 dark:bg-rose-950/20 rounded border border-dashed border-rose-200 dark:border-rose-900">
                     ${isEditable ? 
                       `<input type="text" class="flex-1 px-2 py-0.5 rounded bg-white dark:bg-zinc-800 dark:border-zinc-700 dark:text-white border text-[10px] focus:ring-1 focus:ring-ios-blue outline-none" placeholder="Tulis alasan..." id="absence-reason-${prodi.prodiId}-${c.no}" value="${draftReason}" onblur="this.value = this.value.toUpperCase(); syncDraftReason(${prodi.prodiId}, ${c.no});">`
                     : 
@@ -3496,14 +3491,14 @@ if (status === 'TAMBAH_BARU') {
       if (newStatus && newStatus.trim() !== '') {
           const formattedStatus = standardizeEYD(newStatus);
           let statuses = JSON.parse(storage.getItem('e_arvy_absence_statuses') || '["Sakit", "Izin", "Alpa", "Dinas"]');
-          if (!statuses.includes(formattedStatus) && formattedStatus !== 'Hadir') {
+          if (!statuses.includes(formattedStatus) && formattedStatus !== 'HADIR') {
               statuses.push(formattedStatus);
               storage.setItem('e_arvy_absence_statuses', JSON.stringify(statuses));
               if (window.syncLocalStorageToCloud) window.syncLocalStorageToCloud('e_arvy_absence_statuses');
           }
           storage.setItem(`draft_status_${dateStr}_${activityName}_${prodiId}_${cadetNo}`, formattedStatus);
       } else {
-          storage.setItem(`draft_status_${dateStr}_${activityName}_${prodiId}_${cadetNo}`, 'Hadir');
+          storage.setItem(`draft_status_${dateStr}_${activityName}_${prodiId}_${cadetNo}`, 'HADIR');
       }
       renderAttendanceList();
       renderAbsenceStatusManager(); // Jika admin panel perlu direfresh
@@ -3512,7 +3507,7 @@ if (status === 'TAMBAH_BARU') {
       const detailRow = document.getElementById(`absence-detail-${prodiId}-${cadetNo}`);
       
       storage.setItem(`draft_status_${dateStr}_${activityName}_${prodiId}_${cadetNo}`, status);
-      if (status !== 'Hadir') { detailRow.classList.remove('hidden'); detailRow.classList.add('flex'); } 
+      if (status !== 'HADIR') { detailRow.classList.remove('hidden'); detailRow.classList.add('flex'); } 
       else {
         detailRow.classList.add('hidden'); document.getElementById(`absence-reason-${prodiId}-${cadetNo}`).value = '';
         storage.removeItem(`draft_reason_${dateStr}_${activityName}_${prodiId}_${cadetNo}`);
@@ -3564,8 +3559,8 @@ markAsUnsaved(prodiId);
       let present = 0, absent = 0; const absentList = [];
 
       cadets.forEach(c => {
-        const status = storage.getItem(`draft_status_${dateStr}_${act}_${prodiId}_${c.no}`) || 'Hadir';
-        if (status === 'Hadir') present++;
+        const status = storage.getItem(`draft_status_${dateStr}_${act}_${prodiId}_${c.no}`) || 'HADIR';
+        if (status === 'HADIR') present++;
         else { 
           absent++; 
           const reason = storage.getItem(`draft_reason_${dateStr}_${act}_${prodiId}_${c.no}`) || ''; 
@@ -3647,8 +3642,8 @@ function markAsUnsaved(prodiId) {
 
         // Cek status per individu di dalam prodi
         cadets.forEach(c => {
-          const status = storage.getItem(`draft_status_${dateStr}_${act}_${p.prodiId}_${c.no}`) || 'Hadir';
-          if (status === 'Hadir') {
+          const status = storage.getItem(`draft_status_${dateStr}_${act}_${p.prodiId}_${c.no}`) || 'HADIR';
+          if (status === 'HADIR') {
               present++; 
           } else { 
             absent++;
@@ -3712,11 +3707,11 @@ function markAsUnsaved(prodiId) {
       const cadetsDraftData = [];
 
       cadets.forEach(c => { 
-        const st = storage.getItem(`draft_status_${dateStr}_${act}_${prodiId}_${c.no}`) || 'Hadir'; 
+        const st = storage.getItem(`draft_status_${dateStr}_${act}_${prodiId}_${c.no}`) || 'HADIR'; 
         const rs = storage.getItem(`draft_reason_${dateStr}_${act}_${prodiId}_${c.no}`) || '';
         const pr = storage.getItem(`draft_proof_${dateStr}_${act}_${prodiId}_${c.no}`) || '';
 
-        if (st === 'Hadir') presentCnt++; else absentCnt++; 
+        if (st === 'HADIR') presentCnt++; else absentCnt++; 
         
         cadetsDraftData.push({
           no: c.no,
@@ -3802,8 +3797,8 @@ function markAsUnsaved(prodiId) {
       appData.prodis.forEach(prodi => {
         const cadets = (appData.cadets[prodi.currentName] || []).filter(c => activeCategory === 'Batalyon' || (activeCategory === 'Putra' && c.gender === 'Laki-Laki') || (activeCategory === 'Putri' && c.gender === 'Perempuan'));
         cadets.forEach(c => {
-          const status = storage.getItem(`draft_status_${dateStr}_${act}_${prodi.prodiId}_${c.no}`) || 'Hadir';
-          if (status !== 'Hadir') {
+          const status = storage.getItem(`draft_status_${dateStr}_${act}_${prodi.prodiId}_${c.no}`) || 'HADIR';
+          if (status !== 'HADIR') {
             const reason = storage.getItem(`draft_reason_${dateStr}_${act}_${prodi.prodiId}_${c.no}`) || '';
             const att = storage.getItem(`draft_proof_${dateStr}_${act}_${prodi.prodiId}_${c.no}`) || '';
             absents.push({ prodiName: prodi.currentName, cadetNo: c.no, cadetName: c.name, status, reason, attachmentBase64: att });
@@ -4240,7 +4235,7 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
         });
       }
 
-      let statusCounts = { 'Hadir': 0 };
+      let statusCounts = { 'HADIR': 0 };
       absenceStatuses.forEach(st => statusCounts[st] = 0);
 
       let logPool = src === 'last' && appData.historyAttendance.length > 0 ? [appData.historyAttendance[0]] : appData.historyAttendance;
@@ -4250,7 +4245,7 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
           if (lvl === 'Prodi') items = items.filter(a => a.prodiName === pd);
           else if (lvl === 'Putra' || lvl === 'Putri') items = items.filter(a => { const c = (appData.cadets[a.prodiName] || []).find(x => x.no === a.cadetNo); return c && c.gender === (lvl === 'Putra' ? 'Laki-Laki' : 'Perempuan'); });
           
-          statusCounts['Hadir'] += (log.totalCadets - items.length);
+          statusCounts['HADIR'] += (log.totalCadets - items.length);
 
           items.forEach(a => {
              if(statusCounts[a.status] !== undefined) statusCounts[a.status]++;
@@ -4260,7 +4255,7 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
       });
 
       const pieLabels = ['HADIR', ...absenceStatuses.map(st => st.toUpperCase())];
-      const pieData = [statusCounts['Hadir'], ...absenceStatuses.map(st => statusCounts[st])];
+      const pieData = [statusCounts['HADIR'], ...absenceStatuses.map(st => statusCounts[st])];
       const actualColors = pieLabels.map((_, i) => bgColors[i % bgColors.length]);
 
       const pieEl = document.getElementById('pieChart');
@@ -4648,7 +4643,7 @@ if (window.syncLocalStorageToCloud) {
       const val = standardizeEYD(document.getElementById('newAbsenceStatusInput').value);
       if (!val) return;
       let statuses = JSON.parse(storage.getItem('e_arvy_absence_statuses') || '["Sakit", "Izin", "Alpa", "Dinas"]');
-      if (!statuses.includes(val) && val !== 'Hadir') {
+      if (!statuses.includes(val) && val !== 'HADIR') {
         statuses.push(val); storage.setItem('e_arvy_absence_statuses', JSON.stringify(statuses));
         document.getElementById('newAbsenceStatusInput').value = ''; renderAbsenceStatusManager(); populatePresensiActivities(); renderAttendanceList(); showToast('Ditambahkan', 'Status presensi ditambahkan.', 'success');
       }
@@ -4788,10 +4783,27 @@ if (window.syncLocalStorageToCloud) window.syncLocalStorageToCloud('e_arvy_absen
     }
 
     function saveAnnounceConfig(e) {
-      e.preventDefault(); const today = new Date().toISOString().split('T')[0];
+      e.preventDefault(); 
+  
+      const today = getLocalDateString(); 
       const ann = appData.announcements.find(a => a.date === today) || {};
-      callServer('saveAnnouncement', { date: today, pakaianInfo: standardizeEYD(document.getElementById('announcePakaian').value), piketBatalyonPutraName: standardizeEYD(document.getElementById('announcePiketBatPaName').value), piketBatalyonPutraTelegram: document.getElementById('announcePiketBatPaTg').value, piketBatalyonPutraAvatar: ann.piketBatalyonPutraAvatar, piketBatalyonPutriName: standardizeEYD(document.getElementById('announcePiketBatPiName').value), piketBatalyonPutriTelegram: document.getElementById('announcePiketBatPiTg').value, piketBatalyonPutriAvatar: ann.piketBatalyonPutriAvatar, username: currentUser.username }, () => {
-        showToast('Disimpan', 'Pengumuman diperbarui.', 'success'); loadDashboardAndAppData();
+      
+      callServer('saveAnnouncement', { 
+          date: today, 
+          pakaianInfo: standardizeEYD(document.getElementById('announcePakaian').value), 
+          piketBatalyonPutraName: standardizeEYD(document.getElementById('announcePiketBatPaName').value), 
+          piketBatalyonPutraTelegram: document.getElementById('announcePiketBatPaTg').value, 
+          piketBatalyonPutraAvatar: ann.piketBatalyonPutraAvatar, 
+          piketBatalyonPutriName: standardizeEYD(document.getElementById('announcePiketBatPiName').value), 
+          piketBatalyonPutriTelegram: document.getElementById('announcePiketBatPiTg').value, 
+          piketBatalyonPutriAvatar: ann.piketBatalyonPutriAvatar, 
+          username: currentUser.username 
+      }, () => {
+            if (window.syncLocalStorageToCloud) {
+            window.syncLocalStorageToCloud('e_arvy_announcements');
+        }
+        showToast('Disimpan', 'Pengumuman diperbarui.', 'success'); 
+        loadDashboardAndAppData();
       });
     }
 
@@ -5610,7 +5622,7 @@ window.fetchJadwalDefaultDariSupabase = async function() {
                   if (statusDropdown) {
                       statusDropdown.value = newData.jsonString;
                       // Otomatis buka/tutup kolom alasan di layar kita
-                      if (newData.jsonString !== 'Hadir') {
+                      if (newData.jsonString !== 'HADIR') {
                           detailRow.classList.remove('hidden');
                           detailRow.classList.add('flex');
                       } else {
@@ -5667,7 +5679,7 @@ window.fetchJadwalDefaultDariSupabase = async function() {
 <script>
 
 // --- UBAH ANGKA INI SETIAP KALI AKU DEPLOY HTML BARU ---
-const APP_VERSION = "v1.3.0"; 
+const APP_VERSION = "v1.3.2"; 
 // -------------------------------------------------------------------
 
 function forceClearCacheOnUpdate() {
