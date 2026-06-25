@@ -745,6 +745,20 @@
             <input type="text" id="customActivityName" onblur="this.value = standardizeEYD(this.value); renderAttendanceList();" oninput="renderAttendanceList()" class="w-full px-4 py-2.5 rounded-ios-md glass-input text-sm text-slate-900 dark:text-white focus:outline-none" placeholder="Masukkan nama kegiatan baru...">
           </div>
 
+<div id="miniRecapCard" class="hidden mt-4 p-4 bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900 rounded-ios-md justify-between items-center transition-all animate-fadeIn">
+  <div class="flex items-center gap-3">
+    <div class="p-2 bg-rose-100 dark:bg-rose-900/50 rounded-full text-ios-red">
+      <i data-lucide="user-minus" class="w-5 h-5"></i>
+    </div>
+    <div class="flex flex-col">
+      <span class="text-sm font-bold text-slate-900 dark:text-white">Total Kurang Hadir</span>
+      <span class="text-[10px] text-slate-500 font-medium">Berdasarkan filter aktif saat ini</span>
+    </div>
+  </div>
+  <div class="text-2xl font-black text-ios-red" id="miniRecapCount">
+    0
+  </div>
+</div>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="flex flex-col gap-1.5">
               <label class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Tanggal Presensi</label>
@@ -1273,50 +1287,65 @@ function getLocalDateString(d = new Date()) {
       return `${year}-${month}-${day}`;
     }
 
-    function sendDesktopNotification(title, message, soundType = 'default') {
-      
-      // --- LOGIKA PEMUTAR SUARA KUSTOM ---
-      try {
-        let audioFile = '';
-        if (soundType === 'bell') audioFile = './sounds/bell.mp3';
-        else if (soundType === 'stealing') audioFile = './sounds/stealing.mp3';
-else if (soundType === 'rukanmalam') audioFile = './sounds/rukanmalam.mp3';
-        
-        if (audioFile !== '') {
-          const audio = new Audio(audioFile);
-          // Putar suara. Catch error digunakan jika browser memblokir Autoplay
-          audio.play().catch(err => console.log('Suara diblokir oleh browser (butuh interaksi pengguna):', err));
-        }
-      } catch(e) {
-        console.log('Gagal memutar audio', e);
-      }
-      // -----------------------------------
+    let lastNotificationId = "";
+let notificationTimeout = null;
 
-      if ('Notification' in window && Notification.permission === 'granted') {
-        
-        if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-          navigator.serviceWorker.ready.then(function(registration) {
-            registration.showNotification(title, {
-              body: message,
-              icon: './logowalrusearvy.png',
-              vibrate: soundType === 'peluit' ? [300, 100, 300, 100, 300] : [200, 100, 200], 
-              requireInteraction: true 
-            });
-          });
-        } 
-        else {
-          const notif = new Notification(title, {
-            body: message,
-            icon: './logowalrusearvy.png'
-          });
-          
-          notif.onclick = function() {
-            window.focus(); 
-            this.close(); 
-          };
-        }
-      }
+function sendDesktopNotification(title, message, soundType = 'default') {
+  // --- Mencegah Notifikasi Ganda (Debouncer & Unique Tag) ---
+  const currentNotifId = title + message;
+  
+  // Jika notifikasi yang sama persis sedang diproses dalam 3 detik terakhir, batalkan!
+  if (lastNotificationId === currentNotifId) return; 
+
+  lastNotificationId = currentNotifId;
+  clearTimeout(notificationTimeout);
+  notificationTimeout = setTimeout(() => {
+      lastNotificationId = ""; // Reset memori setelah 3 detik
+  }, 3000);
+  // ----------------------------------------------------
+
+  // --- LOGIKA PEMUTAR SUARA KUSTOM ---
+  try {
+    let audioFile = '';
+    if (soundType === 'bell') audioFile = './sounds/bell.mp3';
+    else if (soundType === 'stealing') audioFile = './sounds/stealing.mp3';
+    else if (soundType === 'rukanmalam') audioFile = './sounds/rukanmalam.mp3';
+    
+    if (audioFile !== '') {
+      const audio = new Audio(audioFile);
+      audio.play().catch(err => console.log('Suara diblokir oleh browser (butuh interaksi pengguna):', err));
     }
+  } catch(e) {
+    console.log('Gagal memutar audio', e);
+  }
+  // -----------------------------------
+
+  if ('Notification' in window && Notification.permission === 'granted') {
+    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+      navigator.serviceWorker.ready.then(function(registration) {
+        registration.showNotification(title, {
+          body: message,
+          icon: './logowalrusearvy.png',
+          tag: 'earvy_pengumuman', // <--- Mencegah notifikasi numpuk di tray OS
+          vibrate: soundType === 'peluit' ? [300, 100, 300, 100, 300] : [200, 100, 200], 
+          requireInteraction: true 
+        });
+      });
+    } 
+    else {
+      const notif = new Notification(title, {
+        body: message,
+        icon: './logowalrusearvy.png',
+        tag: 'earvy_pengumuman' // <--- Mencegah notifikasi numpuk di tray OS
+      });
+      
+      notif.onclick = function() {
+        window.focus(); 
+        this.close(); 
+      };
+    }
+  }
+}
 
     const DEFAULT_SVG_LOGO_LOGIN = `<img src="./logowalrusearvy.png"
 class="w-14 h-14 object-contain rounded drop-shadow-lg" alt="Logo Login">`;
@@ -3175,6 +3204,7 @@ function toggleSelectAll(prodiId, isChecked) {
         updateProdiSummary(prodiId);
         updateAllKompisCumulativeAbsents();
         markAsUnsaved(prodiId);
+updateMiniRecapCard();
         
         // Render ulang untuk memunculkan gambar
         renderAttendanceList();
@@ -3196,7 +3226,43 @@ function toggleSelectAll(prodiId, isChecked) {
       }
     }
 
+function updateMiniRecapCard() {
+  const card = document.getElementById('miniRecapCard');
+  const countText = document.getElementById('miniRecapCount');
+  if (!card || !countText) return;
 
+  const dateStr = document.getElementById('presensiDate').value;
+  let act = document.getElementById('presensiActivitySelect').value;
+  if (act === 'kustom') act = document.getElementById('customActivityName').value;
+  
+  // Sembunyikan jika kegiatan belum dipilih
+  if (!act) { 
+    card.classList.add('hidden'); 
+    card.classList.remove('flex'); 
+    return; 
+  }
+
+  let totalKurang = 0;
+  
+  // Kalkulasi total yang statusnya bukan 'HADIR'
+  appData.prodis.forEach(p => {
+    const cadets = (appData.cadets[p.currentName] || []).filter(c => activeCategory === 'Batalyon' || (activeCategory === 'Putra' && c.gender === 'Laki-Laki') || (activeCategory === 'Putri' && c.gender === 'Perempuan'));
+    cadets.forEach(c => {
+      const status = storage.getItem(`draft_status_${dateStr}_${act}_${p.prodiId}_${c.no}`) || 'HADIR';
+      if (status !== 'HADIR') totalKurang++;
+    });
+  });
+
+  // Tampilkan card hanya jika ada yang kurang hadir
+  if (totalKurang > 0) {
+    countText.innerText = totalKurang;
+    card.classList.remove('hidden');
+    card.classList.add('flex');
+  } else {
+    card.classList.add('hidden');
+    card.classList.remove('flex');
+  }
+}
     function renderAttendanceList() {
       const container = document.getElementById('kompiGroupWrapper');
       if (!container) return;
@@ -3547,7 +3613,7 @@ if (status === 'TAMBAH_BARU') {
         document.getElementById(`proof-base64-${prodiId}-${cadetNo}`).value = '';
       }
       updateProdiSummary(prodiId); updateAllKompisCumulativeAbsents();
-markAsUnsaved(prodiId);
+markAsUnsaved(prodiId); updateMiniRecapCard();
     }
 
     function syncDraftReason(prodiId, cadetNo) {
@@ -5710,7 +5776,7 @@ window.fetchJadwalDefaultDariSupabase = async function() {
 <script>
 
 // --- UBAH ANGKA INI SETIAP KALI AKU DEPLOY HTML BARU ---
-const APP_VERSION = "v1.3.4"; 
+const APP_VERSION = "v1.3.5"; 
 // -------------------------------------------------------------------
 
 function forceClearCacheOnUpdate() {
