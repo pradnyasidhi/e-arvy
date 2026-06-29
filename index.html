@@ -639,7 +639,7 @@
         </div>
         <div class="relative flex-1 bg-white dark:bg-zinc-700 px-3 py-2.5 rounded-2xl border-2 border-slate-700 dark:border-zinc-500 shadow-sm">
           <div class="absolute -left-[7px] top-4 w-3.5 h-3.5 bg-white dark:bg-zinc-700 border-l-2 border-b-2 border-slate-700 dark:border-zinc-500 transform rotate-45 rounded-sm"></div>
-          <p id="petSpeechBubble" class="text-[10px] sm:text-[11px] font-bold text-slate-800 dark:text-zinc-200 leading-snug relative z-10">Aku sehat! Tolong disiplin absen terus ya biar aku gak sakit.</p>
+          <p id="petSpeechBubble" class="text-[10px] sm:text-[11px] font-bold text-slate-800 dark:text-zinc-200 leading-snug relative z-10">Arvy sehat! Tolong disiplin absen terus ya biar Arvy gak sakit.</p>
         </div>
      </div>
   </div>
@@ -4429,99 +4429,133 @@ let currentRecapFormat = 'Kadpaga';
       const activeClass = "flex-1 text-center py-2 rounded-ios-sm text-xs font-bold bg-white text-slate-800 dark:bg-zinc-700 dark:text-white shadow-sm transition-all";
       const inactiveClass = "flex-1 text-center py-2 rounded-ios-sm text-xs font-bold text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-zinc-200 transition-all";
 
-      if (format === 'Kadpaga') {
-          btnKadpaga.className = activeClass;
-          btnPokdokad.className = inactiveClass;
-          // Tampilkan sub-filter (Putra/Putri) jika kategorinya Batalyon
-          if (currentViewedLog.category === 'Batalyon') {
-              document.getElementById('recapFilterOptions').classList.remove('hidden');
-          }
-      } else {
-          btnPokdokad.className = activeClass;
-          btnKadpaga.className = inactiveClass;
-          // Sembunyikan sub-filter (Pokdokad umumnya rekap batalyon total)
-          document.getElementById('recapFilterOptions').classList.add('hidden');
-      }
+     if (format === 'Kadpaga') {
+      btnKadpaga.className = activeClass;
+      btnPokdokad.className = inactiveClass;
+  } else {
+      btnPokdokad.className = activeClass;
+      btnKadpaga.className = inactiveClass;
+  }
+  
+  // Tampilkan Sub-Filter (Putra/Putri) untuk KEDUA FORMAT (Kadpaga & Pokdokad) 
+  // asalkan kategori log yang sedang dilihat adalah "Batalyon"
+  if (currentViewedLog.category === 'Batalyon') {
+      document.getElementById('recapFilterOptions').classList.remove('hidden');
+  } else {
+      document.getElementById('recapFilterOptions').classList.add('hidden');
+  }
 
-      refreshRecapText();
-    }
+  refreshRecapText();
+}
 
     function refreshRecapText() {
       if (!currentViewedLog) return;
       if (currentRecapFormat === 'Kadpaga') {
           document.getElementById('recapTextarea').value = buildDynamicRecapText(currentViewedLog, currentRecapFilter);
       } else {
-          document.getElementById('recapTextarea').value = buildPokdokadFormat(currentViewedLog);
-      }
-    }
+          document.getElementById('recapTextarea').value = buildPokdokadFormat(currentViewedLog, currentRecapFilter);
+  }
+}
 
-    function buildPokdokadFormat(log) {
-        const dateObj = new Date(log.date);
-        const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-        const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-        const formattedDate = `${days[dateObj.getDay()]} ${dateObj.getDate()} ${months[dateObj.getMonth()]} ${dateObj.getFullYear()}`;
-        
-        let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET ${formattedDate.toUpperCase()}\n\n`;
-        text += `A. REKAP KEKUATAN ${log.activityName.toUpperCase()} KOPRAL KADET ${formattedDate.toUpperCase()} SBB:\n\n`;
-        text += `1. JUMLAH: ${log.totalCadets} + 22 PALESTINA\n`;
-        text += `2. KURANG: ${log.absentCount}\n`;
-        text += `3. HADIR: ${log.presentCount} + 22 PALESTINA\n\n`;
-        
-        text += `B. ADAPUN RINCIAN KEKUATAN ${log.activityName.toUpperCase()} SBB:\n\n`;
-        
-        const kompis = {1: {total:0, hadir:0, kurang:0, absents:[]}, 2: {total:0, hadir:0, kurang:0, absents:[]}, 3: {total:0, hadir:0, kurang:0, absents:[]}, 4: {total:0, hadir:0, kurang:0, absents:[]}, 5: {total:0, hadir:0, kurang:0, absents:[]}, 6: {total:0, hadir:0, kurang:0, absents:[]}};
-   
-        appData.prodis.forEach(p => {
-            const pCadets = appData.cadets[p.currentName] || [];
-            
-         
-            let filteredCadets = pCadets;
-            if (log.category === 'Putra') filteredCadets = pCadets.filter(c => c.gender === 'Laki-Laki');
-            if (log.category === 'Putri') filteredCadets = pCadets.filter(c => c.gender === 'Perempuan');
+    function buildPokdokadFormat(log, mode = 'Batalyon') {
+    const dateObj = new Date(log.date);
+    const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    const formattedDate = `${days[dateObj.getDay()]}, ${dateObj.getDate()} ${months[dateObj.getMonth()]} ${dateObj.getFullYear()}`;
+    
+    // 1. Setup Variabel Berdasarkan Filter (Mode)
+    const isPutra = mode === 'Putra';
+    const targetGender = isPutra ? 'Laki-Laki' : 'Perempuan';
+    const totalQuota = mode === 'Batalyon' ? log.totalCadets : (isPutra ? (appData.settings.total_putra || 0) : (appData.settings.total_putri || 0));
 
-            kompis[p.kompiNumber].total += filteredCadets.length;
-            
-            const pAbsents = log.absents.filter(a => a.prodiName === p.currentName);
-            kompis[p.kompiNumber].kurang += pAbsents.length;
-            kompis[p.kompiNumber].hadir += (filteredCadets.length - pAbsents.length);
-            
-            pAbsents.forEach(a => kompis[p.kompiNumber].absents.push(a));
+    // 2. Filter Daftar Tidak Hadir (Absents) Berdasarkan Gender
+    let filteredAbsents = log.absents || [];
+    if (mode !== 'Batalyon') {
+        filteredAbsents = log.absents.filter(a => {
+            const pCadets = appData.cadets[a.prodiName] || [];
+            const cadet = pCadets.find(c => c.name === a.cadetName);
+            return cadet && cadet.gender === targetGender;
         });
-        
-        const kompiLetters = ['A', 'B', 'C', 'D', 'E', 'F'];
-        
-        for (let i=1; i<=6; i++) {
-            if (kompis[i].total === 0) continue;
-            
-            text += `${i}. KOMPI ${kompiLetters[i-1]}\n`;
-            text += `JUMLAH: ${kompis[i].total}\n`;
-            text += `KURANG: ${kompis[i].kurang}\n`;
-            text += `HADIR: ${kompis[i].hadir}\n`;
-            text += `KETERANGAN:\n`;
-            
-            if (kompis[i].kurang === 0) {
-                text += `LENGKAP\n\n`;
-            } else {
-               
-                const statusGroup = {};
-                kompis[i].absents.forEach(a => {
-                    if (!statusGroup[a.status]) statusGroup[a.status] = [];
-                    statusGroup[a.status].push(a);
-                });
-                
-                for (const st in statusGroup) {
-                    text += `• ${statusGroup[st].length} ${st.toUpperCase()}\n`;
-                    statusGroup[st].forEach(a => {
-                        let reasonPart = a.reason ? ` (${a.reason})` : '';
-                        text += `${a.cadetName.toUpperCase()}${reasonPart}\n`;
-                    });
-                }
-                text += `\n`;
-            }
-        }
-        
-        return text.trim();
     }
+
+    const absentCount = filteredAbsents.length;
+    const presentCount = totalQuota - absentCount;
+    let kategoriStr = mode === 'Batalyon' ? '' : ` ${mode.toUpperCase()}`;
+    
+    // 3. Render Header Pokdokad
+    let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${kategoriStr} (${formattedDate.toUpperCase()})\n\n`;
+    text += `A. REKAP KEKUATAN ${log.activityName.toUpperCase()} KOPRAL KADET${kategoriStr} ${formattedDate.toUpperCase()} SBB:\n\n`;
+    
+    // Logika Palestina untuk Pokdokad Batalyon/Putra/Putri
+    let palestinaTotal = mode === 'Batalyon' ? 22 : (mode === 'Putra' ? 12 : 10);
+    text += `1. JUMLAH: ${totalQuota} + ${palestinaTotal} PALESTINA\n`;
+    text += `2. KURANG: ${absentCount}\n`;
+    text += `3. HADIR: ${presentCount} + ${palestinaTotal} PALESTINA\n\n`;
+    
+    text += `B. ADAPUN RINCIAN KEKUATAN ${log.activityName.toUpperCase()} SBB:\n\n`;
+    
+    const kompis = {
+        1: {total:0, hadir:0, kurang:0, absents:[]}, 
+        2: {total:0, hadir:0, kurang:0, absents:[]}, 
+        3: {total:0, hadir:0, kurang:0, absents:[]}, 
+        4: {total:0, hadir:0, kurang:0, absents:[]}, 
+        5: {total:0, hadir:0, kurang:0, absents:[]}, 
+        6: {total:0, hadir:0, kurang:0, absents:[]}
+    };
+
+    // 4. Kalkulasi Data Setiap Prodi Sesuai Filter
+    appData.prodis.forEach(p => {
+        const pCadets = appData.cadets[p.currentName] || [];
+        
+        let filteredCadets = pCadets;
+        if (mode !== 'Batalyon') {
+            filteredCadets = pCadets.filter(c => c.gender === targetGender);
+        }
+
+        kompis[p.kompiNumber].total += filteredCadets.length;
+        
+        const pAbsents = filteredAbsents.filter(a => a.prodiName === p.currentName);
+        kompis[p.kompiNumber].kurang += pAbsents.length;
+        kompis[p.kompiNumber].hadir += (filteredCadets.length - pAbsents.length);
+        
+        pAbsents.forEach(a => kompis[p.kompiNumber].absents.push(a));
+    });
+    
+    // 5. Cetak Kompi ke Teks
+    const kompiLetters = ['A', 'B', 'C', 'D', 'E', 'F'];
+    
+    for (let i=1; i<=6; i++) {
+        if (kompis[i].total === 0) continue; // Jangan cetak kompi jika kosong (akibat filter)
+        
+        text += `${i}. KOMPI ${kompiLetters[i-1]}\n`;
+        text += `JUMLAH: ${kompis[i].total}\n`;
+        text += `KURANG: ${kompis[i].kurang}\n`;
+        text += `HADIR: ${kompis[i].hadir}\n`;
+        text += `KETERANGAN:\n`;
+        
+        if (kompis[i].kurang === 0) {
+            text += `LENGKAP\n\n`;
+        } else {
+            // Kelompokkan Alasan berdasarkan Status (SAKIT, IZIN, dll)
+            const statusGroup = {};
+            kompis[i].absents.forEach(a => {
+                if (!statusGroup[a.status]) statusGroup[a.status] = [];
+                statusGroup[a.status].push(a);
+            });
+            
+            for (const st in statusGroup) {
+                text += `• ${statusGroup[st].length} ${st.toUpperCase()}\n`;
+                statusGroup[st].forEach(a => {
+                    let reasonPart = a.reason ? ` (${a.reason})` : '';
+                    text += `${a.cadetName.toUpperCase()}${reasonPart}\n`;
+                });
+            }
+            text += `\n`;
+        }
+    }
+    
+    return text.trim();
+}
 
     function applyRecapFilter(mode) {
       if (!currentViewedLog) return;
@@ -5833,7 +5867,7 @@ function updatePetUI() {
   if (currentXp >= 70) {
     xpBar.className = "h-full bg-[#a8d672] transition-all duration-500 rounded-full";
     avatar.src = PET_ANIMATIONS.healthy; 
-    speech.innerText = "Yey! Arvy kenyang & sehat! Makasih udah disiplin absen.";
+    speech.innerText = "Yey! Arvy kenyang & sehat! Makasih sudah disiplin absen.";
   } else if (currentXp >= 30) {
     xpBar.className = "h-full bg-amber-400 transition-all duration-500 rounded-full";
     avatar.src = PET_ANIMATIONS.normal;
