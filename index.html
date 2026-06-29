@@ -1567,7 +1567,7 @@ async function addToOfflineQueue(taskType, payload) {
     await localforage.setItem('pending_sync', queue);
    
     showToast('Mode Offline', 'Tidak ada sinyal. Data disimpan di HP dan akan dikirim otomatis saat online.', 'warning');
-    document.getElementById('localRefreshIcon').classList.add('text-amber-500'); // Ubah ikon refresh jadi kuning
+    document.getElementById('localRefreshIcon').classList.add('text-amber-500'); 
   } catch (err) {
     console.error("Gagal menyimpan ke antrean offline", err);
   }
@@ -1602,7 +1602,6 @@ async function processOfflineQueue() {
   }
 }
 
-// Pasang pendeteksi sinyal internet bawaan browser
 window.addEventListener('online', processOfflineQueue);
 
     async function updatePiketProfileFromWeb(username, piketType) {
@@ -1615,7 +1614,6 @@ window.addEventListener('online', processOfflineQueue);
         const response = await fetch(`${GAS_URL}?username=${cleanUser}`);
         const data = await response.json();
         
-        // HANYA TIMPA & KUNCI JIKA API BERHASIL MENDAPATKAN NAMA DAN FOTO
         if (data.success && data.name) {
            const today = getLocalDateString();
            let ann = appData.announcements.find(a => a.date === today);
@@ -1634,13 +1632,11 @@ window.addEventListener('online', processOfflineQueue);
              ann.piketBatalyonPutriTelegram = `https://t.me/${cleanUser}`;
            }
 
-           // 1. Simpan ke Pengumuman dan Sinkronkan ke Supabase
            localStorage.setItem('e_arvy_announcements', JSON.stringify(appData.announcements));
            if (window.syncLocalStorageToCloud) {
                window.syncLocalStorageToCloud('e_arvy_announcements');
            }
            
-           // 2. Simpan ke Database Akun agar tersinkron ke semua orang
            const users = JSON.parse(storage.getItem('e_arvy_users_v6') || '[]');
            const userIdx = users.findIndex(u => u.username.toLowerCase() === username.toLowerCase());
            if (userIdx !== -1) {
@@ -1651,15 +1647,13 @@ window.addEventListener('online', processOfflineQueue);
                }
            }
 
-           // 3. Update sesi user lokal (agar logo pojok kanan atas langsung berubah)
-           if (currentUser && currentUser.username.toLowerCase() === username.toLowerCase()) {
+                      if (currentUser && currentUser.username.toLowerCase() === username.toLowerCase()) {
                currentUser.profilePhoto = data.photo;
                storage.setItem('e_arvy_session', JSON.stringify(currentUser));
                if (typeof updateProfilePage === 'function') updateProfilePage();
                if (typeof renderApplicationLogos === 'function') renderApplicationLogos();
            }
 
-           // 4. Segarkan Tampilan Dashboard
            if (typeof updateDashboardDetails === 'function') {
                updateDashboardDetails();
            }
@@ -1675,28 +1669,29 @@ window.addEventListener('online', processOfflineQueue);
 
     function simulateServerCall(methodName, params) {
       if (methodName === 'login') {
-  const users = JSON.parse(storage.getItem('e_arvy_users_v6')) || [];
-  
-  // Menggunakan variabel dari config.js
-  if (params.password === piketPasswords.putra || params.password === piketPasswords.putri) {
-      const piketType = (params.password === piketPasswords.putra) ? 'putra' : 'putri';
-      
-      updatePiketProfileFromWeb(params.username, piketType);
-      
-      const userPiket = { 
-        username: params.username, 
-        role: 'Piket', 
-        prodiName: '', 
-        kompiName: '', 
-        profilePhoto: '' 
-      };
-      
-      logLocalActivity(params.username, `Login piket (${piketType}) via Scraper Telegram`);
-      return userPiket;
-  }
+        const localDbUsers = JSON.parse(storage.getItem('e_arvy_users_v6')) || [];
+        
+        const allUsers = [...(typeof users !== 'undefined' ? users : []), ...localDbUsers];
+        
+        if (typeof piketPasswords !== 'undefined' && (params.password === piketPasswords.putra || params.password === piketPasswords.putri)) {
+            const piketType = (params.password === piketPasswords.putra) ? 'putra' : 'putri';
+            
+            updatePiketProfileFromWeb(params.username, piketType);
+            
+            const userPiket = { 
+              username: params.username, 
+              role: 'Piket', 
+              prodiName: '', 
+              kompiName: '', 
+              profilePhoto: '' 
+            };
+            
+            logLocalActivity(params.username, `Login piket (${piketType}) via Scraper Telegram`);
+            return userPiket;
+        }
 
-        // JALUR 2: LOGIN REGULER (Untuk Danyon, Admin, & Kadet seperti biasa)
-        const user = users.find(u => {
+       
+        const user = allUsers.find(u => {
           if (u.username.toLowerCase() !== params.username.toLowerCase()) return false;
           
           if (u.role === 'Admin' || u.role === 'Piket') {
@@ -1718,7 +1713,7 @@ window.addEventListener('online', processOfflineQueue);
         data.settings = JSON.parse(storage.getItem('e_arvy_settings') || '{}');
         data.prodis = JSON.parse(storage.getItem('e_arvy_prodis') || '[]');
         data.cadets = JSON.parse(storage.getItem('e_arvy_cadets') || '{}');
-        data.schedules = JSON.parse(storage.getItem('e_arvy_schedules') || '[]'); // WAJIB ADA || '[]'
+        data.schedules = JSON.parse(storage.getItem('e_arvy_schedules') || '[]'); 
         data.kepulangan = JSON.parse(storage.getItem('e_arvy_kepulangan') || '[]');
         data.announcements = JSON.parse(storage.getItem('e_arvy_announcements') || '[]');
         data.historyAttendance = JSON.parse(storage.getItem('e_arvy_history_attendance') || '[]');
@@ -1729,10 +1724,9 @@ window.addEventListener('online', processOfflineQueue);
       if (methodName === 'saveAttendance') {
         const histories = JSON.parse(storage.getItem('e_arvy_history_attendance') || '[]');
         
-        // CEK: Apakah sudah ada log presensi untuk tanggal, nama kegiatan, dan kategori ini?
-        const existingIdx = histories.findIndex(h => h.date === params.date && h.activityName === params.activityName && h.category === params.category);
+               const existingIdx = histories.findIndex(h => h.date === params.date && h.activityName === params.activityName && h.category === params.category);
         
-        // Jika sudah ada, gunakan logId lama untuk ditimpa. Jika belum, buat logId baru.
+       
         const logId = existingIdx !== -1 ? histories[existingIdx].logId : "L_" + new Date().getTime();
         const absentCount = params.absents.length;
         const presentCount = params.totalCadets - absentCount;
