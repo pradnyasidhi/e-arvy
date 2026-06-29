@@ -3,7 +3,7 @@
 <html lang="id" class="scroll-smooth">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=0.85, maximum-scale=0.85, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>e-Arvy · Nara Arvyaksa #6</title>
 
 <meta name="title" content="e-Arvy · Nara Arvyaksa #6">
@@ -39,6 +39,9 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./config.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
 
   <script>
     tailwind.config = {
@@ -378,9 +381,9 @@
   </header>
 
   
-  <div id="loginWrapper" class="fixed inset-0 bg-slate-100/90 dark:bg-black/95 backdrop-blur-2xl z-[2000] flex items-center justify-center p-4 transition-all-300">
-    
-    <div class="flex w-full max-w-4xl h-[560px] bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl overflow-hidden border border-white/20 dark:border-zinc-800/40 animate-fadeIn">
+  <div id="loginWrapper" class="fixed inset-0 bg-slate-100/90 dark:bg-black/95 backdrop-blur-2xl z-[2000] flex items-start sm:items-center justify-center p-4 py-10 sm:py-4 transition-all-300 overflow-y-auto">
+
+  <div class="flex w-full max-w-4xl h-auto md:h-[560px] m-auto bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl overflow-hidden border border-white/20 dark:border-zinc-800/40 animate-fadeIn">
 
       <div class="relative hidden md:flex w-1/2 overflow-hidden items-end justify-center h-[560px] bg-slate-200">
         
@@ -608,6 +611,37 @@
           </div>
           
           <div class="flex flex-col gap-4 h-full justify-between">
+
+<!-- Widget Arvy Virtual Pet -->
+<div class="bg-[#fff8eb] dark:bg-zinc-800 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-[#f0e3c8] dark:border-zinc-700 flex flex-col relative shrink-0">
+  <div class="px-4 py-3 flex justify-between items-center z-10 border-b border-[#f0e3c8]/50 dark:border-zinc-700/50">
+    <div class="flex items-center gap-2">
+      <span class="bg-[#a8d672] text-white text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider shadow-sm" id="petLevelBadge">Lv.1</span>
+      <span class="text-xs font-extrabold text-slate-700 dark:text-zinc-200">Arvy Virtual Pet</span>
+    </div>
+    <button onclick="openPetLeaderboard()" class="text-[10px] font-bold text-ios-blue bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded hover:bg-blue-100 transition-colors flex items-center gap-1 shadow-sm">
+      <i data-lucide="trophy" class="w-3 h-3 text-amber-500"></i> Leaderboard
+    </button>
+  </div>
+  <div class="p-4 flex flex-col gap-3">
+     <div class="flex items-center gap-2 w-full">
+        <div class="w-full h-2.5 bg-slate-200 dark:bg-zinc-700 rounded-full overflow-hidden border border-slate-300/50 dark:border-zinc-600">
+          <div id="petXpBar" class="h-full bg-[#a8d672] w-[50%] transition-all duration-500 rounded-full"></div>
+        </div>
+        <span class="text-[9px] font-bold text-slate-500 w-10 text-right" id="petXpText">50/100</span>
+     </div>
+     <div class="flex flex-row items-center gap-3 mt-1">
+        <div class="relative w-24 h-24 sm:w-28 sm:h-28 bg-transparent rounded-2xl border-2 border-white dark:border-zinc-600 flex flex-col justify-end items-center overflow-hidden shrink-0">
+            <img id="petAvatar" src="https://media.giphy.com/media/OvS3HOUuoPbRVftwqA/giphy.gif" class="absolute inset-0 w-full h-full object-cover z-10 cursor-default">
+            <div class="absolute bottom-2 w-14 h-2.5 bg-black/10 dark:bg-black/50 rounded-[100%] filter blur-[2px]"></div>
+        </div>
+        <div class="relative flex-1 bg-white dark:bg-zinc-700 px-3 py-2.5 rounded-2xl border-2 border-slate-700 dark:border-zinc-500 shadow-sm">
+          <div class="absolute -left-[7px] top-4 w-3.5 h-3.5 bg-white dark:bg-zinc-700 border-l-2 border-b-2 border-slate-700 dark:border-zinc-500 transform rotate-45 rounded-sm"></div>
+          <p id="petSpeechBubble" class="text-[10px] sm:text-[11px] font-bold text-slate-800 dark:text-zinc-200 leading-snug relative z-10">Aku sehat! Tolong disiplin absen terus ya biar aku gak sakit.</p>
+        </div>
+     </div>
+  </div>
+</div>
             
             <div class="bg-white dark:bg-zinc-900 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-slate-200 dark:border-zinc-700 flex flex-col relative overflow-hidden flex-1">
               
@@ -1460,18 +1494,9 @@ let formatted = text.trim().replace(/[ \t]+/g, ' ');
         ];
         originalSetItem('e_arvy_prodis', JSON.stringify(defaultProdiList));
 
-        const users = [
-          { username: 'nami', password: CryptoJS.SHA256('0401072').toString(), role: 'Admin', prodiName: '', kompiName: '', profilePhoto: '' },
-          { username: 'piket', password: CryptoJS.SHA256('piket6').toString(), role: 'Piket', prodiName: '', kompiName: '', profilePhoto: '' },
-          // Tambahkan 5 akun baru di sini (Diberi akses setara Admin)
-          { username: 'danyon', password: CryptoJS.SHA256('danyon6').toString(), role: 'Piket', prodiName: '', kompiName: '', profilePhoto: '' },
-          { username: 'wadanyon', password: CryptoJS.SHA256('wadanyon6').toString(), role: 'Piket', prodiName: '', kompiName: '', profilePhoto: '' },
-          { username: 'danki', password: CryptoJS.SHA256('danki6').toString(), role: 'Piket', prodiName: '', kompiName: '', profilePhoto: '' },
-          { username: 'danton', password: CryptoJS.SHA256('danton6').toString(), role: 'Piket', prodiName: '', kompiName: '', profilePhoto: '' },
-          { username: 'pasi', password: CryptoJS.SHA256('pasi6').toString(), role: 'Piket', prodiName: '', kompiName: '', profilePhoto: '' }
-        ];
+const localUsers = typeof defaultUsers !== 'undefined' ? [...defaultUsers] : [];
 
-  defaultProdiList.forEach(p => users.push({ 
+  defaultProdiList.forEach(p => localUsers.push({ 
     username: p.currentName.replace(/\s+/g, '').toLowerCase(), 
     password: 'cohort6', 
     role: 'Kopral Kadet', 
@@ -1480,19 +1505,22 @@ let formatted = text.trim().replace(/[ \t]+/g, ' ');
     profilePhoto: '' 
   }));
 
-  originalSetItem('e_arvy_users_v6', JSON.stringify(users))
+  originalSetItem('e_arvy_users_v6', JSON.stringify(localUsers));
 originalSetItem('e_arvy_settings', JSON.stringify(appData.settings));
+storage.setItem('e_arvy_initialized_real_data_v6', 'true');
+}
 
-        const todayStr = getLocalDateString();
-const defaultSchedules = [
-{ date: todayStr, time: "05:00", title: "Apel Pagi", location: "Lapangan Utama", photoUrl: "" },
-          { date: todayStr, time: "12:00", title: "Makan Siang", location: "Ruang Makan"} ];
-originalSetItem('e_arvy_schedules', JSON.stringify(defaultSchedules));
-originalSetItem('e_arvy_kepulangan', JSON.stringify([]));
-originalSetItem('e_arvy_absence_statuses', JSON.stringify(['SAKIT', 'IZIN', 'DINAS LUAR', 'DINAS DALAM', 'GASUH', 'KONTROL', 'KELAS', 'TANPA KETERANGAN']));
-originalSetItem('e_arvy_initialized_real_data_v6', 'true');
+       function getAbsenceStatuses() {
+    const todayStr = getLocalDateString();
+    const savedDate = storage.getItem('e_arvy_absence_date');
+    if (savedDate !== todayStr) {
+        const DEFAULT_ABSENCE_STATUSES = ['SAKIT', 'IZIN', 'DINAS LUAR', 'DINAS DALAM', 'GASUH', 'KONTROL', 'KELAS', 'TANPA KETERANGAN'];
+        storage.setItem('e_arvy_absence_statuses', JSON.stringify(DEFAULT_ABSENCE_STATUSES));
+        storage.setItem('e_arvy_absence_date', todayStr);
+        return [...DEFAULT_ABSENCE_STATUSES];
     }
-  } 
+    return JSON.parse(storage.getItem('e_arvy_absence_statuses'));
+}
 
   function callServer(methodName, params, successCallback, errorCallback) {
     setTimeout(() => {
@@ -1504,6 +1532,62 @@ originalSetItem('e_arvy_initialized_real_data_v6', 'true');
       }
     }, 150);
   }
+
+localforage.config({
+  name: 'eArvy_OfflineDB',
+  storeName: 'sync_queue'
+});
+}
+
+async function addToOfflineQueue(taskType, payload) {
+  try {
+    const queue = await localforage.getItem('pending_sync') || [];
+    queue.push({ 
+      id: Date.now().toString(), 
+      type: taskType, 
+      data: payload, 
+      timestamp: new Date().toISOString() 
+    });
+    await localforage.setItem('pending_sync', queue);
+   
+    showToast('Mode Offline', 'Tidak ada sinyal. Data disimpan di HP dan akan dikirim otomatis saat online.', 'warning');
+    document.getElementById('localRefreshIcon').classList.add('text-amber-500'); // Ubah ikon refresh jadi kuning
+  } catch (err) {
+    console.error("Gagal menyimpan ke antrean offline", err);
+  }
+}
+
+async function processOfflineQueue() {
+  const queue = await localforage.getItem('pending_sync') || [];
+  if (queue.length === 0) return;
+
+  showToast('Sinyal Tersambung', `Mengirim ${queue.length} data tertunda ke server...`, 'info');
+  document.getElementById('localRefreshIcon').classList.remove('text-amber-500');
+
+  let remainingQueue = [];
+
+  for (const task of queue) {
+    try {
+      if (task.type === 'SYNC_LOCAL_TO_CLOUD') {
+        await supabaseClient.from('DataArvy').upsert({ kunci: task.data.key, jsonString: task.data.value }, { onConflict: 'kunci' });
+      } else if (task.type === 'SAVE_PRESENSI') {
+        await supabaseClient.from('LogPresensi').upsert(task.data, { onConflict: 'logId' });
+      } else if (task.type === 'UPDATE_PET') {
+        await supabaseClient.from('VirtualPet').upsert(task.data, { onConflict: 'prodi_name' });
+      }
+    } catch (error) {
+      console.error("Gagal proses antrean", error);
+      remainingQueue.push(task);     }
+  }
+
+  await localforage.setItem('pending_sync', remainingQueue);
+  if (remainingQueue.length === 0) {
+    showToast('Sinkronisasi Selesai', 'Semua data tertunda berhasil masuk ke server.', 'success');
+  }
+}
+
+// Pasang pendeteksi sinyal internet bawaan browser
+window.addEventListener('online', processOfflineQueue);
 
     async function updatePiketProfileFromWeb(username, piketType) {
       const cleanUser = username.replace('@', '').trim();
@@ -1556,25 +1640,25 @@ originalSetItem('e_arvy_initialized_real_data_v6', 'true');
 
     function simulateServerCall(methodName, params) {
       if (methodName === 'login') {
-        const users = JSON.parse(storage.getItem('e_arvy_users_v6')) || [];
-        
-        if (params.password === 'piketpa6' || params.password === 'piketpi6') {
-                    const piketType = (params.password === 'piketpa6') ? 'putra' : 'putri';
-          
-        
-          updatePiketProfileFromWeb(params.username, piketType);
-          
-          const userPiket = { 
-            username: params.username, 
-            role: 'Piket', 
-            prodiName: '', 
-            kompiName: '', 
-            profilePhoto: '' 
-          };
-          
-          logLocalActivity(params.username, `Login piket (${piketType}) via Scraper Telegram`);
-          return userPiket;
-        }
+  const users = JSON.parse(storage.getItem('e_arvy_users_v6')) || [];
+  
+  // Menggunakan variabel dari config.js
+  if (params.password === piketPasswords.putra || params.password === piketPasswords.putri) {
+      const piketType = (params.password === piketPasswords.putra) ? 'putra' : 'putri';
+      
+      updatePiketProfileFromWeb(params.username, piketType);
+      
+      const userPiket = { 
+        username: params.username, 
+        role: 'Piket', 
+        prodiName: '', 
+        kompiName: '', 
+        profilePhoto: '' 
+      };
+      
+      logLocalActivity(params.username, `Login piket (${piketType}) via Scraper Telegram`);
+      return userPiket;
+  }
 
         // JALUR 2: LOGIN REGULER (Untuk Danyon, Admin, & Kadet seperti biasa)
         const user = users.find(u => {
@@ -1713,8 +1797,7 @@ originalSetItem('e_arvy_initialized_real_data_v6', 'true');
         const list = JSON.parse(storage.getItem('e_arvy_kepulangan'));
         const idx = list.findIndex(k => k.prodiName === params.prodiName && k.date === params.date);
         
-        // --- TAMBAHKAN PENCATAT WAKTU REAL-TIME ---
-        const timestamp = new Date().toISOString(); 
+                const timestamp = new Date().toISOString(); 
         
         // Masukkan 'submittedAt' ke dalam objek data
         const entry = { 
@@ -3001,7 +3084,7 @@ function generateAndCopyShareLink() {
     }
 
 function populateConvertDropdowns() {
-  const statuses = ['HADIR', ...JSON.parse(storage.getItem('e_arvy_absence_statuses') || '["Sakit", "Izin", "Alpa", "Dinas"]')]
+  const statuses = ['HADIR', ...getAbsenceStatuses()]
   let html = '';
   statuses.forEach(st => html += `<option value="${st}">${st}</option>`);
   document.getElementById('convertFromStatus').innerHTML = html;
@@ -3474,7 +3557,7 @@ function updateMiniRecapCard() {
       }
       container.innerHTML += lockBannerHtml;
 
-      const absenceStatuses = JSON.parse(storage.getItem('e_arvy_absence_statuses') || '["Sakit", "Izin", "Alpa", "Dinas"]');
+      const absenceStatuses = getAbsenceStatuses();
       let statusOptionsHtml = `<option value="HADIR">HADIR</option>`;
       absenceStatuses.forEach(st => statusOptionsHtml += `<option value="${st}">${st}</option>`);
 
@@ -3740,7 +3823,7 @@ updateMiniRecapCard()
           if (formattedStatus.toUpperCase() === 'HADIR') {
               storage.setItem(`draft_status_${dateStr}_${activityName}_${prodiId}_${cadetNo}`, 'HADIR');
           } else {
-              let statuses = JSON.parse(storage.getItem('e_arvy_absence_statuses') || '["Sakit", "Izin", "Alpa", "Dinas"]');
+              let statuses = getAbsenceStatuses();
               if (!statuses.includes(formattedStatus)) {
                   statuses.push(formattedStatus);
                   storage.setItem('e_arvy_absence_statuses', JSON.stringify(statuses));
@@ -4006,8 +4089,31 @@ function markAsUnsaved(prodiId) {
         showToast('Tersimpan Sementara', `Prodi ${prodiName} disimpan lokal.`, 'success');
       }
       
-      loadDashboardAndAppData();
+      const now = new Date();
+    let isLate = false;
+
+    const schedule = appData.schedules.find(s => s.date === dateStr && s.title === act);
+
+    if (schedule && schedule.time) {
+        const [actHour, actMinute] = schedule.time.split(':').map(Number);
+        const [year, month, day] = dateStr.split('-');
+        
+        const activityTime = new Date(year, month - 1, day, actHour, actMinute, 0, 0);
+
+        const deadlineTime = new Date(activityTime.getTime() - (60 * 60 * 1000));
+
+
+        isLate = now > deadlineTime;
+    } else {
+                    isLate = false; 
     }
+
+ 
+    triggerAttendancePetReward(isLate, prodiName);
+
+
+    loadDashboardAndAppData();
+  }
 
     function resetSingleProdiAttendance(prodiId, prodiName) {
       if (!confirm(`Apakah Anda yakin ingin membatalkan simpan sementara dan mereset kehadiran prodi ${prodiName}?`)) return;
@@ -4432,7 +4538,7 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
       const pd = document.getElementById('statProdiSelect').value;
       const src = document.getElementById('pieLogSourceSelect').value;
       
-      const absenceStatuses = JSON.parse(storage.getItem('e_arvy_absence_statuses') || '["Sakit", "Izin", "Alpa", "Dinas"]');
+      const absenceStatuses = getAbsenceStatuses();
       const bgColors = ['#34c759', '#ff9500', '#007aff', '#ff3b30', '#8e8e93', '#af52de', '#ff2d55', '#5ac8fa', '#32ade6', '#a2845e'];
 
       const days = Array.from({length: 30}, (_, i) => i + 1);
@@ -4904,7 +5010,7 @@ if (window.syncLocalStorageToCloud) {
       const wrapper = document.getElementById('absenceStatusListWrapper');
       if (!wrapper) return; 
       
-      const statuses = JSON.parse(storage.getItem('e_arvy_absence_statuses') || '["Sakit", "Izin", "Alpa", "Dinas"]');
+      const statuses = getAbsenceStatuses();
       let statusHtml = ''; 
       
       statuses.forEach(st => {
@@ -4917,7 +5023,7 @@ if (window.syncLocalStorageToCloud) {
     function addNewAbsenceStatus() {
       const val = standardizeEYD(document.getElementById('newAbsenceStatusInput').value);
       if (!val) return;
-      let statuses = JSON.parse(storage.getItem('e_arvy_absence_statuses') || '["Sakit", "Izin", "Alpa", "Dinas"]');
+      let statuses = getAbsenceStatuses();
       if (!statuses.includes(val) && val !== 'HADIR') {
         statuses.push(val); storage.setItem('e_arvy_absence_statuses', JSON.stringify(statuses));
         document.getElementById('newAbsenceStatusInput').value = ''; renderAbsenceStatusManager(); populatePresensiActivities(); renderAttendanceList(); showToast('Ditambahkan', 'Status presensi ditambahkan.', 'success');
@@ -4960,7 +5066,7 @@ if (window.syncLocalStorageToCloud) window.syncLocalStorageToCloud('e_arvy_absen
 
     function deleteAbsenceStatus(st) {
       if(confirm(`Hapus status "${st}"?`)) {
-        let statuses = JSON.parse(storage.getItem('e_arvy_absence_statuses'));
+        let statuses = getAbsenceStatuses();
         storage.setItem('e_arvy_absence_statuses', JSON.stringify(statuses.filter(s => s !== st)));
         renderAbsenceStatusManager(); populatePresensiActivities(); renderAttendanceList();
       }
@@ -5532,6 +5638,92 @@ function updateDashboardPendataan() {
       }
     }
 
+const PET_ANIMATIONS = {
+  healthy: "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExa3l6NHkwbnhyNmdtcDhsd2I1enM3Ymt0a2R2amd0ZGd3YWs0dTcxbiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/Cym3GAviz8Da8AJ9D1/giphy.gif", 
+  normal: "https://media.giphy.com/media/157ptIj2qDyvxPjars/giphy.gif",      
+  sick: "https://media.giphy.com/media/OvS3HOUuoPbRVftwqA/giphy.gif"         
+};
+
+let petData = { xp: 50, level: 1 };
+
+function updatePetUI() {
+  const xpBar = document.getElementById('petXpBar');
+  const avatar = document.getElementById('petAvatar');
+  const speech = document.getElementById('petSpeechBubble');
+  if (!xpBar || !avatar) return;
+
+  let currentXp = Math.max(0, Math.min(100, petData.xp));
+  document.getElementById('petXpText').innerText = `${currentXp}/100`;
+  xpBar.style.width = `${currentXp}%`;
+  document.getElementById('petLevelBadge').innerText = `Lv.${petData.level}`;
+
+  if (currentXp >= 70) {
+    xpBar.className = "h-full bg-[#a8d672] transition-all duration-500 rounded-full";
+    avatar.src = PET_ANIMATIONS.healthy; 
+    speech.innerText = "Yey! Aku kenyang & sehat! Makasih udah disiplin absen.";
+  } else if (currentXp >= 30) {
+    xpBar.className = "h-full bg-amber-400 transition-all duration-500 rounded-full";
+    avatar.src = PET_ANIMATIONS.normal;
+    speech.innerText = "Hei, jangan sampai telat isi absen ya biar aku gak lapar!";
+  } else {
+    xpBar.className = "h-full bg-rose-500 transition-all duration-500 rounded-full";
+    avatar.src = PET_ANIMATIONS.sick;
+    speech.innerText = "Aku kelaparan & sakit... Tolong jangan telat absen 😿";
+  }
+}
+
+function triggerAttendancePetReward(isLate, prodiName) {
+  if (isLate) { petData.xp -= 15; showToast('Peringatan!', 'Telat absen! Pet kehilangan 15 XP.', 'error'); } 
+  else { petData.xp += 10; showToast('Hebat!', 'Absen tepat waktu! Pet mendapat +10 XP.', 'success'); }
+
+  if (petData.xp >= 100) {
+    petData.level += 1; petData.xp = 50;
+    showToast('Level Up!', `Arvy Pet Prodi kamu naik ke Level ${petData.level}!`, 'success');
+  } else if (petData.xp <= 0) {
+    if (petData.level > 1) { petData.level -= 1; petData.xp = 50; } 
+    else { petData.xp = 0; }
+  }
+  updatePetUI();
+
+  if(typeof supabaseClient !== 'undefined' && prodiName) {
+    supabaseClient.from('VirtualPet').upsert({ prodi_name: prodiName, xp: petData.xp, level: petData.level }, { onConflict: 'prodi_name' });
+  }
+}
+
+async function openPetLeaderboard() {
+  openModal('petLeaderboardModal');
+  const content = document.getElementById('leaderboardContent');
+  content.innerHTML = '<p class="text-center text-xs py-6"><i data-lucide="loader" class="animate-spin inline w-4 h-4 mr-1"></i> Memuat peringkat...</p>';
+  lucide.createIcons();
+  
+  try {
+    const { data, error } = await supabaseClient.from('VirtualPet').select('*');
+    if (error) throw error;
+    if (data && data.length > 0) {
+      data.sort((a,b) => b.level !== a.level ? b.level - a.level : b.xp - a.xp);
+      let html = '';
+      data.forEach((item, index) => {
+        let rankBadge = index === 0 ? '🥇' : (index === 1 ? '🥈' : (index === 2 ? '🥉' : `<span class="text-slate-400 font-bold text-sm">#${index + 1}</span>`));
+        let bgClass = index === 0 ? 'bg-amber-50 border-amber-200' : 'bg-slate-50 border-slate-100';
+        const statusText = item.xp >= 70 ? 'Healthy 💚' : (item.xp >= 30 ? 'Normal 💛' : 'Sick 💔');
+        const statusColor = item.xp >= 70 ? 'text-ios-green' : (item.xp >= 30 ? 'text-amber-500' : 'text-ios-red');
+
+        html += `
+          <div class="flex items-center justify-between p-3 rounded-lg border ${bgClass} transition-all">
+            <div class="flex items-center gap-3">
+               <div class="w-8 text-center text-xl drop-shadow-sm">${rankBadge}</div>
+               <div class="flex flex-col"><h4 class="text-sm font-extrabold text-slate-900">${item.prodi_name}</h4><span class="text-[9px] font-bold uppercase tracking-wider ${statusColor} mt-0.5">${statusText}</span></div>
+            </div>
+            <div class="text-right flex flex-col items-end">
+               <span class="px-2 py-0.5 bg-ios-blue text-white rounded text-[10px] font-black">Lv.${item.level}</span><span class="text-[9px] text-slate-500 font-bold mt-1">${item.xp}/100 XP</span>
+            </div>
+          </div>`;
+      });
+      content.innerHTML = html;
+    } else { content.innerHTML = '<p class="text-center text-xs py-6">Belum ada prodi yang tercatat.</p>'; }
+  } catch (err) { content.innerHTML = '<p class="text-center text-xs text-rose-500 py-6">Gagal memuat leaderboard.</p>'; }
+}
+
     function toggleTheme() {
       const html = document.documentElement; 
       html.classList.toggle('dark');
@@ -5552,11 +5744,7 @@ function updateDashboardPendataan() {
     function closeModal(modalId) { const m = document.getElementById(modalId); m.querySelector('.ios-modal-content').classList.add('translate-y-full'); setTimeout(() => { m.classList.remove('flex'); m.classList.add('hidden'); }, 300); }
   </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-  const supabaseUrl = 'https://ygfzxemuzhwwadamkgen.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlnZnp4ZW11emh3d2FkYW1rZ2VuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4NjA1ODAsImV4cCI6MjA5NzQzNjU4MH0.sY1ffJXkef3wUxRfaoD8ecAitQtdN9fFNeCxJjXnoPo';
-const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
     
   window.deleteFromCloud = async function(key) {
@@ -5586,6 +5774,10 @@ const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
   };
 
  window.savePresensiKeCloud = async function(dataPresensi) {
+if (!navigator.onLine) {
+      await addToOfflineQueue('SAVE_PRESENSI', dataPresensi);
+      return;
+  }
     try {
       window.isUploadingData = true; 
       
@@ -5616,6 +5808,10 @@ const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
   window.syncLocalStorageToCloud = async function(key) {
     const data = localStorage.getItem(key);
     if (!data) return;
+if (!navigator.onLine) {
+    await addToOfflineQueue('SYNC_LOCAL_TO_CLOUD', { key: key, value: data });
+    return;
+  }
     try {
       window.isUploadingData = true; 
       
@@ -6001,12 +6197,13 @@ function forceClearCacheOnUpdate() {
     }
 
     // 3. Bersihkan sisa-sisa draf lama di memori (biar bersih total)
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith('draft_')) {
-        localStorage.removeItem(key);
-      }
-    }
+    // --- BAGIAN INI DIMATIKAN AGAR DRAF ABSENSI TIDAK TERHAPUS ---
+    // for (let i = 0; i < localStorage.length; i++) {
+    //   const key = localStorage.key(i);
+    //   if (key && key.startsWith('draft_')) {
+    //     localStorage.removeItem(key);
+    //   }
+    // }
 
     // 4. Simpan versi baru agar tidak terus-terusan nge-refresh
     localStorage.setItem('e_arvy_app_version', APP_VERSION);
@@ -6018,7 +6215,10 @@ function forceClearCacheOnUpdate() {
 
 const originalOnload = window.onload;
 window.onload = function() {
-forceClearCacheOnUpdate(); 
+  forceClearCacheOnUpdate();
+  if (typeof originalOnload === 'function') {
+    originalOnload();
+  }
 };
     try {
       if (typeof startLoginSlider === 'function') startLoginSlider();
@@ -6192,6 +6392,18 @@ if ('serviceWorker' in navigator) {
       <button onclick="requestNotificationPermissionBtn()" class="flex-1 py-2 bg-ios-green text-white text-xs font-bold rounded-ios-md shadow-md hover:opacity-90 transition-all">Izinkan Notifikasi</button>
     </div>
   </div>
+<div id="petLeaderboardModal" class="ios-modal fixed inset-0 bg-black/60 z-[3000] hidden items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-md">
+  <div class="ios-modal-content w-full sm:max-w-md bg-white dark:bg-zinc-900 rounded-t-ios-xl sm:rounded-ios-lg p-5 shadow-2xl flex flex-col gap-3 transform translate-y-full transition-transform max-h-[85vh]">
+    <div class="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-3 shrink-0">
+      <h3 class="text-lg font-black dark:text-white flex items-center gap-2"><i data-lucide="trophy" class="w-5 h-5 text-amber-500"></i> Peringkat Pet Prodi</h3>
+      <button onclick="closeModal('petLeaderboardModal')" class="text-slate-400 hover:text-slate-200 text-2xl leading-none">&times;</button>
+    </div>
+    <div class="flex justify-between px-3 pt-2 pb-1 text-[9px] font-black uppercase text-slate-400 tracking-wider">
+      <span>Peringkat & Status</span><span>Level & XP</span>
+    </div>
+    <div id="leaderboardContent" class="flex flex-col gap-2 overflow-y-auto no-scrollbar pb-2"></div>
+  </div>
+</div>
 
 </body>
 </html>
