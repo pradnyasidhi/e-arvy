@@ -1615,7 +1615,7 @@ window.addEventListener('online', processOfflineQueue);
         const response = await fetch(`${GAS_URL}?username=${cleanUser}`);
         const data = await response.json();
         
-        // HANYA TIMPA & KUNCI JIKA API BERHASIL MENDAPATKAN NAMA
+        // HANYA TIMPA & KUNCI JIKA API BERHASIL MENDAPATKAN NAMA DAN FOTO
         if (data.success && data.name) {
            const today = getLocalDateString();
            let ann = appData.announcements.find(a => a.date === today);
@@ -1634,18 +1634,37 @@ window.addEventListener('online', processOfflineQueue);
              ann.piketBatalyonPutriTelegram = `https://t.me/${cleanUser}`;
            }
 
+           // 1. Simpan ke Pengumuman dan Sinkronkan ke Supabase
            localStorage.setItem('e_arvy_announcements', JSON.stringify(appData.announcements));
-           
            if (window.syncLocalStorageToCloud) {
                window.syncLocalStorageToCloud('e_arvy_announcements');
            }
            
-          
+           // 2. Simpan ke Database Akun agar tersinkron ke semua orang
+           const users = JSON.parse(storage.getItem('e_arvy_users_v6') || '[]');
+           const userIdx = users.findIndex(u => u.username.toLowerCase() === username.toLowerCase());
+           if (userIdx !== -1) {
+               users[userIdx].profilePhoto = data.photo;
+               storage.setItem('e_arvy_users_v6', JSON.stringify(users));
+               if (window.syncLocalStorageToCloud) {
+                   window.syncLocalStorageToCloud('e_arvy_users_v6');
+               }
+           }
+
+           // 3. Update sesi user lokal (agar logo pojok kanan atas langsung berubah)
+           if (currentUser && currentUser.username.toLowerCase() === username.toLowerCase()) {
+               currentUser.profilePhoto = data.photo;
+               storage.setItem('e_arvy_session', JSON.stringify(currentUser));
+               if (typeof updateProfilePage === 'function') updateProfilePage();
+               if (typeof renderApplicationLogos === 'function') renderApplicationLogos();
+           }
+
+           // 4. Segarkan Tampilan Dashboard
            if (typeof updateDashboardDetails === 'function') {
                updateDashboardDetails();
            }
            
-           showToast('Data Terkunci', `Profil Piket ${piketType === 'putra' ? 'Putra' : 'Putri'} berhasil ditarik dan dikunci ke server.`, 'success');
+           showToast('Sinkronisasi Telegram', `Profil Piket ${piketType === 'putra' ? 'Putra' : 'Putri'} berhasil ditarik dan disinkronkan ke seluruh perangkat.`, 'success');
         } else {
            console.warn("Scraper tidak menemukan data yang valid. Data piket lama dipertahankan.");
         }
