@@ -5845,12 +5845,14 @@ function updatePetUI() {
   }
 }
 
-function triggerAttendancePetReward(isLate, prodiName) {
-if (!currentUser || currentUser.role !== 'Kopral Kadet') return;
+async function triggerAttendancePetReward(isLate, prodiName) {
+  // 1. Blokir Admin/Piket merubah XP (Hanya Kadet yang bisa)
+  if (!currentUser || currentUser.role !== 'Kopral Kadet') {
+      console.log("ℹ️ XP tidak diupdate ke Supabase karena Anda login sebagai Admin/Piket.");
+      return; 
+  }
 
-  if (isLate) { petData.xp -= 10; showToast('Peringatan!', 'Telat absen! Pet kehilangan -10 XP.', 'error'); } 
-  else { petData.xp += 5; showToast('Hebat!', 'Absen tepat waktu! Pet mendapat +5 XP.', 'success'); }
-  if (isLate) { petData.xp -= 10; showToast('Peringatan!', 'Telat absen! Pet kehilangan -10 XP.', 'error'); } 
+  if (isLate) { petData.xp -= 10; showToast('Peringatan!', 'Telat absen! Pet kehilangan 10 XP.', 'error'); } 
   else { petData.xp += 5; showToast('Hebat!', 'Absen tepat waktu! Pet mendapat +5 XP.', 'success'); }
 
   if (petData.xp >= 100) {
@@ -5862,8 +5864,25 @@ if (!currentUser || currentUser.role !== 'Kopral Kadet') return;
   }
   updatePetUI();
 
+  // 2. Kirim ke Supabase dengan pendeteksi Error
   if(typeof supabaseClient !== 'undefined' && prodiName) {
-    supabaseClient.from('VirtualPet').upsert({ prodi_name: prodiName, xp: petData.xp, level: petData.level }, { onConflict: 'prodi_name' });
+    try {
+        console.log(`Mencoba menyimpan XP ${petData.xp} untuk prodi ${prodiName}...`);
+        
+        // PENTING: Jika error terus, coba ubah 'VirtualPet' di bawah ini menjadi 'virtualpet' (huruf kecil semua)
+        const { data, error } = await supabaseClient
+            .from('VirtualPet') 
+            .upsert({ prodi_name: prodiName, xp: petData.xp, level: petData.level }, { onConflict: 'prodi_name' });
+        
+        if (error) {
+            console.error("❌ Gagal simpan XP ke Supabase:", error);
+            showToast('Error Database', 'Gagal menyimpan XP ke server.', 'error');
+        } else {
+            console.log("✅ XP berhasil masuk ke Supabase!");
+        }
+    } catch (err) {
+        console.error("❌ Koneksi Supabase terputus:", err);
+    }
   }
 }
 
@@ -6558,7 +6577,47 @@ if ('serviceWorker' in navigator) {
         });
     });
   }
+// Fungsi untuk membuka pop-up Leaderboard
+async function openPetLeaderboard() {
+  openModal('petLeaderboardModal');
+  const content = document.getElementById('leaderboardContent');
+  if (!content) return;
+  content.innerHTML = '<p class="text-center text-xs py-6"><i data-lucide="loader" class="animate-spin inline w-4 h-4 mr-1"></i> Memuat peringkat...</p>';
+  if (typeof lucide !== 'undefined') lucide.createIcons();
 
+  try {
+    const { data, error } = await supabaseClient.from('VirtualPet').select('*');
+    if (error) throw error;
+    
+    if (data && data.length > 0) {
+      // Urutkan berdasarkan Level tertinggi, lalu XP tertinggi
+      data.sort((a,b) => b.level !== a.level ? b.level - a.level : b.xp - a.xp);
+      let html = '';
+      data.forEach((item, index) => {
+        let rankBadge = index === 0 ? '🥇' : (index === 1 ? '🥈' : (index === 2 ? '🥉' : `<span class="text-slate-400 font-bold text-sm">#${index + 1}</span>`));
+        let bgClass = index === 0 ? 'bg-amber-50 border-amber-200' : 'bg-slate-50 border-slate-100';
+        const statusText = item.xp >= 70 ? 'Healthy 💚' : (item.xp >= 30 ? 'Normal 💛' : 'Sick 💔');
+        const statusColor = item.xp >= 70 ? 'text-ios-green' : (item.xp >= 30 ? 'text-amber-500' : 'text-ios-red');
+
+        html += `
+          <div class="flex items-center justify-between p-3 rounded-lg border ${bgClass} transition-all mb-2">
+            <div class="flex items-center gap-3">
+               <div class="w-8 text-center text-xl drop-shadow-sm">${rankBadge}</div>
+               <div class="flex flex-col"><h4 class="text-sm font-extrabold text-slate-900 dark:text-slate-800">${item.prodi_name}</h4><span class="text-[9px] font-bold uppercase tracking-wider ${statusColor} mt-0.5">${statusText}</span></div>
+            </div>
+            <div class="text-right flex flex-col items-end">
+               <span class="px-2 py-0.5 bg-ios-blue text-white rounded text-[10px] font-black">Lv.${item.level}</span><span class="text-[9px] text-slate-500 font-bold mt-1">${item.xp}/100 XP</span>
+            </div>
+          </div>`;
+      });
+      content.innerHTML = html;
+    } else { 
+      content.innerHTML = '<p class="text-center text-xs py-6">Belum ada prodi yang tercatat.</p>'; 
+    }
+  } catch (err) { 
+    content.innerHTML = '<p class="text-center text-xs text-rose-500 py-6">Gagal memuat leaderboard.</p>'; 
+  }
+}
 </script>
 
 
