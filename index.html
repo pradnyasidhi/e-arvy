@@ -6207,7 +6207,7 @@ window.fetchDataKadetDariSupabase = async function() {
       localStorage.setItem('e_arvy_all_cadets_flat', JSON.stringify(allCadetsFlat));
 
       if (typeof renderAttendanceList === 'function') renderAttendanceList();
-      if (typeof loadAdminCadetList === 'function' && document.getElementById('view-admin-panel').classList.contains('active')) loadAdminCadetList();
+      if (typeof loadAdminCadetList === 'function' && document.getElementById('view-admin-panel')?.classList.contains('active')) loadAdminCadetList();
       
       // Panggil fungsi render ulang tahun
       if (typeof renderBirthdays === 'function') renderBirthdays();
