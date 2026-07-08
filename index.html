@@ -1429,16 +1429,19 @@ storage.setItem = function(key, val) {
 
   const localOnlyKeys = ['e_arvy_session', 'e_arvy_active_tab', 'e_arvy_initialized_real_data'];
 
-  // KUNCI REALTIME: '!key.startsWith("draft_")' SUDAH DIHAPUS
   if (window.syncLocalStorageToCloud && !localOnlyKeys.includes(key)) {
-    // Sistem anti-spam: Tunggu user berhenti ngetik selama 0.4 detik baru kirim ke radar
-    clearTimeout(cloudSyncTimeouts[key]);
-    cloudSyncTimeouts[key] = setTimeout(() => {
-      window.syncLocalStorageToCloud(key);
-    }, 400);
+    // Jangan sinkronkan ketikan per individu ke cloud untuk menghemat Egress
+        const isHeavyDraft = key.startsWith('draft_status_') || key.startsWith('draft_reason_') || key.startsWith('draft_proof_');
+    
+    if (!isHeavyDraft) {
+        clearTimeout(cloudSyncTimeouts[key]);
+        // Ubah dari 400ms menjadi 2000ms (2 Detik) untuk mengurangi frekuensi tembakan ke API
+        cloudSyncTimeouts[key] = setTimeout(() => {
+          window.syncLocalStorageToCloud(key);
+        }, 2000);
+    }
   }
 };
-
 storage.removeItem = function(key) {
   originalRemoveItem(key);
   
@@ -1724,10 +1727,9 @@ window.addEventListener('online', processOfflineQueue);
       if (methodName === 'saveAttendance') {
         const histories = JSON.parse(storage.getItem('e_arvy_history_attendance') || '[]');
         
-               const existingIdx = histories.findIndex(h => h.date === params.date && h.activityName === params.activityName && h.category === params.category);
-        
-       
-        const logId = existingIdx !== -1 ? histories[existingIdx].logId : "L_" + new Date().getTime();
+               const cleanActName = params.activityName.replace(/\s+/g, '_').toUpperCase();
+const logId = `LOG_${params.date}_${cleanActName}_${params.category.toUpperCase()}`;
+const existingIdx = histories.findIndex(h => h.logId === logId);
         const absentCount = params.absents.length;
         const presentCount = params.totalCadets - absentCount;
         
@@ -4183,7 +4185,7 @@ function markAsUnsaved(prodiId) {
     }
 
  
-    triggerAttendancePetReward(isLate, prodiName);
+   triggerAttendancePetReward(isLate, prodiName, dateStr, act);
 
 
     loadDashboardAndAppData();
@@ -4196,7 +4198,18 @@ function markAsUnsaved(prodiId) {
       let act = document.getElementById('presensiActivitySelect').value; 
       if (act === 'kustom') act = document.getElementById('customActivityName').value; 
       if (!act) { showToast('Validasi', 'Tentukan kegiatan!', 'warning'); return; }
-
+if (isCustom) {
+   const timeStr = new Date().toTimeString().substring(0,5);
+   const exists = appData.schedules.some(s => s.date === dateStr && s.title.toLowerCase() === act.toLowerCase());
+   if (!exists) {
+       appData.schedules.push({ date: dateStr, time: timeStr, title: act, location: 'Menyesuaikan', photoUrl: '' });
+       appData.schedules.sort((a,b) => a.time.localeCompare(b.time));
+       storage.setItem('e_arvy_schedules', JSON.stringify(appData.schedules));
+       if (window.syncLocalStorageToCloud) window.syncLocalStorageToCloud('e_arvy_schedules');
+       populatePresensiActivities(); // Perbarui dropdown
+       loadAnnounceSchedules(); // Perbarui tampilan jadwal UI
+   }
+}
       const cadets = appData.cadets[prodiName] || []; 
 
       cadets.forEach(c => {
@@ -5066,11 +5079,7 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
       openModal('detailAbsentsModal');
     }
 
-    function viewHistoryRecap(logId) {
-      const item = appData.historyAttendance.find(h => h.logId === logId);
-      if (item) { document.getElementById('recapTextarea').value = item.recapText; openModal('recapModal'); }
-    }
-
+   
     function renderKepulanganList() {
       const wrapper = document.getElementById('kepulanganListWrapper');
       if (!wrapper) return;
@@ -5399,29 +5408,27 @@ if (window.syncLocalStorageToCloud) window.syncLocalStorageToCloud('e_arvy_absen
     }
 
     function saveAnnounceConfig(e) {
-      e.preventDefault(); 
+  e.preventDefault(); 
+  const today = getLocalDateString(); 
+  const ann = appData.announcements.find(a => a.date === today) || {};
   
-      const today = getLocalDateString(); 
-      const ann = appData.announcements.find(a => a.date === today) || {};
-      
-      callServer('saveAnnouncement', { 
-          date: today, 
-          pakaianInfo: standardizeEYD(document.getElementById('announcePakaian').value), 
-          piketBatalyonPutraName: standardizeEYD(document.getElementById('announcePiketBatPaName').value), 
-          piketBatalyonPutraTelegram: document.getElementById('announcePiketBatPaTg').value, 
-          piketBatalyonPutraAvatar: ann.piketBatalyonPutraAvatar, 
-          piketBatalyonPutriName: standardizeEYD(document.getElementById('announcePiketBatPiName').value), 
-          piketBatalyonPutriTelegram: document.getElementById('announcePiketBatPiTg').value, 
-          piketBatalyonPutriAvatar: ann.piketBatalyonPutriAvatar, 
-          username: currentUser.username 
-      }, () => {
-            if (window.syncLocalStorageToCloud) {
-            window.syncLocalStorageToCloud('e_arvy_announcements');
-        }
-        showToast('Disimpan', 'Pengumuman diperbarui.', 'success'); 
-        loadDashboardAndAppData();
-      });
-    }
+  const payload = { 
+      date: today, 
+      pakaianInfo: standardizeEYD(document.getElementById('announcePakaian').value), 
+      piketBatalyonPutraName: standardizeEYD(document.getElementById('announcePiketBatPaName').value), 
+      piketBatalyonPutraTelegram: document.getElementById('announcePiketBatPaTg').value, 
+      piketBatalyonPutraAvatar: ann.piketBatalyonPutraAvatar, 
+      piketBatalyonPutriName: standardizeEYD(document.getElementById('announcePiketBatPiName').value), 
+      piketBatalyonPutriTelegram: document.getElementById('announcePiketBatPiTg').value, 
+      piketBatalyonPutriAvatar: ann.piketBatalyonPutriAvatar 
+  };
+
+  callServer('saveAnnouncement', { ...payload, username: currentUser.username }, () => {
+    if (window.savePengumumanKeCloud) window.savePengumumanKeCloud(payload);
+    showToast('Disimpan', 'Pengumuman diperbarui di Cloud.', 'success'); 
+    loadDashboardAndAppData();
+  });
+}
 
     function openEditGeneralAnnounceModal() { document.getElementById('editGeneralAnnounceText').value = appData.settings.general_announcement || ''; openModal('generalAnnounceModal'); }
     function saveGeneralAnnounce() {
@@ -5892,11 +5899,17 @@ function updatePetUI() {
   }
 }
 
-async function triggerAttendancePetReward(isLate, prodiName) {
-  // 1. Blokir Admin/Piket merubah XP (Hanya Kadet yang bisa)
+async function triggerAttendancePetReward(isLate, prodiName, date, activity) {
   if (!currentUser || currentUser.role !== 'Kopral Kadet') {
-      console.log("ℹ️ XP tidak diupdate ke Supabase karena Anda login sebagai Admin/Piket.");
+      console.log("ℹ️ XP tidak diupdate karena login sebagai Admin/Piket.");
       return; 
+  }
+
+  // --- KODE BARU: Cek apakah sudah pernah klaim XP ---
+  const claimKey = `xp_claimed_${date}_${activity}_${prodiName}`;
+  if (localStorage.getItem(claimKey) === 'true') {
+      console.log("XP sudah diklaim untuk kegiatan ini. Mengabaikan penambahan XP.");
+      return;
   }
 
   if (isLate) { petData.xp -= 10; showToast('Peringatan!', 'Telat absen! Pet kehilangan 10 XP.', 'error'); } 
@@ -5911,28 +5924,21 @@ async function triggerAttendancePetReward(isLate, prodiName) {
   }
   updatePetUI();
 
-  // 2. Kirim ke Supabase dengan pendeteksi Error
+  // Tandai bahwa prodi ini sudah mengklaim XP untuk kegiatan ini
+  localStorage.setItem(claimKey, 'true');
+  if (window.syncLocalStorageToCloud) window.syncLocalStorageToCloud(claimKey);
+
   if(typeof supabaseClient !== 'undefined' && prodiName) {
     try {
-        console.log(`Mencoba menyimpan XP ${petData.xp} untuk prodi ${prodiName}...`);
-        
-        // PENTING: Jika error terus, coba ubah 'VirtualPet' di bawah ini menjadi 'virtualpet' (huruf kecil semua)
         const { data, error } = await supabaseClient
             .from('VirtualPet') 
             .upsert({ prodi_name: prodiName, xp: petData.xp, level: petData.level }, { onConflict: 'prodi_name' });
-        
-        if (error) {
-            console.error("❌ Gagal simpan XP ke Supabase:", error);
-            showToast('Error Database', 'Gagal menyimpan XP ke server.', 'error');
-        } else {
-            console.log("✅ XP berhasil masuk ke Supabase!");
-        }
+        if (error) throw error;
     } catch (err) {
-        console.error("❌ Koneksi Supabase terputus:", err);
+        console.error("❌ Gagal simpan XP ke Supabase:", err);
     }
   }
 }
-
 
 async function loadUserPetData() {
     if (!currentUser || currentUser.role !== 'Kopral Kadet') return;
@@ -6072,6 +6078,41 @@ if (!navigator.onLine) {
     }
   };
 
+window.savePengumumanKeCloud = async function(dataAnnounce) {
+  try {
+    const { error } = await supabaseClient.from('PengumumanHarian').upsert({
+      tanggal: dataAnnounce.date,
+      pakaian_info: dataAnnounce.pakaianInfo,
+      piket_pa_name: dataAnnounce.piketBatalyonPutraName,
+      piket_pa_tg: dataAnnounce.piketBatalyonPutraTelegram,
+      piket_pa_avatar: dataAnnounce.piketBatalyonPutraAvatar,
+      piket_pi_name: dataAnnounce.piketBatalyonPutriName,
+      piket_pi_tg: dataAnnounce.piketBatalyonPutriTelegram,
+      piket_pi_avatar: dataAnnounce.piketBatalyonPutriAvatar
+    }, { onConflict: 'tanggal' });
+  } catch(e) { console.error("Gagal simpan pengumuman", e); }
+};
+
+window.fetchPengumumanDariCloud = async function() {
+  try {
+    const { data, error } = await supabaseClient.from('PengumumanHarian').select('*');
+    if (data) {
+      const formatted = data.map(d => ({
+        date: d.tanggal,
+        pakaianInfo: d.pakaian_info,
+        piketBatalyonPutraName: d.piket_pa_name,
+        piketBatalyonPutraTelegram: d.piket_pa_tg,
+        piketBatalyonPutraAvatar: d.piket_pa_avatar,
+        piketBatalyonPutriName: d.piket_pi_name,
+        piketBatalyonPutriTelegram: d.piket_pi_tg,
+        piketBatalyonPutriAvatar: d.piket_pi_avatar
+      }));
+      appData.announcements = formatted;
+      localStorage.setItem('e_arvy_announcements', JSON.stringify(formatted));
+    }
+  } catch(e) { console.error("Gagal tarik pengumuman", e); }
+};
+
   window.syncLocalStorageToCloud = async function(key) {
     const data = localStorage.getItem(key);
     if (!data) return;
@@ -6100,6 +6141,9 @@ if (!navigator.onLine) {
   window.fetchDatabaseFromCloud = async function() {
     if (window.isUploadingData) return;
     try {
+if (window.fetchPengumumanDariCloud) {
+        await window.fetchPengumumanDariCloud();
+      }
       // 1. Tarik tabel DataArvy
       const { data: results, error: errData } = await supabaseClient
         .from('DataArvy')
@@ -6127,7 +6171,7 @@ if (!navigator.onLine) {
         .from('LogPresensi')
         .select('*')
         .order('created_at', { ascending: false })
-        .limit(10000);
+        .limit(50);
 
       if (errLog) throw errLog;
       
@@ -6326,7 +6370,7 @@ window.fetchJadwalDefaultDariSupabase = async function() {
 // --- RADAR SINKRONISASI LIVE (SUPABASE REALTIME) ---
   window.initSupabaseRealtime = function() {
     if (!supabaseClient) return;
-
+/*
     // 1. Pantau ketikan sementara (Draft / Pengumuman)
     supabaseClient
       .channel('realtime-arvy-data')
@@ -6408,7 +6452,7 @@ window.fetchJadwalDefaultDariSupabase = async function() {
         }
       })
       .subscribe();
-
+*/
     // 2. Pantau jika ada Piket yang menekan "Verifikasi Permanen"
     supabaseClient
       .channel('realtime-presensi-log')
@@ -6480,8 +6524,39 @@ function forceClearCacheOnUpdate() {
   }
 }
 
+function cleanupOldDrafts() {
+    const now = Date.now();
+    const maxAgeMs = 3 * 24 * 60 * 60 * 1000; // Umur maksimal: 3 Hari
+    const keysToDelete = [];
+
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        // Cari kunci yang berhubungan dengan draf atau data sementara
+        if (key && (key.startsWith('draft_') || key.startsWith('saved_bundle_') || key.startsWith('locked_presensi_') || key.startsWith('saved_present_'))) {
+            // Ekstrak tanggal dari format kuncinya (YYYY-MM-DD)
+            const dateMatch = key.match(/\d{4}-\d{2}-\d{2}/);
+            if (dateMatch) {
+                const draftDate = new Date(dateMatch[0]).getTime();
+                // Jika sudah melewati 3 hari, masukkan ke daftar hapus
+                if (now - draftDate > maxAgeMs) {
+                    keysToDelete.push(key);
+                }
+            }
+        }
+    }
+
+    if (keysToDelete.length > 0) {
+        keysToDelete.forEach(key => {
+            localStorage.removeItem(key); // Hapus dari HP lokal
+            if (window.deleteFromCloud) window.deleteFromCloud(key); // Hapus dari Supabase
+        });
+        console.log(`🧹 Membersihkan ${keysToDelete.length} data draf yang kadaluarsa (> 3 hari).`);
+    }
+}
+
 const originalOnload = window.onload;
 window.onload = function() {
+cleanupOldDrafts();
   forceClearCacheOnUpdate();
   if (typeof originalOnload === 'function') {
     originalOnload();
@@ -6510,8 +6585,7 @@ const aDate = document.getElementById('announceScheduleDate'); if(aDate) aDate.v
 
      
      if (window.fetchDatabaseFromCloud) {
-        window.fetchDatabaseFromCloud().then(async () => { // <--- Tambahkan async
-          await window.fetchDataKadetDariSupabase(); // <--- Tambahkan await
+        window.fetchDatabaseFromCloud().then(async () => {          await window.fetchDataKadetDariSupabase();
 	await window.fetchJadwalDefaultDariSupabase();
           if (icon) icon.classList.remove('animate-spin');
           if (typeof currentUser !== 'undefined' && currentUser && typeof loadDashboardAndAppData === 'function') {
@@ -6624,7 +6698,7 @@ if ('serviceWorker' in navigator) {
         });
     });
   }
-// Fungsi untuk membuka pop-up Leaderboard
+
 async function openPetLeaderboard() {
   openModal('petLeaderboardModal');
   const content = document.getElementById('leaderboardContent');
