@@ -247,6 +247,24 @@
       font-weight: normal;
       font-style: normal;
     }
+    .history-scrollbar::-webkit-scrollbar {
+      width: 6px;
+    }
+    .history-scrollbar::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.05);
+      border-radius: 4px;
+    }
+    .dark .history-scrollbar::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .history-scrollbar::-webkit-scrollbar-thumb {
+      background-color: rgba(83, 176, 174, 0.6);
+      border-radius: 4px;
+    }
+    .history-scrollbar::-webkit-scrollbar-thumb:hover {
+      background-color: rgba(83, 176, 174, 0.9);
+    }
+
       </style>
 </head>
 <body class="bg-zinc-100 dark:bg-black text-slate-900 dark:text-zinc-100 min-h-screen flex flex-col font-sans transition-all-300 pb-16 lg:pb-4">
@@ -495,9 +513,9 @@
         <button onclick="switchTab('statistik')" id="side-statistik" class="sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-ios-md text-sm font-semibold transition-all text-slate-600 dark:text-zinc-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/30">
           <i data-lucide="trending-up" class="w-5 h-5"></i> Analisis Statistik
         </button>
-        <button onclick="switchTab('kepulangan')" id="side-kepulangan" class="sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-ios-md text-sm font-semibold transition-all text-slate-600 dark:text-zinc-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/30">
-          <i data-lucide="plane-takeoff" class="w-5 h-5"></i> Kepulangan
-        </button>
+       <button onclick="switchTab('datakadet')" id="side-datakadet" class="sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-ios-md text-sm font-semibold transition-all text-slate-600 dark:text-zinc-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/30">
+  <i data-lucide="database" class="w-5 h-5"></i> Data Kadet
+</button>
         <button onclick="switchTab('profile')" id="side-profile" class="sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-ios-md text-sm font-semibold transition-all text-slate-600 dark:text-zinc-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/30">
           <i data-lucide="user-cog" class="w-5 h-5"></i> Profil Pengguna
         </button>
@@ -604,7 +622,7 @@
               </div>
               <div class="bg-[#f8f9fa] dark:bg-zinc-800/40 p-3.5 rounded-xl border border-slate-100 dark:border-zinc-800/60 border-l-4 border-l-ios-blue">
                 <p id="dashGeneralAnnouncement" class="text-sm text-slate-600 dark:text-zinc-300 leading-relaxed whitespace-pre-wrap">
-                  Selamat datang di E-Arvy. Silahkan laksanakan presensi harian tepat waktu.
+                  Selamat datang di e-Arvy. Silahkan laksanakan presensi harian tepat waktu.
                 </p>
               </div>
             </div>
@@ -752,7 +770,7 @@
           <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-3 gap-3">
             
             <div class="flex items-center gap-2">
-              <h3 class="font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">Formulir Presensi Kehadiran</h3>
+              <h3 class="font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">Formulir Presensi</h3>
               
               <button onclick="generateAndCopyShareLink()" class="p-1.5 bg-slate-100 dark:bg-zinc-800 text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-zinc-700 rounded-md transition-colors" title="Salin Tautan">
                 <i data-lucide="link" class="w-4 h-4"></i>
@@ -1027,77 +1045,27 @@
       </section>
 
       
-      <section id="view-kepulangan" class="view-screen hidden flex flex-col gap-6 transition-all-300">
-        
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div class="p-5 bg-white dark:bg-zinc-900 rounded-ios-lg shadow-lg flex items-center gap-4">
-            <div class="p-3.5 rounded-full bg-emerald-100 text-ios-green"><i data-lucide="check-circle" class="w-6 h-6"></i></div>
-            <div>
-              <h4 class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Sudah Kepulangan</h4>
-              <h2 id="depCountSudah" class="text-2xl font-black text-emerald-600 dark:text-ios-green">0 Prodi</h2>
-            </div>
-          </div>
-          <div class="p-5 bg-white dark:bg-zinc-900 rounded-ios-lg shadow-lg flex items-center gap-4">
-            <div class="p-3.5 rounded-full bg-amber-100 text-ios-orange"><i data-lucide="clock" class="w-6 h-6"></i></div>
-            <div>
-              <h4 class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Belum Kepulangan</h4>
-              <h2 id="depCountBelum" class="text-2xl font-black text-ios-orange">0 Prodi</h2>
-            </div>
-          </div>
+     <section id="view-datakadet" class="view-screen hidden flex flex-col gap-6 transition-all-300">
+  <div class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg shadow-lg flex flex-col gap-4 min-h-[70vh]">
+    <div class="flex flex-col md:flex-row justify-between md:items-center gap-4 pb-4 border-b border-slate-100 dark:border-zinc-800">
+      <div>
+        <h3 class="font-extrabold text-lg text-slate-900 dark:text-white tracking-tight">Pangkalan Data Kadet</h3>
+        <p class="text-xs text-slate-500 font-medium">Manajemen profil, riwayat absensi bulanan, dan data diri kadet.</p>
+      </div>
+      <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+        <div class="relative w-full sm:w-64">
+          <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+          <input type="text" id="searchDataKadet" oninput="renderDataKadetList()" placeholder="Cari nama kadet..." class="w-full pl-9 pr-3 py-2.5 rounded-ios-md glass-input text-xs outline-none dark:text-white">
         </div>
-
-        <div class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg shadow-lg flex flex-col gap-4">
-          <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 pb-3 border-b border-slate-100 dark:border-zinc-800">
-            <div>
-              <h3 class="font-extrabold text-lg text-slate-900 dark:text-white tracking-tight">Manajemen Kepulangan Prodi</h3>
-              <p class="text-xs text-slate-500 font-medium">Reset kepulangan prodi dilakukan secara otomatis pada 00:00 AM.</p>
-            </div>
-            <div class="flex flex-col gap-1 w-full sm:w-auto min-w-[180px]">
-              <label class="text-[9px] font-black uppercase tracking-widest text-slate-400">Tanggal Kepulangan</label>
-              <input type="date" id="kepulanganFilterDate" onchange="renderKepulanganList()" class="px-3.5 py-2 rounded-ios-md glass-input text-xs text-slate-950 dark:text-white focus:outline-none">
-            </div>
-          </div>
-          
-          <div class="w-full">
-            <div class="w-full flex flex-col gap-1">
-              <div class="hidden md:grid grid-cols-6 gap-4 py-2 px-4 bg-slate-100 dark:bg-zinc-800/80 rounded-ios-md text-[10px] font-black uppercase tracking-wider text-slate-400">
-                <div class="col-span-2">Program Studi</div>
-                <div>Tanggal & Waktu</div>
-                <div class="col-span-2">Status / Keterangan</div>
-                <div class="text-right">Aksi</div>
-              </div>
-              <div id="kepulanganListWrapper" class="flex flex-col border border-slate-100 dark:border-zinc-800 rounded-ios-md overflow-hidden"></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="p-6 bg-white dark:bg-zinc-900 rounded-ios-lg shadow-lg flex flex-col gap-4">
-          <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 pb-3 border-b border-slate-100 dark:border-zinc-800">
-            <div>
-              <h3 class="font-extrabold text-base tracking-tight">Riwayat Log Kepulangan (Terbaru di Atas)</h3>
-            </div>
-            <div class="flex items-center gap-2">
-              <input type="date" id="depLogSearchDate" onchange="renderDepartureLogs()" class="px-3.5 py-2 rounded-ios-md glass-input text-xs text-slate-900 dark:text-white outline-none">
-              
-            </div>
-          </div>
-
-          <div class="overflow-x-auto no-scrollbar">
-            <table class="min-w-full text-xs text-left">
-              <thead>
-                <tr class="border-b border-slate-100 dark:border-zinc-800 text-[10px] font-black uppercase text-slate-400 tracking-wider">
-                  <th class="py-2.5 px-3">Tanggal</th>
-                  <th class="py-2.5 px-3">Program Studi</th>
-                  <th class="py-2.5 px-3">Jam Pulang</th>
-                  <th class="py-2.5 px-3">Status</th>
-                  <th class="py-2.5 px-3">Hapus</th>
-                </tr>
-              </thead>
-              <tbody id="departureLogsTableBody" class="divide-y divide-slate-100 dark:divide-zinc-800/60 font-medium"></tbody>
-            </table>
-          </div>
-        </div>
-      </section>
+      </div>
+    </div>
+    
+    <!-- Wadah Pengelompokan Kompi -> Prodi -->
+    <div id="dataKadetGroupWrapper" class="flex flex-col gap-4 pb-16">
+       <!-- Akan dirender via JavaScript -->
+    </div>
+  </div>
+</section>
 
       
       <section id="view-profile" class="view-screen hidden flex flex-col gap-6 transition-all-300">
@@ -1210,7 +1178,9 @@
     <button onclick="switchTab('kehadiran')" id="tab-kehadiran" class="tabbar-item flex flex-col items-center gap-0.5 text-slate-400 font-semibold text-[10px]"><i data-lucide="clipboard-list" class="w-6 h-6"></i>Kehadiran</button>
     <button onclick="switchTab('announce')" id="tab-announce" class="tabbar-item flex flex-col items-center gap-0.5 text-slate-400 font-semibold text-[10px]"><i data-lucide="megaphone" class="w-6 h-6"></i>Announce</button>
     <button onclick="switchTab('statistik')" id="tab-statistik" class="tabbar-item flex flex-col items-center gap-0.5 text-slate-400 font-semibold text-[10px]"><i data-lucide="trending-up" class="w-6 h-6"></i>Statistik</button>
-    <button onclick="switchTab('kepulangan')" id="tab-kepulangan" class="tabbar-item flex flex-col items-center gap-0.5 text-slate-400 font-semibold text-[10px]"><i data-lucide="plane-takeoff" class="w-6 h-6"></i>Kepulangan</button>
+    <button onclick="switchTab('datakadet')" id="tab-datakadet" class="tabbar-item flex flex-col items-center gap-0.5 text-slate-400 font-semibold text-[10px]">
+  <i data-lucide="database" class="w-6 h-6"></i>Data Kadet
+</button>
   </nav>
 
   
@@ -4946,7 +4916,285 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
       tbody.innerHTML = htmlContent; 
       lucide.createIcons(); 
     }
-    function toggleHistoryLogSelection(logId, isChecked) {
+
+
+
+
+function cleanCadetName(name) {
+  if(!name) return "";
+    return name.replace(/^(?:KK\s+)?(?:KED|IF|FM|SM|BIO|RSDA|TS|TM|TE|KIM|MATH|FIS|IKOR)?\s+/i, '').trim();
+}
+
+function populateFilterProdiKadet() {
+  const select = document.getElementById('filterKadetProdi');
+  if (!select) return;
+  select.innerHTML = '<option value="Semua">Semua Prodi</option>';
+  appData.prodis.forEach(p => {
+    select.innerHTML += `<option value="${p.currentName}">${p.currentName}</option>`;
+  });
+}
+
+function renderDataKadetList() {
+  const wrapper = document.getElementById('dataKadetGroupWrapper');
+  if (!wrapper) return;
+
+  const searchQ = document.getElementById('searchDataKadet').value.toLowerCase().trim();
+  const isSearching = searchQ.length > 0; 
+
+  const kompis = {};
+  appData.prodis.forEach(p => {
+    if (!kompis[p.kompiNumber]) kompis[p.kompiNumber] = [];
+    kompis[p.kompiNumber].push(p);
+  });
+
+  let html = '';
+  let totalMatches = 0;
+
+  for (let k = 1; k <= 6; k++) {
+    if (!kompis[k]) continue;
+
+    let kompiHtml = '';
+    let kompiMatchCount = 0;
+
+    kompis[k].forEach(prodi => {
+      const cadets = appData.cadets[prodi.currentName] || [];
+      const filteredCadets = cadets.filter(c => !searchQ || c.name.toLowerCase().includes(searchQ));
+
+      if (filteredCadets.length === 0) return;
+      kompiMatchCount += filteredCadets.length;
+      totalMatches += filteredCadets.length;
+
+      let cadetsHtml = '';
+      filteredCadets.forEach(c => {
+
+        const cleanName = cleanCadetName(c.name);
+        const inisial = cleanName.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
+        const badgeWarna = c.gender === 'Laki-Laki' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400' : 'bg-pink-100 text-pink-700 dark:bg-pink-900/40 dark:text-pink-400';
+
+        cadetsHtml += `
+          <div onclick="openCadetProfile('${prodi.currentName}', ${c.no})" class="bg-white dark:bg-zinc-800/60 border border-slate-200 dark:border-zinc-700 p-3 sm:p-4 rounded-ios-md cursor-pointer hover:shadow-md hover:-translate-y-1 transition-all flex flex-col items-center text-center gap-2">
+              <div class="relative">
+                 <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-slate-200 dark:bg-zinc-700 text-slate-500 flex items-center justify-center font-black text-lg sm:text-xl shadow-inner border-2 border-white dark:border-zinc-600">
+                    ${inisial}
+                 </div>
+                 <div class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full ${badgeWarna} border-2 border-white dark:border-zinc-800 flex items-center justify-center text-[8px] font-black shadow-sm">
+                    ${c.gender === 'Laki-Laki' ? 'PA' : 'PI'}
+                 </div>
+              </div>
+              <div class="w-full">
+                  <h4 class="text-[11px] sm:text-xs font-extrabold text-slate-900 dark:text-white line-clamp-2 leading-snug" title="${cleanName}">${cleanName}</h4>
+              </div>
+          </div>
+        `;
+      });
+
+      const hiddenClass = isSearching ? '' : 'hidden';
+      const chevronClass = isSearching ? 'rotate-180' : '';
+
+      kompiHtml += `
+        <div class="mt-3 border border-slate-200/60 dark:border-zinc-700/60 rounded-ios-md overflow-hidden bg-white dark:bg-zinc-900 shadow-sm">
+          <div class="bg-slate-50 dark:bg-zinc-800/80 px-3 py-2.5 flex justify-between items-center cursor-pointer hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors" onclick="document.getElementById('dk-prodi-${prodi.prodiId}').classList.toggle('hidden'); document.getElementById('dk-chevron-${prodi.prodiId}').classList.toggle('rotate-180');">
+            <span class="font-bold text-sm text-slate-800 dark:text-white">${prodi.currentName}</span>
+            <div class="flex items-center gap-2">
+              <span class="text-[10px] bg-slate-200 dark:bg-zinc-700 text-slate-500 dark:text-zinc-300 px-2.5 py-1 rounded font-bold">${filteredCadets.length} Kadet</span>
+              <i data-lucide="chevron-down" id="dk-chevron-${prodi.prodiId}" class="w-4 h-4 text-slate-400 transition-transform ${chevronClass}"></i>
+            </div>
+          </div>
+          <div id="dk-prodi-${prodi.prodiId}" class="${hiddenClass} p-3 bg-slate-50/50 dark:bg-zinc-900/50 border-t border-slate-200/60 dark:border-zinc-700/60 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+            ${cadetsHtml}
+          </div>
+        </div>
+      `;
+    });
+
+    if (kompiMatchCount > 0) {
+      html += `
+        <div class="p-3 sm:p-4 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-md rounded-ios-lg border border-slate-200/60 shadow-md flex flex-col">
+          <div class="flex items-center gap-2.5 pb-2 border-b border-slate-100 dark:border-zinc-800">
+            <div class="p-1.5 bg-blue-50 dark:bg-blue-900/30 rounded"><i data-lucide="users" class="w-4 h-4 text-ios-blue"></i></div>
+            <span class="font-extrabold text-base text-slate-900 dark:text-white tracking-tight">KOMPI ${k}</span>
+            <span class="ml-auto text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-ios-blue">${kompiMatchCount} Kadet</span>
+          </div>
+          ${kompiHtml}
+        </div>
+      `;
+    }
+  }
+
+  wrapper.innerHTML = html || '<div class="flex flex-col items-center justify-center py-16 text-slate-400"><i data-lucide="user-x" class="w-12 h-12 mb-3"></i><p class="text-sm font-bold">Kadet tidak ditemukan.</p></div>';
+  lucide.createIcons();
+}
+
+function toggleEditTelegram() {
+    const wrapper = document.getElementById('cdmEditTgWrapper');
+    wrapper.classList.toggle('hidden');
+    if (!wrapper.classList.contains('hidden')) {
+        setTimeout(() => document.getElementById('cdmTgInput').focus(), 100);
+    }
+}
+
+let currentProfileProdi = '';
+let currentProfileCadetNo = 0;
+let currentProfileRawName = '';
+
+function openCadetProfile(prodiName, cadetNo) {
+  const cadets = appData.cadets[prodiName] || [];
+  const cadet = cadets.find(c => c.no === cadetNo);
+  const prodi = appData.prodis.find(p => p.currentName === prodiName);
+  
+  if(!cadet || !prodi) return;
+
+  currentProfileProdi = prodiName;
+  currentProfileCadetNo = cadetNo;
+  currentProfileRawName = cadet.name; 
+
+  const cleanName = cleanCadetName(cadet.name);
+
+  document.getElementById('cdmName').innerText = cleanName;
+  document.getElementById('cdmGender').innerText = cadet.gender === 'Laki-Laki' ? 'Putra' : 'Putri';
+  document.getElementById('cdmProdi').innerText = prodiName;
+  document.getElementById('cdmKompi').innerText = `Ki-${prodi.kompiNumber}`;
+  
+  let formattedTanggal = 'Tidak ada data';
+  if (cadet.tanggal_lahir) {
+      const parts = cadet.tanggal_lahir.split('-');
+      if (parts.length === 3) {
+          const year = parts[0];
+          const monthIndex = parseInt(parts[1]) - 1; // Array bulan dimulai dari 0
+          const day = parseInt(parts[2]); // ParseInt untuk menghilangkan angka 0 di depan (contoh 05 jadi 5)
+          const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+          
+          if (monthIndex >= 0 && monthIndex <= 11) {
+              formattedTanggal = `${day} ${monthNames[monthIndex]} ${year}`;
+          } else {
+              formattedTanggal = cadet.tanggal_lahir; // Fallback jika format aneh
+          }
+      } else {
+          formattedTanggal = cadet.tanggal_lahir; // Fallback
+      }
+  }
+  
+  // Gabungkan Tempat dan Tanggal Lahir
+  document.getElementById('cdmTTL').innerText = `${cadet.tempat_lahir || '-'}, ${formattedTanggal}`;
+  
+  const imgEl = document.getElementById('cdmAvatarImage');
+  const initEl = document.getElementById('cdmAvatarInitials');
+  if (cadet.foto_profile) {
+      imgEl.src = cadet.foto_profile;
+      imgEl.classList.remove('hidden');
+      initEl.classList.add('hidden');
+  } else {
+      imgEl.classList.add('hidden');
+      initEl.classList.remove('hidden');
+      initEl.innerText = cleanName.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
+  }
+
+  const editBtn = document.getElementById('cdmEditBtn');
+  const tgWrapper = document.getElementById('cdmEditTgWrapper');
+  tgWrapper.classList.add('hidden'); 
+  
+  const isAuthorizedToEdit = ['Admin', 'Piket', 'Pokdo', 'Pengasuh'].includes(currentUser.role) || (currentUser.role === 'Kopral Kadet' && currentUser.kompiName === `Kompi ${prodi.kompiNumber}`);
+  
+  if (isAuthorizedToEdit) {
+      editBtn.classList.remove('hidden');
+      document.getElementById('cdmTgInput').value = cadet.telegram_id || '';
+      document.getElementById('cdmSaveTgBtn').setAttribute('onclick', `saveCadetTelegramProfile('${prodiName}', ${cadetNo})`);
+  } else {
+      editBtn.classList.add('hidden');
+  }
+
+  const monthSelect = document.getElementById('cdmMonthFilter');
+  monthSelect.innerHTML = '';
+          
+  const startDate = new Date(2026, 5); // Awal Angkatan: Juni 2026
+  const now = new Date();
+  const monthNamesDropdown = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+          
+  let currentDate = new Date(now.getFullYear(), now.getMonth(), 1);
+          
+  while (currentDate >= startDate) {
+      const year = currentDate.getFullYear();
+      const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+      const value = `${year}-${month}`;
+      const label = `${monthNamesDropdown[currentDate.getMonth()]} ${year}`;
+      
+      const isSelected = (currentDate.getTime() === new Date(now.getFullYear(), now.getMonth(), 1).getTime()) ? 'selected' : '';
+      monthSelect.innerHTML += `<option value="${value}" ${isSelected}>${label}</option>`;
+      
+      currentDate.setMonth(currentDate.getMonth() - 1);
+  }
+
+  // Tarik data riwayat langsung dari server
+  renderCadetHistoryList();
+
+  openModal('cadetProfileModal');
+}
+
+async function renderCadetHistoryList() {
+    const selectedMonth = document.getElementById('cdmMonthFilter').value; // Format: "YYYY-MM"
+    const historyContainer = document.getElementById('cdmAbsentHistory');
+    const countEl = document.getElementById('cdmAbsentCount');
+
+    // UI Loading state (karena sekarang narik via internet)
+    historyContainer.innerHTML = '<div class="flex flex-col items-center justify-center py-8 text-slate-400 m-auto"><i data-lucide="loader" class="animate-spin w-6 h-6 text-ios-blue mb-2"></i><p class="text-[10px] font-bold">Menarik log dari server...</p></div>';
+    countEl.innerText = "...";
+    lucide.createIcons();
+
+    let absentCount = 0;
+    let historyHtml = '';
+
+    try {
+        // Query langsung ke Supabase: Ambil Log khusus bulan ini saja & yang ada jumlah kurangnya
+        const { data: logs, error } = await supabaseClient
+            .from('LogPresensi')
+            .select('tanggal, namaKegiatan, detailAbsen')
+            .like('tanggal', `${selectedMonth}%`)
+            .gt('jumlahKurang', 0) 
+            .order('tanggal', { ascending: false });
+
+        if (error) throw error;
+
+        if (logs && logs.length > 0) {
+            logs.forEach(log => {
+                // Filter lokal untuk mencari si kadet di dalam daftar absen tersebut
+                const isAbsent = (log.detailAbsen || []).find(a => a.prodiName === currentProfileProdi && a.cadetName === currentProfileRawName);
+                
+                if (isAbsent) {
+                    absentCount++;
+
+                    let proofHtml = '';
+                    if (isAbsent.attachmentBase64) {
+                        const urls = isAbsent.attachmentBase64.split(',');
+                        proofHtml = urls.map(url => `<img src="${url}" class="w-10 h-10 object-cover rounded cursor-zoom-in border border-slate-200 dark:border-zinc-700 hover:opacity-80 shadow-sm" onclick="viewDocumentedPhoto('${cleanCadetName(currentProfileRawName)} - ${log.tanggal}', '${url}')">`).join('');
+                    }
+
+                    historyHtml += `
+                    <div class="flex flex-col gap-1.5 p-2.5 bg-rose-50/50 dark:bg-rose-950/20 rounded-md border border-rose-100 dark:border-rose-900/50 shadow-sm shrink-0">
+                        <div class="flex justify-between items-start gap-2">
+                            <div class="flex flex-col">
+                                <span class="text-[10px] font-black text-slate-800 dark:text-white leading-tight">${log.namaKegiatan}</span>
+                                <span class="text-[9px] font-bold text-slate-400 mt-0.5"><i data-lucide="calendar" class="w-2.5 h-2.5 inline -mt-0.5 text-ios-blue"></i> ${log.tanggal}</span>
+                            </div>
+                            <span class="text-[9px] font-black bg-rose-100 dark:bg-rose-900/60 text-rose-600 dark:text-rose-400 px-1.5 py-0.5 rounded tracking-wider uppercase border border-rose-200 dark:border-rose-800 shadow-sm shrink-0">${isAbsent.status}</span>
+                        </div>
+                        ${isAbsent.reason ? `<div class="text-[10px] text-slate-600 dark:text-zinc-300 italic bg-white dark:bg-zinc-800 p-2 rounded border border-slate-100 dark:border-zinc-700 mt-1">"${isAbsent.reason}"</div>` : ''}
+                        ${proofHtml ? `<div class="flex gap-1.5 mt-1 overflow-x-auto pb-1 no-scrollbar">${proofHtml}</div>` : ''}
+                    </div>
+                    `;
+                }
+            });
+        }
+
+        countEl.innerText = absentCount;
+        historyContainer.innerHTML = historyHtml || `<div class="flex flex-col items-center justify-center text-center py-6 text-slate-400 m-auto"><div class="p-3 bg-emerald-50 dark:bg-emerald-950/30 rounded-full mb-2"><i data-lucide="check-circle-2" class="w-8 h-8 text-ios-green"></i></div><p class="text-xs font-bold text-slate-600 dark:text-zinc-300">Lengkap Hadir 100%</p><p class="text-[10px] mt-0.5">Tidak ada catatan kurang di server pada bulan ini.</p></div>`;
+        lucide.createIcons();
+
+    } catch (err) {
+        console.error("Gagal menarik histori dari Supabase:", err);
+        historyContainer.innerHTML = `<div class="text-center py-6 text-rose-500 m-auto"><i data-lucide="alert-triangle" class="w-6 h-6 mx-auto mb-2"></i><p class="text-[10px] font-bold">Gagal memuat histori dari server.</p></div>`;
+        lucide.createIcons();
+    }
+}    function toggleHistoryLogSelection(logId, isChecked) {
       if (isChecked) selectedHistoryLogs.add(logId);
       else selectedHistoryLogs.delete(logId);
       updateBulkDeleteHistoryBtn();
@@ -5816,11 +6064,14 @@ function updateDashboardPendataan() {
     }
 
  function switchTab(viewId) {
+            const isAuthorized = ['Admin', 'Piket', 'Pokdo', 'Pengasuh'].includes(currentUser.role);
+      
       if (viewId === 'admin-panel' && currentUser.role !== 'Admin') {
           showToast('Akses Ditolak', 'Halaman ini khusus Administrator.', 'error');
           return switchTab('dashboard');
       }
-      
+
+           
       storage.setItem('e_arvy_active_tab', viewId);
 
       // 1. BERSIHKAN SEMUA HALAMAN: Hapus flex & active, lalu paksa hidden
@@ -5840,15 +6091,15 @@ function updateDashboardPendataan() {
       // 3. Scroll layar ke atas dengan mulus
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
-      // -- Pembaruan Warna Tombol Sidebar --
+   
       document.querySelectorAll('.sidebar-item').forEach(i => i.className = i.id === `side-${viewId}` ? 
         "sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-ios-md text-sm font-bold text-ios-blue bg-[#53b0ae]/10 dark:bg-zinc-800 border border-transparent dark:border-[#53b0ae]/40 shadow-sm" : 
         "sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-ios-md text-sm font-semibold text-slate-600 dark:text-zinc-400 hover:bg-slate-100/50 dark:hover:bg-zinc-800/50 border border-transparent");
       
-      // -- Pembaruan Warna Tombol Tabbar Mobile --
+      
       document.querySelectorAll('.tabbar-item').forEach(i => i.className = i.id === `tab-${viewId}` ? "tabbar-item flex flex-col items-center gap-0.5 text-ios-blue font-bold text-[10px]" : "tabbar-item flex flex-col items-center gap-0.5 text-slate-400 font-semibold text-[10px]");
       
-      // -- Pemanggilan Data Sesuai Halaman --
+     
       if (viewId === 'statistik') { 
         renderCharts(); 
         renderHistoryTable(); 
@@ -5857,9 +6108,9 @@ function updateDashboardPendataan() {
         renderPendataanList();
       } else if (viewId === 'profile') { 
         updateProfilePage(); 
-      } else if (viewId === 'kepulangan') { 
-        renderKepulanganList(); 
-        renderDepartureLogs(); 
+      } else if (viewId === 'datakadet') { 
+        populateFilterProdiKadet();
+        renderDataKadetList(); 
       } else if (viewId === 'admin-panel') { 
         renderAbsenceStatusManager();
       }
@@ -6220,10 +6471,9 @@ if (window.fetchPengumumanDariCloud) {
 
 window.fetchDataKadetDariSupabase = async function() {
   try {
-    // 1. Tarik data termasuk tempat_lahir dan tanggal_lahir
-    const { data: KadetData, error } = await supabaseClient
+      const { data: KadetData, error } = await supabaseClient
       .from('DataKadet')
-      .select('nama_kadet, prodi, gender, tempat_lahir, tanggal_lahir')
+      .select('nama_kadet, prodi, gender, tempat_lahir, tanggal_lahir, telegram_id, foto_profile')
       .order('prodi', { ascending: true })
       .order('nama_kadet', { ascending: true });
 
@@ -6237,12 +6487,8 @@ window.fetchDataKadetDariSupabase = async function() {
         const prodiName = kadet.prodi;
         if (!formattedCadets[prodiName]) formattedCadets[prodiName] = [];
         
-        // --- LOGIKA NORMALISASI GENDER (ANTI-BUG) ---
-        // Ubah apapun input dari database menjadi huruf kecil semua dulu
         let rawGender = (kadet.gender || "laki-laki").toLowerCase().trim();
-        let finalGender = "Laki-Laki"; // Defaultnya laki-laki
-        
-        // Cek jika ada unsur kata perempuan/putri di database
+        let finalGender = "Laki-Laki"; 
         if (rawGender.includes("perempuan") || rawGender.includes("putri") || rawGender === "pi" || rawGender === "p") {
             finalGender = "Perempuan";
         }
@@ -6250,9 +6496,12 @@ window.fetchDataKadetDariSupabase = async function() {
         const cadetObj = {
           no: formattedCadets[prodiName].length + 1,
           name: kadet.nama_kadet,
-          gender: finalGender, // Masukkan gender yang sudah dinormalkan
+          gender: finalGender,
           tempat_lahir: kadet.tempat_lahir || "Tidak diketahui",
-          tanggal_lahir: kadet.tanggal_lahir || ""
+          tanggal_lahir: kadet.tanggal_lahir || "",
+         
+          telegram_id: kadet.telegram_id || "",
+          foto_profile: kadet.foto_profile || ""
         };
 
         formattedCadets[prodiName].push(cadetObj);
@@ -6266,7 +6515,6 @@ window.fetchDataKadetDariSupabase = async function() {
       if (typeof renderAttendanceList === 'function') renderAttendanceList();
       if (typeof loadAdminCadetList === 'function' && document.getElementById('view-admin-panel')?.classList.contains('active')) loadAdminCadetList();
       
-      // Panggil fungsi render ulang tahun
       if (typeof renderBirthdays === 'function') renderBirthdays();
     }
   } catch (error) {
@@ -6287,13 +6535,11 @@ window.fetchJadwalDefaultDariSupabase = async function() {
       let schedules = JSON.parse(localStorage.getItem('e_arvy_schedules') || '[]');
       let updated = false;
 
-      // Loop untuk mengisi jadwal 7 hari ke depan mulai dari hari ini
-      for (let i = 0; i < 7; i++) {
+           for (let i = 0; i < 7; i++) {
         let dateObj = new Date();
         dateObj.setDate(dateObj.getDate() + i);
         const targetDateStr = getLocalDateString(dateObj);
 
-        // Cek apakah hari ini+i sudah punya jadwal
         const alreadyHasSchedule = schedules.some(s => s.date === targetDateStr);
         
         if (!alreadyHasSchedule) {
@@ -6311,14 +6557,12 @@ window.fetchJadwalDefaultDariSupabase = async function() {
       }
 
       if (updated) {
-        // Urutkan jadwal berdasarkan jam
+
         schedules.sort((a,b) => (a.date + a.time).localeCompare(b.date + b.time));
 
-        // Simpan ke memori lokal
         appData.schedules = schedules;
         localStorage.setItem('e_arvy_schedules', JSON.stringify(schedules));
         
-        // Sinkronisasi ke Cloud
         if (typeof window.syncLocalStorageToCloud === 'function') {
           window.syncLocalStorageToCloud('e_arvy_schedules');
         }
@@ -6370,7 +6614,7 @@ window.fetchJadwalDefaultDariSupabase = async function() {
 // --- RADAR SINKRONISASI LIVE (SUPABASE REALTIME) ---
   window.initSupabaseRealtime = function() {
     if (!supabaseClient) return;
-/*
+
     // 1. Pantau ketikan sementara (Draft / Pengumuman)
     supabaseClient
       .channel('realtime-arvy-data')
@@ -6452,7 +6696,7 @@ window.fetchJadwalDefaultDariSupabase = async function() {
         }
       })
       .subscribe();
-*/
+
     // 2. Pantau jika ada Piket yang menekan "Verifikasi Permanen"
     supabaseClient
       .channel('realtime-presensi-log')
@@ -6479,7 +6723,7 @@ window.fetchJadwalDefaultDariSupabase = async function() {
 <script>
 
 // --- UBAH ANGKA INI SETIAP KALI AKU DEPLOY HTML BARU ---
-const APP_VERSION = "v1.4.0"; 
+const APP_VERSION = "v1.4.1"; 
 // -------------------------------------------------------------------
 
 function forceClearCacheOnUpdate() {
@@ -6783,6 +7027,70 @@ async function openPetLeaderboard() {
       <span>Peringkat & Status</span><span>Level & XP</span>
     </div>
     <div id="leaderboardContent" class="flex flex-col gap-2 overflow-y-auto no-scrollbar pb-2"></div>
+  </div>
+
+</div>
+<div id="cadetProfileModal" class="ios-modal fixed inset-0 bg-black/60 z-[3000] hidden items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-md">
+  <div class="ios-modal-content w-full sm:max-w-md bg-slate-50 dark:bg-zinc-900 rounded-t-ios-xl sm:rounded-ios-lg p-0 shadow-2xl flex flex-col overflow-hidden transform translate-y-full transition-transform h-[90vh] sm:h-[85vh]">
+    
+   <div class="bg-gradient-to-r from-[#53b0ae] to-[#3b9c9a] p-5 text-white relative flex flex-col items-center shrink-0">
+      <button onclick="closeModal('cadetProfileModal')" class="absolute top-4 right-4 text-white/80 hover:text-white text-3xl leading-none font-bold z-50 cursor-pointer">&times;</button>
+      
+      <button id="cdmEditBtn" onclick="toggleEditTelegram()" class="absolute top-5 left-4 text-white/80 hover:text-white text-xs font-bold flex items-center gap-1 bg-black/20 px-2 py-1.5 rounded hidden z-50 cursor-pointer transition-colors">
+        <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> ID Telegram
+      </button>
+
+      <div id="cdmAvatarWrapper" class="w-16 h-16 rounded-full bg-white text-[#53b0ae] flex items-center justify-center font-black text-2xl shadow-lg border-2 border-white/20 mb-2 overflow-hidden relative z-10">
+        <span id="cdmAvatarInitials">AB</span>
+        <img id="cdmAvatarImage" src="" class="w-full h-full object-cover hidden">
+      </div>
+      
+      <h3 id="cdmName" class="text-base font-black text-center leading-tight relative z-10">Nama Kadet</h3>
+      <div class="flex items-center gap-1.5 mt-1.5 relative z-10">
+          <span id="cdmProdi" class="text-[9px] font-bold uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full">Prodi</span>
+          <span id="cdmKompi" class="text-[9px] font-bold uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full">Ki-1</span>
+          <span id="cdmGender" class="text-[9px] font-bold uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full">PA</span>
+      </div>
+
+      <div id="cdmEditTgWrapper" class="hidden w-full mt-4 bg-black/20 p-2.5 rounded flex gap-2 relative z-50">
+         <input type="text" id="cdmTgInput" style="user-select: auto;" placeholder="Username Telegram (Tanpa @)" class="flex-1 px-3 py-2 text-xs rounded outline-none text-slate-900 focus:ring-2 focus:ring-white/50 transition-all select-text">
+         
+         <button id="cdmSaveTgBtn" class="bg-ios-blue text-white px-4 py-2 rounded text-[10px] font-bold shadow-md hover:scale-105 active:scale-95 transition-all cursor-pointer">
+            Tarik Data
+         </button>
+      </div>
+    </div>
+
+    <!-- Body Info -->
+    <div class="flex-1 flex flex-col p-4 gap-4 overflow-hidden bg-slate-50 dark:bg-zinc-900">
+      <div class="bg-white dark:bg-zinc-800 p-2.5 rounded-lg border border-slate-200 dark:border-zinc-700 flex items-center gap-2 shrink-0 shadow-sm">
+        <div class="p-1.5 bg-blue-50 dark:bg-blue-900/30 rounded text-ios-blue"><i data-lucide="calendar-days" class="w-4 h-4"></i></div>
+        <div class="flex flex-col">
+            <span class="text-[8px] text-slate-400 font-bold uppercase tracking-wider">Tempat, Tanggal Lahir</span>
+            <strong id="cdmTTL" class="text-xs text-slate-800 dark:text-white leading-none mt-0.5">-</strong>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-zinc-800 rounded-lg border border-slate-200 dark:border-zinc-700 flex flex-col flex-1 overflow-hidden shadow-sm">
+        <div class="flex justify-between items-center border-b border-slate-100 dark:border-zinc-700 p-3 shrink-0 bg-slate-50 dark:bg-zinc-800/50">
+          <span class="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+            <i data-lucide="history" class="w-4 h-4 text-ios-blue"></i> Histori Tidak Hadir
+          </span>
+          <!-- Dropdown Pilihan Bulan -->
+          <select id="cdmMonthFilter" onchange="renderCadetHistoryList()" class="px-2 py-1 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 rounded text-[10px] font-bold outline-none cursor-pointer">
+             <!-- Dirender JS -->
+          </select>
+        </div>
+        <div class="px-3 py-2 bg-rose-50/50 dark:bg-rose-950/10 border-b border-slate-100 dark:border-zinc-700 flex justify-between items-center shrink-0">
+           <span class="text-[10px] font-bold text-slate-500 dark:text-zinc-400">Total Akumulasi:</span>
+           <span class="text-[10px] font-black bg-rose-100 dark:bg-rose-900/60 text-ios-red dark:text-rose-400 px-2 py-0.5 rounded shadow-sm border border-rose-200 dark:border-rose-800"><span id="cdmAbsentCount">0</span>x Kurang</span>
+        </div>
+        
+        <div id="cdmAbsentHistory" class="flex-1 overflow-y-auto p-3 overscroll-contain flex flex-col gap-2 history-scrollbar relative">
+          <!-- Histori -->
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
