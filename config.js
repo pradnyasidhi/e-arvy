@@ -5,7 +5,6 @@ const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
  const users = [
           { username: 'nami', password: CryptoJS.SHA256('0401072').toString(), role: 'Admin', prodiName: '', kompiName: '', profilePhoto: '' },
           { username: 'piket', password: CryptoJS.SHA256('piket6').toString(), role: 'Piket', prodiName: '', kompiName: '', profilePhoto: '' },
-          // Tambahkan 5 akun baru di sini (Diberi akses setara Admin)
           { username: 'danyon', password: CryptoJS.SHA256('danyon6').toString(), role: 'Piket', prodiName: '', kompiName: '', profilePhoto: '' },
           { username: 'wadanyon', password: CryptoJS.SHA256('wadanyon6').toString(), role: 'Piket', prodiName: '', kompiName: '', profilePhoto: '' },
           { username: 'danki', password: CryptoJS.SHA256('danki6').toString(), role: 'Piket', prodiName: '', kompiName: '', profilePhoto: '' },
