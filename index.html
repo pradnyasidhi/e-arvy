@@ -4965,17 +4965,21 @@ function renderDataKadetList() {
       totalMatches += filteredCadets.length;
 
       let cadetsHtml = '';
-      filteredCadets.forEach(c => {
-
+     filteredCadets.forEach(c => {
         const cleanName = cleanCadetName(c.name);
         const inisial = cleanName.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
         const badgeWarna = c.gender === 'Laki-Laki' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400' : 'bg-pink-100 text-pink-700 dark:bg-pink-900/40 dark:text-pink-400';
 
+        const avatarHtml = c.foto_profile 
+            ? `<img src="${c.foto_profile}" class="w-full h-full object-cover">`
+            : inisial;
+
         cadetsHtml += `
           <div onclick="openCadetProfile('${prodi.currentName}', ${c.no})" class="bg-white dark:bg-zinc-800/60 border border-slate-200 dark:border-zinc-700 p-3 sm:p-4 rounded-ios-md cursor-pointer hover:shadow-md hover:-translate-y-1 transition-all flex flex-col items-center text-center gap-2">
               <div class="relative">
-                 <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-slate-200 dark:bg-zinc-700 text-slate-500 flex items-center justify-center font-black text-lg sm:text-xl shadow-inner border-2 border-white dark:border-zinc-600">
-                    ${inisial}
+                 <!-- 2. UBAH BARIS INI: Tambahkan class 'overflow-hidden' di akhir dan panggil avatarHtml -->
+                 <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-slate-200 dark:bg-zinc-700 text-slate-500 flex items-center justify-center font-black text-lg sm:text-xl shadow-inner border-2 border-white dark:border-zinc-600 overflow-hidden">
+                    ${avatarHtml}
                  </div>
                  <div class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full ${badgeWarna} border-2 border-white dark:border-zinc-800 flex items-center justify-center text-[8px] font-black shadow-sm">
                     ${c.gender === 'Laki-Laki' ? 'PA' : 'PI'}
