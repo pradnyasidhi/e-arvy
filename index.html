@@ -3697,6 +3697,7 @@ if (isEditable) {
               const draftStatus = storage.getItem(`draft_status_${dateStr}_${activityName}_${prodi.prodiId}_${c.no}`) || 'HADIR';
               const draftReason = storage.getItem(`draft_reason_${dateStr}_${activityName}_${prodi.prodiId}_${c.no}`) || '';
               const draftProof = storage.getItem(`draft_proof_${dateStr}_${activityName}_${prodi.prodiId}_${c.no}`) || '';
+              const draftLocation = storage.getItem(`draft_location_${dateStr}_${activityName}_${prodi.prodiId}_${c.no}`) || '';
               
               let selectOptionsSpecific = `<option value="HADIR" ${draftStatus === 'HADIR' ? 'selected' : ''}>HADIR</option>`;
 absenceStatuses.forEach(st => selectOptionsSpecific += `<option value="${st}" ${draftStatus === st ? 'selected' : ''}>${st}</option>`);
@@ -3704,30 +3705,32 @@ selectOptionsSpecific += `<option value="TAMBAH_BARU" class="font-black text-ios
 
               const checkboxHtml = isEditable ? `<input type="checkbox" data-no="${c.no}" class="bulk-cb-${prodi.prodiId} w-3.5 h-3.5 rounded border-gray-300 text-ios-blue focus:ring-ios-blue cursor-pointer" onchange="toggleBulkCheck(${prodi.prodiId}, ${c.no}, this.checked)">` : '';
 
-                          cadetRowsHtml += `
-                <div id="cadet-row-${prodi.prodiId}-${c.no}" class="flex flex-col py-1 border-b border-slate-100 dark:border-zinc-800/60 last:border-0 hover:bg-slate-50 dark:hover:bg-zinc-800/30 px-1 transition-colors">
-                  <div class="flex flex-row items-center gap-2 w-full">
-                    <div class="flex items-center gap-1.5 shrink-0 min-w-[75px]">
-                      ${checkboxHtml}
-                      <span class="text-[9px] font-extrabold text-slate-400 w-5">#${c.no}</span>
-                      <span class="text-[8px] font-black px-1 py-0.5 rounded ${c.gender === 'Laki-Laki' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400' : 'bg-pink-100 text-pink-700 dark:bg-pink-900/40 dark:text-pink-400'}">${c.gender === 'Laki-Laki' ? 'PA' : 'PI'}</span>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                      <span class="text-[11px] font-bold text-slate-800 dark:text-zinc-200 truncate block cursor-default" title="${c.name}">${c.name}</span>
-                    </div>
-                    <div class="w-24 shrink-0">
-                      <select class="w-full px-1.5 py-0.5 rounded border bg-white dark:bg-zinc-900 dark:border-zinc-700 dark:text-white text-[10px] font-semibold focus:outline-none cursor-pointer" id="cadet-status-${prodi.prodiId}-${c.no}" onchange="handleCadetStatusChange(${prodi.prodiId}, ${c.no})" ${isEditable ? '' : 'disabled'}>
-                        ${selectOptionsSpecific}
-                      </select>
-                    </div>
+                         cadetRowsHtml += `
+              <div id="cadet-row-${prodi.prodiId}-${c.no}" class="flex flex-col py-1 border-b border-slate-100 dark:border-zinc-800/60 last:border-0 hover:bg-slate-50 dark:hover:bg-zinc-800/30 px-1 transition-colors w-full">
+                <div class="flex flex-row items-center gap-2 w-full">
+                  <div class="flex items-center gap-1.5 shrink-0 min-w-[75px]">
+                    ${checkboxHtml}
+                    <span class="text-[9px] font-extrabold text-slate-400 w-5">#${c.no}</span>
+                    <span class="text-[8px] font-black px-1 py-0.5 rounded ${c.gender === 'Laki-Laki' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400' : 'bg-pink-100 text-pink-700 dark:bg-pink-900/40 dark:text-pink-400'}">${c.gender === 'Laki-Laki' ? 'PA' : 'PI'}</span>
                   </div>
+                  <div class="flex-1 min-w-0">
+                    <span class="text-[11px] font-bold text-slate-800 dark:text-zinc-200 truncate block cursor-default" title="${c.name}">${c.name}</span>
+                  </div>
+                  <div class="w-24 shrink-0">
+                    <select class="w-full px-1.5 py-0.5 rounded border bg-white dark:bg-zinc-900 dark:border-zinc-700 dark:text-white text-[10px] font-semibold focus:outline-none cursor-pointer" id="cadet-status-${prodi.prodiId}-${c.no}" onchange="handleCadetStatusChange(${prodi.prodiId}, ${c.no})" ${isEditable ? '' : 'disabled'}>
+                      ${selectOptionsSpecific}
+                    </select>
+                  </div>
+                </div>
+                
+                <div id="absence-detail-${prodi.prodiId}-${c.no}" class="${(draftStatus !== 'HADIR' && (isEditable || draftReason || draftProof)) ? 'flex' : 'hidden'} mt-1 flex-row items-center gap-2 p-1.5 bg-rose-50/50 dark:bg-rose-950/20 rounded border border-dashed border-rose-200 dark:border-rose-900">
+                  ${isEditable ? 
+                    `<input type="text" class="flex-1 px-2 py-0.5 rounded bg-white dark:bg-zinc-800 dark:border-zinc-700 dark:text-white border text-[10px] focus:ring-1 focus:ring-ios-blue outline-none" placeholder="Tulis alasan..." id="absence-reason-${prodi.prodiId}-${c.no}" value="${draftReason}" onblur="this.value = this.value.toUpperCase(); syncDraftReason(${prodi.prodiId}, ${c.no});">`
+                  : 
+                    (draftReason ? `<div class="text-[10px] font-bold text-rose-700 dark:text-rose-400 flex-1 px-1 truncate">Ket: ${draftReason}</div><input type="hidden" id="absence-reason-${prodi.prodiId}-${c.no}" value="${draftReason}">` : `<input type="hidden" id="absence-reason-${prodi.prodiId}-${c.no}" value="">`)
+                  }
                   
-                  <div id="absence-detail-${prodi.prodiId}-${c.no}" class="${(draftStatus !== 'HADIR' && (isEditable || draftReason || draftProof)) ? 'flex' : 'hidden'} mt-1 flex-row items-center gap-2 p-1.5 bg-rose-50/50 dark:bg-rose-950/20 rounded border border-dashed border-rose-200 dark:border-rose-900">
-                    ${isEditable ? 
-                      `<input type="text" class="flex-1 px-2 py-0.5 rounded bg-white dark:bg-zinc-800 dark:border-zinc-700 dark:text-white border text-[10px] focus:ring-1 focus:ring-ios-blue outline-none" placeholder="Tulis alasan..." id="absence-reason-${prodi.prodiId}-${c.no}" value="${draftReason}" onblur="this.value = this.value.toUpperCase(); syncDraftReason(${prodi.prodiId}, ${c.no});">`
-                    : 
-                      (draftReason ? `<div class="text-[10px] font-bold text-rose-700 dark:text-rose-400 flex-1 px-1 truncate">Ket: ${draftReason}</div><input type="hidden" id="absence-reason-${prodi.prodiId}-${c.no}" value="${draftReason}">` : `<input type="hidden" id="absence-reason-${prodi.prodiId}-${c.no}" value="">`)
-                    }
+                  <div class="flex flex-col gap-1 items-end shrink-0">
                     <div class="flex items-center gap-1.5 shrink-0">
                       ${isEditable ? `<label class="px-2 py-0.5 rounded bg-white dark:bg-zinc-800 dark:border-zinc-700 dark:text-white border border-slate-200 text-[9px] font-bold cursor-pointer hover:bg-slate-50 dark:hover:bg-zinc-700 shrink-0"><i data-lucide="upload" class="w-3 h-3 inline"></i> <input type="file" accept="image/*" multiple class="hidden" onchange="handleProofPhotoUpload(event, ${prodi.prodiId}, ${c.no}, '${c.name.replace(/\x27/g, "\\'")}')"></label>` : ''}
                       
@@ -3735,10 +3738,16 @@ selectOptionsSpecific += `<option value="TAMBAH_BARU" class="font-black text-ios
                          ${draftProof ? draftProof.split(',').map(url => `<img src="${url}" class="h-5 w-8 object-cover rounded border shadow-sm cursor-zoom-in shrink-0" onclick="viewDocumentedPhoto('${c.name.replace(/\x27/g, "\\'")}', '${url}')">`).join('') : ''}
                       </div>
                     </div>
+                    
+                    <div id="proof-location-${prodi.prodiId}-${c.no}" class="${draftLocation ? '' : 'hidden'} text-[8px] text-slate-500 font-medium max-w-[150px] truncate text-right leading-tight" title="${draftLocation}">
+                       <i data-lucide="map-pin" class="w-2.5 h-2.5 inline text-ios-red"></i> ${draftLocation}
+                    </div>
+                    
                     <input type="hidden" id="proof-base64-${prodi.prodiId}-${c.no}" value="${draftProof}">
                   </div>
                 </div>
-              `;
+              </div>
+            `;
             });
           }
 
@@ -4292,7 +4301,8 @@ if (ketuaInput) {
           if (status !== 'HADIR') {
             const reason = storage.getItem(`draft_reason_${dateStr}_${act}_${prodi.prodiId}_${c.no}`) || '';
             const att = storage.getItem(`draft_proof_${dateStr}_${act}_${prodi.prodiId}_${c.no}`) || '';
-            absents.push({ prodiName: prodi.currentName, cadetNo: c.no, cadetName: c.name, status, reason, attachmentBase64: att });
+            const loc = storage.getItem(`draft_location_${dateStr}_${act}_${prodi.prodiId}_${c.no}`) || '';
+            absents.push({ prodiName: prodi.currentName, cadetNo: c.no, cadetName: c.name, status, reason, attachmentBase64: att, locationInfo: loc });
           }
         });
 });
@@ -4353,6 +4363,13 @@ callServer('saveAttendance', {
       }
 
 applyFormatFilter('Kadpaga');
+const evidenceBtn = document.getElementById('recapTabBtnEvidence');
+      if (evidenceBtn) {
+          const isAuthorized = ['Admin', 'Piket', 'Pokdo', 'Pengasuh'].includes(currentUser.role);
+          const hasPhoto = absents.some(a => a.attachmentBase64 && a.attachmentBase64.trim() !== '');
+          if (isAuthorized && hasPhoto) evidenceBtn.classList.remove('hidden');
+          else evidenceBtn.classList.add('hidden');
+      }
       document.getElementById('recapTextarea').value = res.recapText; 
       renderEvidenceGallery(absents);
       switchRecapTab('text');
@@ -4437,7 +4454,8 @@ function switchRecapTab(tab) {
             prodiName: prodiName,
             status: pAbsents[0].status,
             reason: pAbsents[0].reason,
-            attachmentBase64: pAbsents[0].attachmentBase64 // Cukup ambil foto pertama saja
+            attachmentBase64: pAbsents[0].attachmentBase64,
+            locationInfo: pAbsents[0].locationInfo
           });
         } else {
           // RENDER SATU PER SATU JIKA ALASANNYA BEDA-BEDA
@@ -4448,13 +4466,14 @@ function switchRecapTab(tab) {
               prodiName: a.prodiName,
               status: a.status,
               reason: a.reason,
-              attachmentBase64: a.attachmentBase64
+            attachmentBase64: a.attachmentBase64,
+            locationInfo: a.locationInfo
             });
           });
         }
       }
 
-      // 2. RENDER KARTU KE LAYAR
+     // 2. RENDER KARTU KE LAYAR
       finalCardsData.forEach(a => {
         let photoHtml = '';
         if (a.attachmentBase64) {
@@ -4469,8 +4488,43 @@ function switchRecapTab(tab) {
            photoHtml = `<div class="w-full h-32 bg-slate-100 dark:bg-zinc-800/80 rounded mt-2 flex flex-col items-center justify-center text-slate-400 text-[10px] italic border border-slate-200 dark:border-zinc-700"><i data-lucide="image-off" class="w-6 h-6 mb-1 opacity-50"></i> Tanpa Foto</div>`;
         }
 
+       // --- TAMBAHAN LOGIKA PETA MINI (MINI MAP) ---
+        let mapHtml = '';
+        let cleanLocationText = '';
+        
+        if (a.locationInfo) {
+            // Ekstrak Titik Koordinat GPS dari Teks menggunakan Regex
+            const match = a.locationInfo.match(/Lat:\s*([-.\d]+),\s*Lon:\s*([-.\d]+)/);
+            if (match && match.length === 3) {
+                const lat = match[1];
+                const lon = match[2];
+                
+                // Hapus tulisan "(Lat: ... Lon: ...)" dari teks agar UI lebih rapi
+                cleanLocationText = a.locationInfo.replace(/\s*\(Lat.*/, '');
+                
+                // Bangun Iframe Google Maps Mini (PERBAIKAN URL)
+                mapHtml = `
+                  <div class="w-full h-24 mt-2 rounded border border-slate-200 dark:border-zinc-700 overflow-hidden relative shadow-inner">
+                    <iframe 
+                      width="100%" 
+                      height="100%" 
+                      frameborder="0" 
+                      scrolling="no" 
+                      marginheight="0" 
+                      marginwidth="0" 
+                      src="https://maps.google.com/maps?q=${lat},${lon}&z=15&output=embed">
+                    </iframe>
+                  </div>
+                `;
+            } else {
+                cleanLocationText = a.locationInfo; // Fallback jika tidak ada koordinat
+            }
+        }
+        // --------------------------------------------
+
         evContainer.innerHTML += `
           <div class="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 p-3 rounded-ios-md flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow ${a.isWholeProdi ? 'ring-2 ring-ios-blue/30 bg-blue-50/20 dark:bg-blue-900/10' : ''}">
+            
             <div class="text-xs">
               <span class="font-black text-slate-800 dark:text-white block truncate ${a.isWholeProdi ? 'text-ios-blue text-sm' : ''}" title="${a.title}">${a.title}</span>
               <div class="flex items-center justify-between mt-0.5">
@@ -4478,8 +4532,15 @@ function switchRecapTab(tab) {
                 <span class="font-bold text-[10px] uppercase tracking-wider text-ios-red bg-rose-50 dark:bg-rose-950/30 px-1.5 py-0.5 rounded">${a.status}</span>
               </div>
               ${a.reason ? `<p class="mt-2 text-[10px] bg-slate-50 dark:bg-zinc-800/60 p-2 rounded border border-slate-100 dark:border-zinc-700/50 text-slate-600 dark:text-zinc-300">${a.reason}</p>` : ''}
+              
+              ${cleanLocationText ? `<p class="mt-2.5 text-[9px] text-slate-500 dark:text-zinc-400 font-bold leading-snug"><i data-lucide="map-pin" class="w-3 h-3 inline text-ios-red"></i> ${cleanLocationText}</p>` : ''}
             </div>
-            ${photoHtml}
+            
+            <div class="mt-auto flex flex-col w-full">
+               ${mapHtml}
+               ${photoHtml}
+            </div>
+            
           </div>
         `;
       });
@@ -4779,7 +4840,8 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
     const isAuthorized = ['Admin', 'Piket', 'Pokdo', 'Pengasuh'].includes(currentUser.role);
     const evidenceBtn = document.getElementById('recapTabBtnEvidence');
     if (evidenceBtn) {
-      if (isAuthorized) evidenceBtn.classList.remove('hidden');
+      const hasPhoto = currentViewedLog.absents && currentViewedLog.absents.some(a => a.attachmentBase64 && a.attachmentBase64.trim() !== '');
+      if (isAuthorized && hasPhoto) evidenceBtn.classList.remove('hidden');
       else evidenceBtn.classList.add('hidden');
     }
     applyFormatFilter('Kadpaga');
@@ -4803,12 +4865,14 @@ let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${for
     else filterEl.classList.add('hidden');
 
    
-    const isAuthorized = ['Admin', 'Piket', 'Pokdo', 'Pengasuh'].includes(currentUser.role);
+const isAuthorized = ['Admin', 'Piket', 'Pokdo', 'Pengasuh'].includes(currentUser.role);
     const evidenceBtn = document.getElementById('recapTabBtnEvidence');
     if (evidenceBtn) {
-      if (isAuthorized) evidenceBtn.classList.remove('hidden');
+      const hasPhoto = item.absents && item.absents.some(a => a.attachmentBase64 && a.attachmentBase64.trim() !== '');
+      if (isAuthorized && hasPhoto) evidenceBtn.classList.remove('hidden');
       else evidenceBtn.classList.add('hidden');
     }
+
     applyFormatFilter('Kadpaga');
     applyRecapFilter('Batalyon'); 
     renderEvidenceGallery(item.absents);
@@ -6895,7 +6959,7 @@ window.fetchJadwalDefaultDariSupabase = async function() {
 <script>
 
 // --- UBAH ANGKA INI SETIAP KALI AKU DEPLOY HTML BARU ---
-const APP_VERSION = "v1.4.1"; 
+const APP_VERSION = "v1.4.2"; 
 // -------------------------------------------------------------------
 
 function forceClearCacheOnUpdate() {
@@ -7059,38 +7123,73 @@ await window.fetchJadwalDefaultDariSupabase();
 
 
   const originalHandleProofPhotoUpload = handleProofPhotoUpload;
-
-  handleProofPhotoUpload = async function(event, prodiId, cadetNo, cadetName = 'Kadet') {
+handleProofPhotoUpload = async function(event, prodiId, cadetNo, cadetName = 'Kadet') {
     const files = event.target.files;
     if (!files || files.length === 0) {
       markAsUnsaved(prodiId);
       return;
     }
 
+    const dateStr = document.getElementById('presensiDate').value;
+    let activityName = document.getElementById('presensiActivitySelect').value;
+    if (activityName === 'kustom') activityName = document.getElementById('customActivityName').value || 'Kustom';
+
     if (window.uploadFileToCloudStorage) {
-      showToast('Mengunggah...', `Memproses ${files.length} dokumen fisik ke Cloud...`, 'info');
+      showToast('Memproses Lokasi...', 'Memindai titik koordinat GPS Anda...', 'info');
       
-      const dateStr = document.getElementById('presensiDate').value;
-      let activityName = document.getElementById('presensiActivitySelect').value;
-      if (activityName === 'kustom') activityName = document.getElementById('customActivityName').value || 'Kustom';
+      // 1. Ambil Titik Lokasi GPS
+      let locationText = "Lokasi tidak diizinkan/gagal.";
+      try {
+        locationText = await new Promise((resolve) => {
+          if (!navigator.geolocation) {
+            resolve("GPS tidak didukung perangkat."); return;
+          }
+          navigator.geolocation.getCurrentPosition(
+            async (pos) => {
+              const lat = pos.coords.latitude;
+              const lon = pos.coords.longitude;
+              try {
+                // Konversi titik koordinat menjadi nama jalan/kota (Reverse Geocoding)
+                const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
+                const data = await res.json();
+                let place = data.display_name ? data.display_name.split(',').slice(0, 3).join(', ') : "Lokasi Tidak Dikenal";
+                resolve(`${place} (Lat: ${lat.toFixed(5)}, Lon: ${lon.toFixed(5)})`);
+              } catch(e) {
+                // Jika gagal mendapat nama tempat, tampilkan koordinat mentah
+                resolve(`Titik GPS (Lat: ${lat.toFixed(5)}, Lon: ${lon.toFixed(5)})`);
+              }
+            },
+            (err) => { resolve("Akses Lokasi GPS Ditolak."); },
+            { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+          );
+        });
+      } catch(err) { console.error(err); }
+
+      // Simpan lokasi ke memori sementara
+      storage.setItem(`draft_location_${dateStr}_${activityName}_${prodiId}_${cadetNo}`, locationText);
       
-      // Ambil foto yang sudah ada sebelumnya (jika mau ditambah, bukan ditiban murni)
+      // 2. Unggah Foto ke Cloud
       let existingProof = storage.getItem(`draft_proof_${dateStr}_${activityName}_${prodiId}_${cadetNo}`) || "";
       let uploadedUrls = existingProof ? existingProof.split(',') : [];
 
-      // Loop pengompresan dan unggahan
       for (let i = 0; i < files.length; i++) {
         const compressedBase64 = await new Promise((resolve) => compressImage(files[i], 100, resolve));
         const cloudUrl = await window.uploadFileToCloudStorage(compressedBase64, 'absensi_bukti', `cadet_${prodiId}_${cadetNo}_${Date.now()}_${i}`);
         uploadedUrls.push(cloudUrl);
       }
 
-      // Gabungkan semua URL dengan koma
       const finalProofString = uploadedUrls.join(',');
       storage.setItem(`draft_proof_${dateStr}_${activityName}_${prodiId}_${cadetNo}`, finalProofString);
       document.getElementById(`proof-base64-${prodiId}-${cadetNo}`).value = finalProofString;
 
-      // Render ulang wadah preview UI
+      // 3. Render Ulang Antarmuka Foto dan Teks Lokasi
+      const locEl = document.getElementById(`proof-location-${prodiId}-${cadetNo}`);
+      if (locEl) {
+         locEl.innerHTML = `<i data-lucide="map-pin" class="w-2.5 h-2.5 inline text-ios-red"></i> ${locationText}`;
+         locEl.classList.remove('hidden');
+         locEl.setAttribute('title', locationText);
+      }
+      
       const previewContainer = document.getElementById(`proof-preview-container-${prodiId}-${cadetNo}`);
       if (previewContainer) {
          previewContainer.innerHTML = uploadedUrls.map(url => `<img src="${url}" class="h-5 w-8 object-cover rounded border shadow-sm cursor-zoom-in shrink-0" onclick="viewDocumentedPhoto('${cadetName}', '${url}')">`).join('');
@@ -7098,11 +7197,13 @@ await window.fetchJadwalDefaultDariSupabase();
 
       updateProdiSummary(prodiId);
       markAsUnsaved(prodiId);
-      showToast('Selesai', `${files.length} Bukti foto berhasil ditambahkan.`, 'success');
+      lucide.createIcons();
+      showToast('Selesai', `Bukti foto & titik lokasi tersimpan.`, 'success');
     } else {
       markAsUnsaved(prodiId);
     }
   };
+
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('./sw.js')
