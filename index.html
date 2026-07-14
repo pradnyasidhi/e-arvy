@@ -3557,10 +3557,16 @@ function updateMiniRecapCard() {
       const dateStr = document.getElementById('presensiDate').value;
       let activityName = document.getElementById('presensiActivitySelect').value;
       if (activityName === 'kustom') activityName = document.getElementById('customActivityName').value || 'Kegiatan Kustom';
+      
+      // Pengaman agar tidak muncul kutip kosong ("")
+      if (!activityName || activityName.trim() === '') {
+          activityName = 'Belum Dipilih';
+      }
+
       const isLocked = storage.getItem(`locked_presensi_${dateStr}_${activityName}`) === 'true';
       const isAdmin = ['Admin', 'Piket', 'Pokdo', 'Pengasuh'].includes(currentUser.role);
       
-     let lockBannerHtml = '';
+      let lockBannerHtml = '';
       if (isLocked) {
          lockBannerHtml = `
            <div class="col-span-full flex justify-between items-center p-4 mb-2 bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900 rounded-ios-md transition-all">
@@ -3581,19 +3587,6 @@ function updateMiniRecapCard() {
                <i data-lucide="unlock" class="w-5 h-5"></i>
                <div class="flex flex-col">
                  <span class="text-sm font-bold text-slate-900 dark:text-white">Akses Data <span class="font-black">"${activityName}"</span> Terbuka</span>
-                 <span class="text-[10px] text-slate-500 font-medium">Kadet masih dapat mengisi data presensi prodi mereka.</span>
-               </div>
-             </div>
-             <button onclick="toggleAttendanceLock()" class="px-3 py-1.5 bg-white dark:bg-zinc-800 border border-emerald-200 dark:border-emerald-900 text-ios-green rounded-ios-sm text-xs font-bold hover:bg-emerald-100 transition-all shadow-sm">Kunci Manual</button>
-           </div>
-         `;
-      } else if (isAdmin) {
-         lockBannerHtml = `
-           <div class="col-span-full flex justify-between items-center p-4 mb-2 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900 rounded-ios-md transition-all">
-             <div class="flex items-center gap-3 text-ios-green">
-               <i data-lucide="unlock" class="w-5 h-5"></i>
-               <div class="flex flex-col">
-                 <span class="text-sm font-bold text-slate-900 dark:text-white">Akses Kadet Terbuka</span>
                  <span class="text-[10px] text-slate-500 font-medium">Kadet masih dapat mengisi data presensi prodi mereka.</span>
                </div>
              </div>
@@ -3648,13 +3641,13 @@ function updateMiniRecapCard() {
           const cadetsList = (appData.cadets[prodi.currentName] || []).filter(c => activeCategory === 'Batalyon' || (activeCategory === 'Putra' && c.gender === 'Laki-Laki') || (activeCategory === 'Putri' && c.gender === 'Perempuan'));
           const draftPresentCount = storage.getItem(`saved_present_cnt_${dateStr}_${activityName}_${prodi.prodiId}`) || cadetsList.length;
 
-const draftKetuaKey = `draft_ketua_${dateStr}_${activityName}_${prodi.prodiId}`;
-let draftKetua = storage.getItem(draftKetuaKey);
+// --- LOGIKA ROTASI KETUA KELAS HARIAN (SINKRON SEMUA KEGIATAN) ---
+// Gunakan kunci 'daily' tanpa nama kegiatan, sehingga berlaku untuk seharian penuh
+const dailyKetuaKey = `daily_ketua_${dateStr}_${prodi.prodiId}`;
+let draftKetua = storage.getItem(dailyKetuaKey);
 
 if (!draftKetua) {
-
   const lastSavedNo = parseInt(storage.getItem(`last_ketua_no_${prodi.currentName}`)) || 0;
-
   const nextNo = cadetsList.length > 0 ? (lastSavedNo % cadetsList.length) + 1 : 1;
   const nextCadet = cadetsList.find(c => c.no === nextNo);
   draftKetua = nextCadet ? nextCadet.name : '';
@@ -3767,17 +3760,23 @@ selectOptionsSpecific += `<option value="TAMBAH_BARU" class="font-black text-ios
                 </div>
                 
                 <div class="w-full mt-2 pt-2 border-t border-slate-200/60 dark:border-zinc-700/60 relative">
-  <label class="text-[9px] font-bold uppercase tracking-wider text-slate-500">Ketua Kelas</label>
-  ${isEditable ? `
-    <input type="text" id="ketua-input-${prodi.prodiId}" value="${draftKetua}" oninput="searchKetuaKelas(${prodi.prodiId}, '${prodi.currentName}', this.value)" class="w-full px-2 py-1.5 mt-1 rounded border bg-white dark:bg-zinc-800 dark:border-zinc-700 text-xs outline-none focus:ring-1 focus:ring-ios-blue text-slate-900 dark:text-white" placeholder="Ketik nama...">
-    <div id="ketua-suggest-${prodi.prodiId}" class="hidden absolute left-0 right-0 top-[100%] mt-1 bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded shadow-lg z-50 max-h-32 overflow-y-auto"></div>
-  ` : `
-    <div class="text-xs font-bold text-slate-900 dark:text-white mt-0.5">${storage.getItem(`saved_ketua_${dateStr}_${activityName}_${prodi.prodiId}`) || '-'}</div>
-  `}
-</div>
+                  <label class="text-[9px] font-bold uppercase tracking-wider text-slate-500">Ketua Kelas</label>
+                  ${isEditable && !isSaved ? `
+                    <input type="text" id="ketua-input-${prodi.prodiId}" value="${draftKetua}" oninput="searchKetuaKelas(${prodi.prodiId}, '${prodi.currentName}', this.value)" class="w-full px-2 py-1.5 mt-1 rounded border bg-white dark:bg-zinc-800 dark:border-zinc-700 text-xs font-bold text-slate-900 dark:text-white outline-none focus:ring-1 focus:ring-ios-blue" placeholder="Ketik nama...">
+                    <div id="ketua-suggest-${prodi.prodiId}" class="hidden absolute left-0 right-0 top-[100%] mt-1 bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded shadow-lg z-50 max-h-32 overflow-y-auto"></div>
+                  ` : `
+                    <!-- KOTAK ABU-ABU SAAT TERSIMPAN -->
+                    <div class="w-full px-3 py-2 mt-1 rounded border border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-800/80 text-xs font-bold text-slate-700 dark:text-zinc-300 flex items-center justify-between shadow-inner">
+                      <span>${storage.getItem(`saved_ketua_${dateStr}_${activityName}_${prodi.prodiId}`) || draftKetua || '-'}</span>
+                      <i data-lucide="check-circle-2" class="w-4 h-4 text-slate-400"></i>
+                    </div>
+                    <!-- Input hidden agar fungsi Save tidak crash saat menarik data -->
+                    <input type="hidden" id="ketua-input-${prodi.prodiId}" value="${storage.getItem(`saved_ketua_${dateStr}_${activityName}_${prodi.prodiId}`) || draftKetua}">
+                  `}
+                </div>
 
-<div class="flex flex-col 2xl:flex-row justify-between items-start 2xl:items-end gap-2 pt-2">
-  <div class="text-[10px] flex-1 w-full" id="prodi-sum-detail-${prodi.prodiId}"></div>
+                <div class="flex flex-col 2xl:flex-row justify-between items-start 2xl:items-end gap-2 pt-2">
+                  <div class="text-[10px] flex-1 w-full" id="prodi-sum-detail-${prodi.prodiId}"></div>
                   ${isEditable ? `
                     <div id="prodi-action-btns-${prodi.prodiId}" class="flex gap-1.5 w-full 2xl:w-auto shrink-0 justify-end mt-1 2xl:mt-0">
                       ${isSaved ? `
@@ -3943,10 +3942,9 @@ window.searchKetuaKelas = function(prodiId, prodiName, query) {
   }
   suggestBox.classList.remove('hidden');
   
+  // Sinkronisasi Ketikan Mentah secara Harian
   const dateStr = document.getElementById('presensiDate').value;
-  let act = document.getElementById('presensiActivitySelect').value;
-  if (act === 'kustom') act = document.getElementById('customActivityName').value;
-  storage.setItem(`draft_ketua_${dateStr}_${act}_${prodiId}`, query);
+  storage.setItem(`daily_ketua_${dateStr}_${prodiId}`, query);
 };
 
 window.selectKetuaKelas = function(prodiId, name, prodiName, cadetNo) {
@@ -3954,13 +3952,12 @@ window.selectKetuaKelas = function(prodiId, name, prodiName, cadetNo) {
   document.getElementById(`ketua-suggest-${prodiId}`).classList.add('hidden');
   
   const dateStr = document.getElementById('presensiDate').value;
-  let act = document.getElementById('presensiActivitySelect').value;
-  if (act === 'kustom') act = document.getElementById('customActivityName').value;
   
-  storage.setItem(`draft_ketua_${dateStr}_${act}_${prodiId}`, name);
-
-  storage.setItem(`draft_ketua_no_${dateStr}_${act}_${prodiId}`, cadetNo);
+  // Sinkronisasi Harian Penuh
+  storage.setItem(`daily_ketua_${dateStr}_${prodiId}`, name);
+  storage.setItem(`daily_ketua_no_${dateStr}_${prodiId}`, cadetNo);
 };
+
     function syncDraftReason(prodiId, cadetNo) {
       const dateStr = document.getElementById('presensiDate').value;
       let activityName = document.getElementById('presensiActivitySelect').value;
@@ -4175,13 +4172,15 @@ function markAsUnsaved(prodiId) {
 const ketuaInput = document.getElementById(`ketua-input-${prodiId}`);
 if (ketuaInput) {
     const ketuaName = ketuaInput.value;
+    
     storage.setItem(`saved_ketua_${dateStr}_${act}_${prodiId}`, ketuaName);
+    storage.setItem(`daily_ketua_${dateStr}_${prodiId}`, ketuaName); 
     
     const cadet = (appData.cadets[prodiName] || []).find(c => c.name === ketuaName);
     if (cadet) {
         storage.setItem(`last_ketua_no_${prodiName}`, cadet.no);
     } else {
-        const draftNo = storage.getItem(`draft_ketua_no_${dateStr}_${act}_${prodiId}`);
+        const draftNo = storage.getItem(`daily_ketua_no_${dateStr}_${prodiId}`);
         if (draftNo) storage.setItem(`last_ketua_no_${prodiName}`, draftNo);
     }
 }
@@ -4235,49 +4234,41 @@ if (ketuaInput) {
   }
 
     function resetSingleProdiAttendance(prodiId, prodiName) {
-      if (!confirm(`Apakah Anda yakin ingin membatalkan simpan sementara dan mereset kehadiran prodi ${prodiName}?`)) return;
+  if (!confirm(`Apakah Anda yakin ingin membatalkan simpan sementara dan mereset kehadiran prodi ${prodiName}?`)) return;
 
-      const dateStr = document.getElementById('presensiDate').value; 
-      let act = document.getElementById('presensiActivitySelect').value; 
-      if (act === 'kustom') act = document.getElementById('customActivityName').value; 
-      if (!act) { showToast('Validasi', 'Tentukan kegiatan!', 'warning'); return; }
-if (isCustom) {
-   const timeStr = new Date().toTimeString().substring(0,5);
-   const exists = appData.schedules.some(s => s.date === dateStr && s.title.toLowerCase() === act.toLowerCase());
-   if (!exists) {
-       appData.schedules.push({ date: dateStr, time: timeStr, title: act, location: 'Menyesuaikan', photoUrl: '' });
-       appData.schedules.sort((a,b) => a.time.localeCompare(b.time));
-       storage.setItem('e_arvy_schedules', JSON.stringify(appData.schedules));
-       if (window.syncLocalStorageToCloud) window.syncLocalStorageToCloud('e_arvy_schedules');
-       populatePresensiActivities(); // Perbarui dropdown
-       loadAnnounceSchedules(); // Perbarui tampilan jadwal UI
-   }
+  const dateStr = document.getElementById('presensiDate').value; 
+  let act = document.getElementById('presensiActivitySelect').value; 
+  if (act === 'kustom') act = document.getElementById('customActivityName').value; 
+  if (!act) { showToast('Validasi', 'Tentukan kegiatan!', 'warning'); return; }
+
+  const cadets = appData.cadets[prodiName] || []; 
+
+  cadets.forEach(c => {
+    storage.removeItem(`draft_status_${dateStr}_${act}_${prodiId}_${c.no}`); 
+    storage.removeItem(`draft_reason_${dateStr}_${act}_${prodiId}_${c.no}`); 
+    storage.removeItem(`draft_proof_${dateStr}_${act}_${prodiId}_${c.no}`); 
+  });
+
+  storage.removeItem(`saved_present_cnt_${dateStr}_${act}_${prodiId}`); 
+  storage.removeItem(`saved_absent_cnt_${dateStr}_${act}_${prodiId}`); 
+  storage.removeItem(`saved_total_cnt_${dateStr}_${act}_${prodiId}`); 
+  storage.removeItem(`saved_${dateStr}_${act}_${prodiName}`); 
+  // Baris baru untuk mereset tampilan kotak abu-abu ketua kelas
+  storage.removeItem(`saved_ketua_${dateStr}_${act}_${prodiId}`); 
+
+  const bundleKey = `saved_bundle_${dateStr}_${act}_${prodiId}`;
+  storage.removeItem(bundleKey);
+  
+  if (window.syncLocalStorageToCloud) {
+    localStorage.setItem(bundleKey, "{}");         
+    window.syncLocalStorageToCloud(bundleKey).then(() => {
+       localStorage.removeItem(bundleKey); 
+    });
+  }
+
+  showToast('Reset Berhasil', `Data presensi prodi ${prodiName} telah kembali ke Draf.`, 'info');
+  renderAttendanceList(); 
 }
-      const cadets = appData.cadets[prodiName] || []; 
-
-      cadets.forEach(c => {
-        storage.removeItem(`draft_status_${dateStr}_${act}_${prodiId}_${c.no}`); 
-        storage.removeItem(`draft_reason_${dateStr}_${act}_${prodiId}_${c.no}`); 
-        storage.removeItem(`draft_proof_${dateStr}_${act}_${prodiId}_${c.no}`); 
-      });
-
-      storage.removeItem(`saved_present_cnt_${dateStr}_${act}_${prodiId}`); 
-      storage.removeItem(`saved_absent_cnt_${dateStr}_${act}_${prodiId}`); 
-      storage.removeItem(`saved_total_cnt_${dateStr}_${act}_${prodiId}`); 
-      storage.removeItem(`saved_${dateStr}_${act}_${prodiName}`); 
-
-      const bundleKey = `saved_bundle_${dateStr}_${act}_${prodiId}`;
-      storage.removeItem(bundleKey);
-      
-      if (window.syncLocalStorageToCloud) {
-        localStorage.setItem(bundleKey, "{}");         window.syncLocalStorageToCloud(bundleKey).then(() => {
-           localStorage.removeItem(bundleKey); 
-        });
-      }
-
-      showToast('Reset Berhasil', `Data presensi prodi ${prodiName} telah dibersihkan dari cloud & lokal.`, 'info');
-      loadDashboardAndAppData(); 
-    }
 
     function verifyAndSaveAttendance() {
       const dateStr = document.getElementById('presensiDate').value;
@@ -4302,10 +4293,10 @@ if (isCustom) {
 });
 
       const btn = document.querySelector('#verificationPanel button');
-      btn.innerHTML = '<i data-lucide="loader" class="animate-spin w-4.5 h-4.5"></i> Memproses...';
+      btn.innerHTML = '<i data-lucide="loopop;ooader" class="animate-spin w-4.5 h-4.5"></i> Memproses...';
 const ketuaKelasData = {};
 appData.prodis.forEach(p => {
-    ketuaKelasData[p.prodiId] = storage.getItem(`saved_ketua_${dateStr}_${act}_${p.prodiId}`) || '-';
+    ketuaKelasData[p.prodiId] = storage.getItem(`saved_ketua_${dateStr}_${act}_${p.prodiId}`) || storage.getItem(`daily_ketua_${dateStr}_${p.prodiId}`) || '-';
 });
 
 callServer('saveAttendance', { 
