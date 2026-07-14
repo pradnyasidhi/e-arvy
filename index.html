@@ -3761,17 +3761,23 @@ selectOptionsSpecific += `<option value="TAMBAH_BARU" class="font-black text-ios
                 
                 <div class="w-full mt-2 pt-2 border-t border-slate-200/60 dark:border-zinc-700/60 relative">
                   <label class="text-[9px] font-bold uppercase tracking-wider text-slate-500">Ketua Kelas</label>
-                  ${isEditable && !isSaved ? `
-                    <input type="text" id="ketua-input-${prodi.prodiId}" value="${draftKetua}" oninput="searchKetuaKelas(${prodi.prodiId}, '${prodi.currentName}', this.value)" class="w-full px-2 py-1.5 mt-1 rounded border bg-white dark:bg-zinc-800 dark:border-zinc-700 text-xs font-bold text-slate-900 dark:text-white outline-none focus:ring-1 focus:ring-ios-blue" placeholder="Ketik nama...">
-                    <div id="ketua-suggest-${prodi.prodiId}" class="hidden absolute left-0 right-0 top-[100%] mt-1 bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded shadow-lg z-50 max-h-32 overflow-y-auto"></div>
-                  ` : `
-                    <!-- KOTAK ABU-ABU SAAT TERSIMPAN -->
-                    <div class="w-full px-3 py-2 mt-1 rounded border border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-800/80 text-xs font-bold text-slate-700 dark:text-zinc-300 flex items-center justify-between shadow-inner">
-                      <span>${storage.getItem(`saved_ketua_${dateStr}_${activityName}_${prodi.prodiId}`) || draftKetua || '-'}</span>
-                      <i data-lucide="check-circle-2" class="w-4 h-4 text-slate-400"></i>
+                  ${isEditable ? `
+                    <div class="relative mt-1">
+                      <!-- Input tetap aktif, hanya diganti warna latarnya jika isSaved -->
+                      <input type="text" id="ketua-input-${prodi.prodiId}" value="${draftKetua}" oninput="searchKetuaKelas(${prodi.prodiId}, '${prodi.currentName}', this.value)" class="w-full px-2 py-1.5 rounded border ${isSaved ? 'bg-slate-100 dark:bg-zinc-800/80 text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-700 shadow-inner' : 'bg-white dark:bg-zinc-800 dark:border-zinc-700 text-slate-900 dark:text-white'} text-xs font-bold outline-none focus:ring-1 focus:ring-ios-blue pr-8" placeholder="Ketik nama...">
+                      
+                      <!-- Memunculkan icon centang jika isSaved -->
+                      ${isSaved ? `<i data-lucide="check-circle-2" class="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>` : ''}
+                      
+                      <div id="ketua-suggest-${prodi.prodiId}" class="hidden absolute left-0 right-0 top-[100%] mt-1 bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded shadow-lg z-50 max-h-32 overflow-y-auto"></div>
                     </div>
-                    <!-- Input hidden agar fungsi Save tidak crash saat menarik data -->
-                    <input type="hidden" id="ketua-input-${prodi.prodiId}" value="${storage.getItem(`saved_ketua_${dateStr}_${activityName}_${prodi.prodiId}`) || draftKetua}">
+                  ` : `
+                    <!-- Tampilan Read-Only untuk Kadet -->
+                    <div class="w-full px-3 py-2 mt-1 rounded border border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-800/80 text-xs font-bold text-slate-700 dark:text-zinc-300 flex items-center justify-between shadow-inner">
+                      <span>${draftKetua || '-'}</span>
+                      <i data-lucide="lock" class="w-4 h-4 text-slate-400"></i>
+                    </div>
+                    <input type="hidden" id="ketua-input-${prodi.prodiId}" value="${draftKetua}">
                   `}
                 </div>
 
@@ -4173,8 +4179,7 @@ const ketuaInput = document.getElementById(`ketua-input-${prodiId}`);
 if (ketuaInput) {
     const ketuaName = ketuaInput.value;
     
-    storage.setItem(`saved_ketua_${dateStr}_${act}_${prodiId}`, ketuaName);
-    storage.setItem(`daily_ketua_${dateStr}_${prodiId}`, ketuaName); 
+    storage.setItem(`daily_ketua_${dateStr}_${prodiId}`, ketuaName);
     
     const cadet = (appData.cadets[prodiName] || []).find(c => c.name === ketuaName);
     if (cadet) {
@@ -4296,7 +4301,7 @@ if (ketuaInput) {
       btn.innerHTML = '<i data-lucide="loopop;ooader" class="animate-spin w-4.5 h-4.5"></i> Memproses...';
 const ketuaKelasData = {};
 appData.prodis.forEach(p => {
-    ketuaKelasData[p.prodiId] = storage.getItem(`saved_ketua_${dateStr}_${act}_${p.prodiId}`) || storage.getItem(`daily_ketua_${dateStr}_${p.prodiId}`) || '-';
+    ketuaKelasData[p.prodiId] = storage.getItem(`daily_ketua_${dateStr}_${p.prodiId}`) || '-';
 });
 
 callServer('saveAttendance', { 
