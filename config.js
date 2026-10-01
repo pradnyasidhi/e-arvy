@@ -1,9 +1,10 @@
-const supabaseUrl = 'https://ygfzxemuzhwwadamkgen.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlnZnp4ZW11emh3d2FkYW1rZ2VuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4NjA1ODAsImV4cCI6MjA5NzQzNjU4MH0.sY1ffJXkef3wUxRfaoD8ecAitQtdN9fFNeCxJjXnoPo';
+const supabaseUrl = 'https://oqjzikfugwqbynmeiaws.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9xanppa2Z1Z3dxYnlubWVpYXdzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA4MDY3NTAsImV4cCI6MjEwNjM4Mjc1MH0.gXgAP88YqmoTrsWUmj1WTWyHzs9SZWWIpdrYcOkiolg';
 const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
- const users = [
-          { username: 'nami', password: CryptoJS.SHA256('0401072').toString(), role: 'Admin', prodiName: '', kompiName: '', profilePhoto: '' },
+
+ const defaultUsers = [
+  { username: 'nami', password: CryptoJS.SHA256('0401072').toString(), role: 'Admin', prodiName: '', kompiName: '', profilePhoto: '' },
           { username: 'piket', password: CryptoJS.SHA256('piket6').toString(), role: 'Piket', prodiName: '', kompiName: '', profilePhoto: '' },
           { username: 'danyon', password: CryptoJS.SHA256('danyon6').toString(), role: 'Piket', prodiName: '', kompiName: '', profilePhoto: '' },
           { username: 'wadanyon', password: CryptoJS.SHA256('wadanyon6').toString(), role: 'Piket', prodiName: '', kompiName: '', profilePhoto: '' },
