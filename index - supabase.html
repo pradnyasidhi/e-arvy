@@ -2804,51 +2804,50 @@ storage.removeItem('e_arvy_manual_override');  storage.removeItem('e_arvy_last_a
       }
 }
 
-    function populatePresensiActivities() {
-      const select = document.getElementById('presensiActivitySelect');
-      const statSelect = document.getElementById('statActivitySelect');
-      if (!select) return;
+   function populatePresensiActivities() {
+  const select = document.getElementById('presensiActivitySelect');
+  const statSelect = document.getElementById('statActivitySelect');
+  if (!select) return;
 
-      // --- PERBAIKAN: Penangkap URL Parameter Kegiatan & Tanggal ---
-      const urlParams = new URLSearchParams(window.location.search);
-      const linkAct = urlParams.get('act');
-      const linkDate = urlParams.get('date');
-      
-      if (linkDate) {
-          const pDate = document.getElementById('presensiDate');
-          if (pDate) pDate.value = linkDate;
-      }
+  const urlParams = new URLSearchParams(window.location.search);
+  const linkAct = urlParams.get('act');
+  const linkDate = urlParams.get('date');
+  
+  if (linkDate) {
+      const pDate = document.getElementById('presensiDate');
+      if (pDate) pDate.value = linkDate;
+  }
 
-      // Prioritaskan kegiatan dari URL Link, jika tidak ada gunakan draf terakhir
-      const currentAct = linkAct ? linkAct : (select.value || storage.getItem('e_arvy_last_activity'));
-      const currentStatAct = statSelect.value;
+  const currentAct = linkAct ? linkAct : (select.value || storage.getItem('e_arvy_last_activity'));
+  const currentStatAct = statSelect.value;
 
-      select.innerHTML = ''; statSelect.innerHTML = '';
-      const activities = [...new Set(appData.schedules.map(s => s.title))];
-      
-      activities.forEach(act => select.innerHTML += `<option value="${act}">${act}</option>`);
-      select.innerHTML += `<option value="kustom">Tambahkan Kegiatan Lainnya...</option>`;
-      
-      statSelect.innerHTML += `<option value="semua" selected>Semua Kegiatan</option>`;
-      activities.forEach(act => statSelect.innerHTML += `<option value="${act}">${act}</option>`);
-      
-      if (currentAct) {
-         // Cek apakah kegiatan dari link ada di dropdown
-         let exists = Array.from(select.options).some(opt => opt.value === currentAct);
-         if (exists) {
-            select.value = currentAct;
-         } else {
-            // Jika kegiatan spesifik tidak ada di kalender, lempar ke input Kustom
-            select.value = 'kustom';
-            const customInput = document.getElementById('customActivityName');
-            if (customInput) customInput.value = currentAct;
-         }
-      }
-      
-      if (currentStatAct) statSelect.value = currentStatAct;
+  select.innerHTML = ''; statSelect.innerHTML = '';
+  
+  // LOGIKA BARU: Hilangkan jadwal yang mengandung kata "perkuliahan" dari daftar opsi presensi
+  const activities = [...new Set(appData.schedules.map(s => s.title))]
+                      .filter(title => !title.toLowerCase().includes('perkuliahan'));
+  
+  activities.forEach(act => select.innerHTML += `<option value="${act}">${act}</option>`);
+  select.innerHTML += `<option value="kustom">Tambahkan Kegiatan Lainnya...</option>`;
+  
+  statSelect.innerHTML += `<option value="semua" selected>Semua Kegiatan</option>`;
+  activities.forEach(act => statSelect.innerHTML += `<option value="${act}">${act}</option>`);
+  
+  if (currentAct) {
+     let exists = Array.from(select.options).some(opt => opt.value === currentAct);
+     if (exists) {
+        select.value = currentAct;
+     } else {
+        select.value = 'kustom';
+        const customInput = document.getElementById('customActivityName');
+        if (customInput) customInput.value = currentAct;
+     }
+  }
+  
+  if (currentStatAct) statSelect.value = currentStatAct;
 
-      checkCustomActivity();
-    }
+  checkCustomActivity();
+}
 
     function uploadPiketAvatar(event, type) {
       const file = event.target.files[0];
@@ -2947,52 +2946,57 @@ function saveLastSelectedActivity() {
       }
     }
 
-    function checkAndAutoSelectActivity(now = new Date()) {
-return;
-      if (!appData || !appData.schedules) return;
-      
-      const todayStr = getLocalDateString(now);
-      const isManual = storage.getItem('e_arvy_manual_override') === 'true';
-      const manualDate = storage.getItem('e_arvy_manual_date');
+   function checkAndAutoSelectActivity(now = new Date()) {
+  if (!appData || !appData.schedules) return;
+  
+  const todayStr = getLocalDateString(now);
+  const isManual = storage.getItem('e_arvy_manual_override') === 'true';
+  const manualDate = storage.getItem('e_arvy_manual_date');
 
-      // JIKA USER SUDAH PILIH MANUAL HARI INI, JANGAN PERNAH DIGESER LAGI
-      if (isManual && manualDate === todayStr) return;
+  // Jika user sudah pilih manual hari ini, jangan digeser lagi
+  if (isManual && manualDate === todayStr) return;
 
-      const todaySchedules = appData.schedules.filter(s => s.date === todayStr);
-      if (todaySchedules.length === 0) return;
+  const todaySchedules = appData.schedules.filter(s => s.date === todayStr);
+  if (todaySchedules.length === 0) return;
 
-      const sorted = [...todaySchedules].sort((a,b) => a.time.localeCompare(b.time));
-      const currentTimeStr = String(now.getHours()).padStart(2, '0') + ":" + String(now.getMinutes()).padStart(2, '0');
+  const sorted = [...todaySchedules].sort((a,b) => a.time.localeCompare(b.time));
+  const currentTimeStr = String(now.getHours()).padStart(2, '0') + ":" + String(now.getMinutes()).padStart(2, '0');
 
-      let activeTitle = null;
-      for (let i = 0; i < sorted.length; i++) {
-        if (currentTimeStr >= sorted[i].time) activeTitle = sorted[i].title;
-      }
+  let nextTitle = null;
+  for (let i = 0; i < sorted.length; i++) {
+    const titleLower = sorted[i].title.toLowerCase();
+    
+    // LOGIKA BARU: Lompat ke jadwal berikutnya YANG BUKAN PERKULIAHAN
+    if (currentTimeStr < sorted[i].time && !titleLower.includes('perkuliahan')) {
+      nextTitle = sorted[i].title;
+      break; 
+    }
+  }
 
-      if (activeTitle) {
-        const currentEventSignature = todayStr + "_" + activeTitle;
-        const lastAutoEvent = storage.getItem('e_arvy_last_auto_event');
-        const select = document.getElementById('presensiActivitySelect');
+  if (nextTitle) {
+    const currentEventSignature = todayStr + "_" + nextTitle;
+    const lastAutoEvent = storage.getItem('e_arvy_last_auto_event');
+    const select = document.getElementById('presensiActivitySelect');
 
-        // Pindah otomatis jika jadwal berubah
-        if (currentEventSignature !== lastAutoEvent) {
-          if (select) {
-            let exists = Array.from(select.options).some(opt => opt.value === activeTitle);
-            if (exists) {
-              select.value = activeTitle;
-              storage.setItem('e_arvy_last_activity', activeTitle);
-              storage.setItem('e_arvy_last_auto_event', currentEventSignature);
-              
-              document.getElementById('customActivityWrapper').classList.add('hidden');
-              if (document.getElementById('view-kehadiran').classList.contains('active')) {
-                 renderAttendanceList();
-              }
-              showToast('Menyesuaikan Jadwal', `Otomatis beralih ke: ${activeTitle}`, 'info');
-            }
+    // Pindah otomatis jika jadwal berubah
+    if (currentEventSignature !== lastAutoEvent) {
+      if (select) {
+        let exists = Array.from(select.options).some(opt => opt.value === nextTitle);
+        if (exists) {
+          select.value = nextTitle;
+          storage.setItem('e_arvy_last_activity', nextTitle);
+          storage.setItem('e_arvy_last_auto_event', currentEventSignature);
+          
+          document.getElementById('customActivityWrapper').classList.add('hidden');
+          if (document.getElementById('view-kehadiran').classList.contains('active')) {
+             renderAttendanceList();
           }
+          showToast('Menyesuaikan Jadwal', `Otomatis beralih ke: ${nextTitle}`, 'info');
         }
       }
     }
+  }
+}
 
     function checkCustomActivity() {
       const select = document.getElementById('presensiActivitySelect');
@@ -6926,7 +6930,7 @@ if (['dashboard', 'statistik'].includes(activeTab)) {
 <script>
 
 // --- UBAH ANGKA INI SETIAP KALI AKU DEPLOY HTML BARU ---
-const APP_VERSION = "v1.4.3"; 
+const APP_VERSION = "v1.4.4"; 
 // -------------------------------------------------------------------
 
 function forceClearCacheOnUpdate() {
