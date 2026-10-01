@@ -1483,7 +1483,7 @@ const localUsers = typeof defaultUsers !== 'undefined' ? [...defaultUsers] : [];
   defaultProdiList.forEach(p => localUsers.push({ 
     username: p.currentName.replace(/\s+/g, '').toLowerCase(), 
     password: 'cohort6', 
-    role: 'Kopral Kadet', 
+    role: 'Sersan Kadet', 
     prodiName: p.currentName, 
     kompiName: 'Kompi ' + p.kompiNumber, 
     profilePhoto: '' 
@@ -1703,79 +1703,8 @@ const existingIdx = histories.findIndex(h => h.logId === logId);
         const absentCount = params.absents.length;
         const presentCount = params.totalCadets - absentCount;
         
-        const dateObj = new Date(params.date);
-        const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-        const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-        const formattedDate = `${days[dateObj.getDay()]}, ${dateObj.getDate()} ${months[dateObj.getMonth()]} ${dateObj.getFullYear()}`;
-
-        let kategoriStr = params.category === 'Batalyon' ? '' : ` ${params.category.toUpperCase()}`;
-        let textRecap = `DATA ${params.activityName.toUpperCase()} KOPRAL KADET${kategoriStr} (${formattedDate.toUpperCase()})\n\n`;
-        textRecap += `JUMLAH   : ${params.totalCadets}\n`;
-        textRecap += `KURANG   : ${absentCount}\n`;
-        textRecap += `HADIR    : ${presentCount}\n\n`;
-        
-        textRecap += `KETERANGAN:\n`;
-        
-        if (absentCount === 0) {
-            textRecap += `LENGKAP\n\n`;
-        } else {
-            const groupedStatus = {};
-            params.absents.forEach(a => {
-                if (!groupedStatus[a.status]) groupedStatus[a.status] = [];
-                groupedStatus[a.status].push(a);
-            });
-            for (let st in groupedStatus) {
-                textRecap += `• ${st.toUpperCase()} (${groupedStatus[st].length})\n`;
-                groupedStatus[st].forEach(a => {
-                    textRecap += `${a.cadetName} ${a.reason ? '(' + a.reason.toUpperCase() + ')': ''}\n`;
-                });
-                textRecap += `\n`;
-            }
-        }
-        if (params.category === 'Batalyon') {
-          textRecap += `• PALESTINA:\nJUMLAH: 22\nKURANG: -\nHADIR: 22\nKETERANGAN: LENGKAP\n\n`;
-        } else if (params.category === 'Putra') {
-          textRecap += `• PALESTINA:\nJUMLAH: 12\nKURANG: -\nHADIR: 12\nKETERANGAN: LENGKAP\n\n`;
-        } else if (params.category === 'Putri') {
-          textRecap += `• PALESTINE:\nJUMLAH: 10\nKURANG: -\nHADIR: 10\nKETERANGAN: LENGKAP\n\n`;
-        }
-        textRecap += `REKAPITULASI PRODI:\n\n`;
-        
-        const cadetsData = JSON.parse(storage.getItem('e_arvy_cadets') || '{}');
-        const prodisData = JSON.parse(storage.getItem('e_arvy_prodis') || '[]');
-        
-        prodisData.forEach(p => {
-            let pCadets = cadetsData[p.currentName] || [];
-            if (params.category === 'Putra') pCadets = pCadets.filter(c => c.gender === 'Laki-Laki');
-            if (params.category === 'Putri') pCadets = pCadets.filter(c => c.gender === 'Perempuan');
-            
-            const pTotal = pCadets.length;
-            if (pTotal > 0) { 
-                const pAbsents = params.absents.filter(a => a.prodiName === p.currentName);
-                const pKurang = pAbsents.length;
-                const pHadir = pTotal - pKurang;
-                
-                textRecap += `• ${p.currentName}:\n`;
-                textRecap += `JUMLAH: ${pTotal}\n`;
-                textRecap += `KURANG: ${pKurang}\n`;
-                textRecap += `HADIR: ${pHadir}\n`;
-                textRecap += `KETERANGAN:\n`;
-                
-                if (pKurang === 0) {
-                    textRecap += `LENGKAP\n\n\n`;
-                } else {
-                    const allSameReasonAndStatus = pKurang === pTotal && pAbsents.every(a => a.status === pAbsents[0].status && a.reason === pAbsents[0].reason);
-                    if (allSameReasonAndStatus) {
-                        textRecap += `SELURUH ${p.currentName} ${pAbsents[0].status.toUpperCase()}${pAbsents[0].reason ? ' (' + pAbsents[0].reason.toUpperCase() + ')': ''}\n\n\n`;
-                    } else {
-                        pAbsents.forEach(a => {
-                            textRecap += `${a.cadetName} (${a.status.toUpperCase()}${a.reason ? ': ' + a.reason.toUpperCase(): ''})\n`;
-                        });
-                        textRecap += `\n\n`;
-                    }
-                }
-            }
-        });
+        const tempLog = { date: params.date, activityName: params.activityName, totalCadets: params.totalCadets, absents: params.absents };
+  const textRecap = buildDynamicRecapText(tempLog, params.category);
 
         const logEntry = { logId, date: params.date, activityName: params.activityName, category: params.category, totalCadets: params.totalCadets, absentCount, presentCount, verifier: params.verifier, verifiedAt: new Date().toISOString(), absents: params.absents, recapText: textRecap, ketuaKelasData: params.ketuaKelasData };
         
@@ -2388,7 +2317,6 @@ function checkNotificationPermission() {
         renderDashboardSchedules(now);
         updatePendataanCountdowns();
         renderAnnounceLatestSchedule(now);
-        checkAndAutoSelectActivity(now);
 
         if (currentUser && appData.schedules) {
           const todayStr = getLocalDateString(now);
@@ -2876,51 +2804,50 @@ storage.removeItem('e_arvy_manual_override');  storage.removeItem('e_arvy_last_a
       }
 }
 
-    function populatePresensiActivities() {
-      const select = document.getElementById('presensiActivitySelect');
-      const statSelect = document.getElementById('statActivitySelect');
-      if (!select) return;
+   function populatePresensiActivities() {
+  const select = document.getElementById('presensiActivitySelect');
+  const statSelect = document.getElementById('statActivitySelect');
+  if (!select) return;
 
-      // --- PERBAIKAN: Penangkap URL Parameter Kegiatan & Tanggal ---
-      const urlParams = new URLSearchParams(window.location.search);
-      const linkAct = urlParams.get('act');
-      const linkDate = urlParams.get('date');
-      
-      if (linkDate) {
-          const pDate = document.getElementById('presensiDate');
-          if (pDate) pDate.value = linkDate;
-      }
+  const urlParams = new URLSearchParams(window.location.search);
+  const linkAct = urlParams.get('act');
+  const linkDate = urlParams.get('date');
+  
+  if (linkDate) {
+      const pDate = document.getElementById('presensiDate');
+      if (pDate) pDate.value = linkDate;
+  }
 
-      // Prioritaskan kegiatan dari URL Link, jika tidak ada gunakan draf terakhir
-      const currentAct = linkAct ? linkAct : (select.value || storage.getItem('e_arvy_last_activity'));
-      const currentStatAct = statSelect.value;
+  const currentAct = linkAct ? linkAct : (select.value || storage.getItem('e_arvy_last_activity'));
+  const currentStatAct = statSelect.value;
 
-      select.innerHTML = ''; statSelect.innerHTML = '';
-      const activities = [...new Set(appData.schedules.map(s => s.title))];
-      
-      activities.forEach(act => select.innerHTML += `<option value="${act}">${act}</option>`);
-      select.innerHTML += `<option value="kustom">Tambahkan Kegiatan Lainnya...</option>`;
-      
-      statSelect.innerHTML += `<option value="semua" selected>Semua Kegiatan</option>`;
-      activities.forEach(act => statSelect.innerHTML += `<option value="${act}">${act}</option>`);
-      
-      if (currentAct) {
-         // Cek apakah kegiatan dari link ada di dropdown
-         let exists = Array.from(select.options).some(opt => opt.value === currentAct);
-         if (exists) {
-            select.value = currentAct;
-         } else {
-            // Jika kegiatan spesifik tidak ada di kalender, lempar ke input Kustom
-            select.value = 'kustom';
-            const customInput = document.getElementById('customActivityName');
-            if (customInput) customInput.value = currentAct;
-         }
-      }
-      
-      if (currentStatAct) statSelect.value = currentStatAct;
+  select.innerHTML = ''; statSelect.innerHTML = '';
+  
+  // LOGIKA BARU: Hilangkan jadwal yang mengandung kata "perkuliahan" dari daftar opsi presensi
+  const activities = [...new Set(appData.schedules.map(s => s.title))]
+                      .filter(title => !title.toLowerCase().includes('perkuliahan'));
+  
+  activities.forEach(act => select.innerHTML += `<option value="${act}">${act}</option>`);
+  select.innerHTML += `<option value="kustom">Tambahkan Kegiatan Lainnya...</option>`;
+  
+  statSelect.innerHTML += `<option value="semua" selected>Semua Kegiatan</option>`;
+  activities.forEach(act => statSelect.innerHTML += `<option value="${act}">${act}</option>`);
+  
+  if (currentAct) {
+     let exists = Array.from(select.options).some(opt => opt.value === currentAct);
+     if (exists) {
+        select.value = currentAct;
+     } else {
+        select.value = 'kustom';
+        const customInput = document.getElementById('customActivityName');
+        if (customInput) customInput.value = currentAct;
+     }
+  }
+  
+  if (currentStatAct) statSelect.value = currentStatAct;
 
-      checkCustomActivity();
-    }
+  checkCustomActivity();
+}
 
     function uploadPiketAvatar(event, type) {
       const file = event.target.files[0];
@@ -3019,51 +2946,57 @@ function saveLastSelectedActivity() {
       }
     }
 
-    function checkAndAutoSelectActivity(now = new Date()) {
-      if (!appData || !appData.schedules) return;
-      
-      const todayStr = getLocalDateString(now);
-      const isManual = storage.getItem('e_arvy_manual_override') === 'true';
-      const manualDate = storage.getItem('e_arvy_manual_date');
+   function checkAndAutoSelectActivity(now = new Date()) {
+  if (!appData || !appData.schedules) return;
+  
+  const todayStr = getLocalDateString(now);
+  const isManual = storage.getItem('e_arvy_manual_override') === 'true';
+  const manualDate = storage.getItem('e_arvy_manual_date');
 
-      // JIKA USER SUDAH PILIH MANUAL HARI INI, JANGAN PERNAH DIGESER LAGI
-      if (isManual && manualDate === todayStr) return;
+  // Jika user sudah pilih manual hari ini, jangan digeser lagi
+  if (isManual && manualDate === todayStr) return;
 
-      const todaySchedules = appData.schedules.filter(s => s.date === todayStr);
-      if (todaySchedules.length === 0) return;
+  const todaySchedules = appData.schedules.filter(s => s.date === todayStr);
+  if (todaySchedules.length === 0) return;
 
-      const sorted = [...todaySchedules].sort((a,b) => a.time.localeCompare(b.time));
-      const currentTimeStr = String(now.getHours()).padStart(2, '0') + ":" + String(now.getMinutes()).padStart(2, '0');
+  const sorted = [...todaySchedules].sort((a,b) => a.time.localeCompare(b.time));
+  const currentTimeStr = String(now.getHours()).padStart(2, '0') + ":" + String(now.getMinutes()).padStart(2, '0');
 
-      let activeTitle = null;
-      for (let i = 0; i < sorted.length; i++) {
-        if (currentTimeStr >= sorted[i].time) activeTitle = sorted[i].title;
-      }
+  let nextTitle = null;
+  for (let i = 0; i < sorted.length; i++) {
+    const titleLower = sorted[i].title.toLowerCase();
+    
+    // LOGIKA BARU: Lompat ke jadwal berikutnya YANG BUKAN PERKULIAHAN
+    if (currentTimeStr < sorted[i].time && !titleLower.includes('perkuliahan')) {
+      nextTitle = sorted[i].title;
+      break; 
+    }
+  }
 
-      if (activeTitle) {
-        const currentEventSignature = todayStr + "_" + activeTitle;
-        const lastAutoEvent = storage.getItem('e_arvy_last_auto_event');
-        const select = document.getElementById('presensiActivitySelect');
+  if (nextTitle) {
+    const currentEventSignature = todayStr + "_" + nextTitle;
+    const lastAutoEvent = storage.getItem('e_arvy_last_auto_event');
+    const select = document.getElementById('presensiActivitySelect');
 
-        // Pindah otomatis jika jadwal berubah
-        if (currentEventSignature !== lastAutoEvent) {
-          if (select) {
-            let exists = Array.from(select.options).some(opt => opt.value === activeTitle);
-            if (exists) {
-              select.value = activeTitle;
-              storage.setItem('e_arvy_last_activity', activeTitle);
-              storage.setItem('e_arvy_last_auto_event', currentEventSignature);
-              
-              document.getElementById('customActivityWrapper').classList.add('hidden');
-              if (document.getElementById('view-kehadiran').classList.contains('active')) {
-                 renderAttendanceList();
-              }
-              showToast('Menyesuaikan Jadwal', `Otomatis beralih ke: ${activeTitle}`, 'info');
-            }
+    // Pindah otomatis jika jadwal berubah
+    if (currentEventSignature !== lastAutoEvent) {
+      if (select) {
+        let exists = Array.from(select.options).some(opt => opt.value === nextTitle);
+        if (exists) {
+          select.value = nextTitle;
+          storage.setItem('e_arvy_last_activity', nextTitle);
+          storage.setItem('e_arvy_last_auto_event', currentEventSignature);
+          
+          document.getElementById('customActivityWrapper').classList.add('hidden');
+          if (document.getElementById('view-kehadiran').classList.contains('active')) {
+             renderAttendanceList();
           }
+          showToast('Menyesuaikan Jadwal', `Otomatis beralih ke: ${nextTitle}`, 'info');
         }
       }
     }
+  }
+}
 
     function checkCustomActivity() {
       const select = document.getElementById('presensiActivitySelect');
@@ -3854,7 +3787,7 @@ updateMiniRecapCard()
       if (['Admin', 'Piket', 'Pokdo', 'Pengasuh'].includes(currentUser.role)) return true;
       
     
-      if (currentUser.role === 'Kopral Kadet') {
+      if (currentUser.role === 'Sersan Kadet') {
         if (isLocked) return false; 
         return currentUser.kompiName === 'Kompi ' + prodi.kompiNumber;
       }
@@ -4614,8 +4547,8 @@ let currentRecapFormat = 'Kadpaga';
     let kategoriStr = mode === 'Batalyon' ? '' : ` ${mode.toUpperCase()}`;
     
     // 3. Render Header Pokdokad
-    let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${kategoriStr} (${formattedDate.toUpperCase()})\n\n`;
-    text += `A. REKAP KEKUATAN ${log.activityName.toUpperCase()} KOPRAL KADET${kategoriStr} ${formattedDate.toUpperCase()} SBB:\n\n`;
+    let text = `DATA ${log.activityName.toUpperCase()} SERSAN KADET${kategoriStr} (${formattedDate.toUpperCase()})\n\n`;
+    text += `A. REKAP KEKUATAN ${log.activityName.toUpperCase()} SERSAN KADET${kategoriStr} ${formattedDate.toUpperCase()} SBB:\n\n`;
     
     // Logika Palestina untuk Pokdokad Batalyon/Putra/Putri
     let palestinaTotal = mode === 'Batalyon' ? 22 : (mode === 'Putra' ? 12 : 10);
@@ -4737,95 +4670,128 @@ currentRecapFilter = mode;
     }
 
     function buildDynamicRecapText(log, mode) {
-     
-      if (mode === 'Batalyon') return log.recapText;
+  const isPutra = mode === 'Putra';
+  const isPutri = mode === 'Putri';
+  const targetGender = isPutra ? 'Laki-Laki' : (isPutri ? 'Perempuan' : null);
+  
+  const totalQuota = mode === 'Batalyon' ? log.totalCadets : (isPutra ? (appData.settings.total_putra || 0) : (appData.settings.total_putri || 0));
 
-      const isPutra = mode === 'Putra';
-      const targetGender = isPutra ? 'Laki-Laki' : 'Perempuan';
-      const totalQuota = isPutra ? (appData.settings.total_putra || 0) : (appData.settings.total_putri || 0);
+  const filteredAbsents = targetGender ? log.absents.filter(a => {
+    const pCadets = appData.cadets[a.prodiName] || [];
+    const cadet = pCadets.find(c => c.name === a.cadetName);
+    return cadet && cadet.gender === targetGender;
+  }) : log.absents;
 
-      const filteredAbsents = log.absents.filter(a => {
-        const pCadets = appData.cadets[a.prodiName] || [];
-        const cadet = pCadets.find(c => c.name === a.cadetName);
-        return cadet && cadet.gender === targetGender;
-      });
+  const absentCount = filteredAbsents.length;
+  const presentCount = totalQuota - absentCount;
 
-      const absentCount = filteredAbsents.length;
-      const presentCount = totalQuota - absentCount;
+  const dateObj = new Date(log.date);
+  const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+  const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+  const formattedDate = `${days[dateObj.getDay()]}, ${dateObj.getDate()} ${months[dateObj.getMonth()]} ${dateObj.getFullYear()}`;
 
-      const dateObj = new Date(log.date);
-      const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-      const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-      const formattedDate = `${days[dateObj.getDay()]}, ${dateObj.getDate()} ${months[dateObj.getMonth()]} ${dateObj.getFullYear()}`;
+  let modeStr = mode === 'Batalyon' ? '' : ` ${mode.toUpperCase()}`;
+  let palestinaTotal = mode === 'Batalyon' ? 22 : (mode === 'Putra' ? 12 : 10);
 
-      let modeStr = mode === 'Batalyon' ? '' : ` ${mode.toUpperCase()}`;
-let text = `DATA ${log.activityName.toUpperCase()} KOPRAL KADET${modeStr} (${formattedDate.toUpperCase()})\n\n`;
-      text += `JUMLAH   : ${totalQuota}\n`;
-      text += `KURANG   : ${absentCount}\n`;
-      text += `HADIR    : ${presentCount}\n\n`;
-      text += `KETERANGAN:\n`;
+  let text = `DATA ${log.activityName.toUpperCase()} SERSAN KADET${modeStr} (${days[dateObj.getDay()]}, ${dateObj.getDate()} ${months[dateObj.getMonth()]} ${dateObj.getFullYear()})\n\n`;
+  text += `Jumlah: ${totalQuota} + ${palestinaTotal} Palestina\n`;
+  text += `Kurang: ${absentCount}\n`;
+  text += `Hadir: ${presentCount} + ${palestinaTotal} Palestina\n\n`;
+  text += `Keterangan:\n\n`;
 
-      if (absentCount === 0) {
-        text += `LENGKAP\n\n`;
+  if (absentCount === 0) {
+    text += `Lengkap\n\n`;
+  } else {
+    const groupedStatus = {};
+    filteredAbsents.forEach(a => {
+        if (!groupedStatus[a.status]) groupedStatus[a.status] = [];
+        groupedStatus[a.status].push(a);
+    });
+    
+    for (let st in groupedStatus) {
+        let statusName = st;
+        
+        // Logika EYD Dinamis: Ubah status bawaan sistem (ALL CAPS) jadi huruf kecil.
+        // Untuk status kustom, biarkan sesuai huruf asli yang diketik user.
+        const defaultLower = ['SAKIT', 'IZIN', 'DINAS LUAR', 'DINAS DALAM', 'GASUH', 'KONTROL', 'TANPA KETERANGAN'];
+        if (defaultLower.includes(st.toUpperCase())) {
+            statusName = st.toLowerCase();
+        } else if (st.toUpperCase() === 'TANPA KETERANGAN') {
+            statusName = 'Tanpa Keterangan';
+        }
+        
+        if (st.toUpperCase() === 'TANPA KETERANGAN') {
+             text += `${groupedStatus[st].length} ${statusName}\n`;
+        } else {
+             text += `• ${groupedStatus[st].length} ${statusName}\n`;
+        }
+
+        // LOGIKA PENYEMBUNYIAN NAMA (Jika > 20 orang, nama tidak dijabarkan)
+        if (groupedStatus[st].length <= 20) {
+            groupedStatus[st].forEach(a => {
+                let cleanProdi = a.prodiName.replace(/\s\d+$/, '');
+                if (cleanProdi === 'FK') cleanProdi = 'KED'; 
+                
+                let reasonStr = a.reason ? ` (${a.reason.toLowerCase()})` : '';
+                text += `  – SK ${cleanProdi} ${a.cadetName}${reasonStr}\n`;
+            });
+        }
+    }
+  }
+
+  // Bagian REKAPITULASI PRODI
+  text += `\nREKAPITULASI PRODI (${mode.toUpperCase()}):\n\n`;
+
+  appData.prodis.forEach(p => {
+    const pCadets = (appData.cadets[p.currentName] || []).filter(c => !targetGender || c.gender === targetGender);
+    const pTotal = pCadets.length;
+    
+    if (pTotal > 0) {
+      const pAbsents = filteredAbsents.filter(a => a.prodiName === p.currentName);
+      const pKurang = pAbsents.length;
+      const pHadir = pTotal - pKurang;
+
+      text += `• ${p.currentName}:\n`;
+      text += `Jumlah: ${pTotal}\n`;
+      text += `Kurang: ${pKurang}\n`;
+      text += `Hadir: ${pHadir}\n`;
+      text += `Keterangan:\n`;
+
+      if (pKurang === 0) {
+        text += `Lengkap\n\n`;
       } else {
-        const groupedStatus = {};
-        filteredAbsents.forEach(a => {
-            if (!groupedStatus[a.status]) groupedStatus[a.status] = [];
-            groupedStatus[a.status].push(a);
-        });
-        for (let st in groupedStatus) {
-                text += `• ${st.toUpperCase()} (${groupedStatus[st].length})\n`;
-                groupedStatus[st].forEach(a => {
-                    text += `${a.cadetName} ${a.reason ? '(' + a.reason.toUpperCase() + ')' : ''}\n`;
-                });
-                text += `\n`;
+        const allSameReasonAndStatus = pKurang === pTotal && pAbsents.every(a => a.status === pAbsents[0].status && a.reason === pAbsents[0].reason);
+        
+        if (allSameReasonAndStatus) {
+            // EYD format status prodi
+            let prodiStatus = pAbsents[0].status;
+            const defaultLower = ['SAKIT', 'IZIN', 'DINAS LUAR', 'DINAS DALAM', 'GASUH', 'KONTROL', 'KELAS'];
+            if (defaultLower.includes(prodiStatus.toUpperCase())) prodiStatus = prodiStatus.toLowerCase();
+            else if (prodiStatus.toUpperCase() === 'TANPA KETERANGAN') prodiStatus = 'Tanpa Keterangan';
+            
+            text += `Seluruh ${p.currentName} ${prodiStatus}${pAbsents[0].reason ? ' (' + pAbsents[0].reason + ')' : ''}\n\n`;
+        } else {
+            // Sembunyikan nama di rekap prodi jika jumlahnya terlalu panjang (> 20)
+            if (pKurang > 20) {
+                 text += `(${pKurang} Orang - Detail nama dihilangkan agar tidak terlalu panjang)\n\n`;
+            } else {
+                 pAbsents.forEach(a => {
+                     let aStatus = a.status;
+                     const defaultLower = ['SAKIT', 'IZIN', 'DINAS LUAR', 'DINAS DALAM', 'GASUH', 'KONTROL', 'TANPA KETERANGAN'];
+                     if (defaultLower.includes(aStatus.toUpperCase())) aStatus = aStatus.toLowerCase();
+                     else if (aStatus.toUpperCase() === 'TANPA KETERANGAN') aStatus = 'Tanpa Keterangan';
+
+                     text += `${a.cadetName} (${aStatus}${a.reason ? ': ' + a.reason : ''})\n`;
+                 });
+                 text += `\n`;
+            }
         }
       }
-
-         if (mode === 'Batalyon') {
-          text += `• PALESTINA:\nJUMLAH: 22\nKURANG: -\nHADIR: 22\nKETERANGAN: LENGKAP\n\n`;
-        } else if (mode === 'Putra') {
-          text += `• PALESTINA:\nJUMLAH: 12\nKURANG: -\nHADIR: 12\nKETERANGAN: LENGKAP\n\n`;
-        } else if (mode === 'Putri') {
-          text += `• PALESTINE:\nJUMLAH: 10\nKURANG: -\nHADIRr: 10\nKETERANGAN: LENGKAP\n\n`;
-        }
-
-      text += `REKAPITULASI PRODI (${mode.toUpperCase()}):\n\n`;
-
-      appData.prodis.forEach(p => {
-        const pCadets = (appData.cadets[p.currentName] || []).filter(c => c.gender === targetGender);
-        const pTotal = pCadets.length;
-        
-        if (pTotal > 0) {
-          const pAbsents = filteredAbsents.filter(a => a.prodiName === p.currentName);
-          const pKurang = pAbsents.length;
-          const pHadir = pTotal - pKurang;
-
-          text += `• ${p.currentName}:\n`;
-          text += `JUMLAH: ${pTotal}\n`;
-          text += `KURANG: ${pKurang}\n`;
-          text += `HADIR: ${pHadir}\n`;
-          text += `KETERANGAN:\n`;
-
-          if (pKurang === 0) {
-            text += `LENGKAP\n\n\n`;
-          } else {
-            const allSameReasonAndStatus = pKurang === pTotal && pAbsents.every(a => a.status === pAbsents[0].status && a.reason === pAbsents[0].reason);
-            
-            if (allSameReasonAndStatus) {
-                        text += `SELURUH ${p.currentName} ${pAbsents[0].status.toUpperCase()}${pAbsents[0].reason ? ' (' + pAbsents[0].reason.toUpperCase() + ')' : ''}\n\n\n`;
-                    } else {
-                        pAbsents.forEach(a => {
-                            text += `${a.cadetName} (${a.status}${a.reason ? ': ' + a.reason.toUpperCase(): ''})\n`;
-                        });
-                        text += `\n\n`;
-                    }
-          }
-        }
-      });
-
-      return text;
     }
+  });
+
+  return text.trim();
+}
 
 
     function viewLastRecapDetail() {
@@ -5092,7 +5058,7 @@ const isAuthorized = ['Admin', 'Piket', 'Pokdo', 'Pengasuh'].includes(currentUse
 
 function cleanCadetName(name) {
   if(!name) return "";
-    return name.replace(/^(?:KK\s+)?(?:KED|IF|FM|SM|BIO|RSDA|TS|TM|TE|KIM|MATH|FIS|IKOR)?\s+/i, '').trim();
+    return name.replace(/^(?:SK\s+)?(?:KED|IF|FM|SM|BIO|RSDA|TS|TM|TE|KIM|MATH|FIS|IKOR)?\s+/i, '').trim();
 }
 
 function populateFilterProdiKadet() {
@@ -5267,7 +5233,7 @@ function openCadetProfile(prodiName, cadetNo) {
   const tgWrapper = document.getElementById('cdmEditTgWrapper');
   tgWrapper.classList.add('hidden'); 
   
-  const isAuthorizedToEdit = ['Admin', 'Piket', 'Pokdo', 'Pengasuh'].includes(currentUser.role) || (currentUser.role === 'Kopral Kadet' && currentUser.kompiName === `Kompi ${prodi.kompiNumber}`);
+  const isAuthorizedToEdit = ['Admin', 'Piket', 'Pokdo', 'Pengasuh'].includes(currentUser.role) || (currentUser.role === 'Sersan Kadet' && currentUser.kompiName === `Kompi ${prodi.kompiNumber}`);
   
   if (isAuthorizedToEdit) {
       editBtn.classList.remove('hidden');
@@ -5583,7 +5549,7 @@ async function renderCadetHistoryList() {
       filtered.forEach((k) => {
         if (k.status && k.status !== "Belum Pulang") sudahCount++; else belumCount++;
         
-        const canEdit = ['Admin', 'Piket', 'Pokdo', 'Pengasuh'].includes(currentUser.role) || (currentUser.role === 'Kopral Kadet' && currentUser.prodiName === k.prodiName);
+        const canEdit = ['Admin', 'Piket', 'Pokdo', 'Pengasuh'].includes(currentUser.role) || (currentUser.role === 'Sersan Kadet' && currentUser.prodiName === k.prodiName);
         const disabledAttr = canEdit ? '' : 'disabled';
         const trueIdx = appData.kepulangan.findIndex(item => item.prodiName === k.prodiName && item.date === selectedDate);
 
@@ -6388,7 +6354,7 @@ function updatePetUI() {
 }
 
 async function triggerAttendancePetReward(isLate, prodiName, date, activity) {
-  if (!currentUser || currentUser.role !== 'Kopral Kadet') {
+  if (!currentUser || currentUser.role !== 'Sersan Kadet') {
       console.log("ℹ️ XP tidak diupdate karena login sebagai Admin/Piket.");
       return; 
   }
@@ -6429,7 +6395,7 @@ async function triggerAttendancePetReward(isLate, prodiName, date, activity) {
 }
 
 async function loadUserPetData() {
-    if (!currentUser || currentUser.role !== 'Kopral Kadet') return;
+    if (!currentUser || currentUser.role !== 'Sersan Kadet') return;
     try {
         const { data, error } = await supabaseClient
             .from('VirtualPet')
@@ -6865,6 +6831,9 @@ window.fetchJadwalDefaultDariSupabase = async function() {
 
           // Jika ada Piket lain yang klik "Simpan" sementara
           if (newData.kunci.startsWith("saved_bundle_")) {
+    // Matikan refresh paksa, ganti dengan notifikasi
+    showToast('Data Masuk', 'Piket lain memperbarui data. Klik tombol putar (kanan bawah) untuk memuat jika perlu.', 'info');
+} {
             try {
               const bundle = JSON.parse(newData.jsonString);
               localStorage.setItem(`saved_present_cnt_${bundle.dateStr}_${bundle.act}_${bundle.prodiId}`, bundle.presentCnt);
@@ -6942,9 +6911,11 @@ window.fetchJadwalDefaultDariSupabase = async function() {
 
          window.fetchDatabaseFromCloud().then(() => {
             const activeTab = storage.getItem('e_arvy_active_tab');
-            if (['dashboard', 'statistik', 'kehadiran'].includes(activeTab)) {
-                              if (typeof loadDashboardAndAppData === 'function') loadDashboardAndAppData();
-                            if (currentUser && currentUser.role !== 'Kopral Kadet') {
+            // KODE BARU:
+if (['dashboard', 'statistik'].includes(activeTab)) {
+    if (typeof loadDashboardAndAppData === 'function') loadDashboardAndAppData();
+}
+                            if (currentUser && currentUser.role !== 'Sersan Kadet') {
                    showToast('Data Masuk!', 'Piket lain baru saja memverifikasi laporan presensi.', 'success');
                    sendDesktopNotification("Laporan Presensi Masuk", "Ada laporan kehadiran baru yang terverifikasi.", "bell");
                }
@@ -6959,7 +6930,7 @@ window.fetchJadwalDefaultDariSupabase = async function() {
 <script>
 
 // --- UBAH ANGKA INI SETIAP KALI AKU DEPLOY HTML BARU ---
-const APP_VERSION = "v1.4.2"; 
+const APP_VERSION = "v1.4.4"; 
 // -------------------------------------------------------------------
 
 function forceClearCacheOnUpdate() {
