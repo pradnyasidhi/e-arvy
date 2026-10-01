@@ -4711,29 +4711,35 @@ currentRecapFilter = mode;
     for (let st in groupedStatus) {
         let statusName = st;
         
-        // Logika EYD Dinamis: Ubah status bawaan sistem (ALL CAPS) jadi huruf kecil.
-        // Untuk status kustom, biarkan sesuai huruf asli yang diketik user.
-        const defaultLower = ['SAKIT', 'IZIN', 'DINAS LUAR', 'DINAS DALAM', 'GASUH', 'KONTROL', 'TANPA KETERANGAN'];
+        // Kapitalisasi Status: Bawaan sistem jadi Title Case, kustom kapital huruf depannya saja
+        const defaultLower = ['SAKIT', 'IZIN', 'DINAS LUAR', 'DINAS DALAM', 'GASUH', 'KONTROL', 'KELAS'];
         if (defaultLower.includes(st.toUpperCase())) {
-            statusName = st.toLowerCase();
+            statusName = st.toLowerCase().replace(/(?:^|\s)\S/g, a => a.toUpperCase());
         } else if (st.toUpperCase() === 'TANPA KETERANGAN') {
             statusName = 'Tanpa Keterangan';
+        } else {
+            statusName = st.charAt(0).toUpperCase() + st.slice(1);
         }
         
+        // Cetak header status absen
         if (st.toUpperCase() === 'TANPA KETERANGAN') {
              text += `${groupedStatus[st].length} ${statusName}\n`;
         } else {
              text += `• ${groupedStatus[st].length} ${statusName}\n`;
         }
 
-        // LOGIKA PENYEMBUNYIAN NAMA (Jika > 20 orang, nama tidak dijabarkan)
+        // Tampilkan nama-nama jika jumlahnya tidak lebih dari 20 orang
         if (groupedStatus[st].length <= 20) {
             groupedStatus[st].forEach(a => {
-                let cleanProdi = a.prodiName.replace(/\s\d+$/, '');
+                let cleanProdi = a.prodiName.replace(/\s\d+$/, ''); // Buang angka kompi
                 if (cleanProdi === 'FK') cleanProdi = 'KED'; 
                 
+                // Pembersihan nama: Hapus pangkat/prodi bawaan, lalu ubah jadi EYD
+                let cleanName = a.cadetName.replace(/^(?:(?:SK|KK)\s+)?(?:KED|IF|FM|SM|BIO|RSDA|TS|TM|TE|KIM|MATH|FIS|IKOR)?\s+/i, '').trim();
+                let eydName = cleanName.toLowerCase().replace(/(?:^|\s|\.|-)\S/g, match => match.toUpperCase());
+                
                 let reasonStr = a.reason ? ` (${a.reason.toLowerCase()})` : '';
-                text += `  – SK ${cleanProdi} ${a.cadetName}${reasonStr}\n`;
+                text += `  – SK ${cleanProdi} ${eydName}${reasonStr}\n`;
             });
         }
     }
@@ -4763,25 +4769,37 @@ currentRecapFilter = mode;
         const allSameReasonAndStatus = pKurang === pTotal && pAbsents.every(a => a.status === pAbsents[0].status && a.reason === pAbsents[0].reason);
         
         if (allSameReasonAndStatus) {
-            // EYD format status prodi
             let prodiStatus = pAbsents[0].status;
             const defaultLower = ['SAKIT', 'IZIN', 'DINAS LUAR', 'DINAS DALAM', 'GASUH', 'KONTROL', 'KELAS'];
-            if (defaultLower.includes(prodiStatus.toUpperCase())) prodiStatus = prodiStatus.toLowerCase();
-            else if (prodiStatus.toUpperCase() === 'TANPA KETERANGAN') prodiStatus = 'Tanpa Keterangan';
+            if (defaultLower.includes(prodiStatus.toUpperCase())) {
+                prodiStatus = prodiStatus.toLowerCase().replace(/(?:^|\s)\S/g, a => a.toUpperCase());
+            } else if (prodiStatus.toUpperCase() === 'TANPA KETERANGAN') {
+                prodiStatus = 'Tanpa Keterangan';
+            } else {
+                prodiStatus = prodiStatus.charAt(0).toUpperCase() + prodiStatus.slice(1);
+            }
             
             text += `Seluruh ${p.currentName} ${prodiStatus}${pAbsents[0].reason ? ' (' + pAbsents[0].reason + ')' : ''}\n\n`;
         } else {
-            // Sembunyikan nama di rekap prodi jika jumlahnya terlalu panjang (> 20)
             if (pKurang > 20) {
                  text += `(${pKurang} Orang - Detail nama dihilangkan agar tidak terlalu panjang)\n\n`;
             } else {
                  pAbsents.forEach(a => {
                      let aStatus = a.status;
-                     const defaultLower = ['SAKIT', 'IZIN', 'DINAS LUAR', 'DINAS DALAM', 'GASUH', 'KONTROL', 'TANPA KETERANGAN'];
-                     if (defaultLower.includes(aStatus.toUpperCase())) aStatus = aStatus.toLowerCase();
-                     else if (aStatus.toUpperCase() === 'TANPA KETERANGAN') aStatus = 'Tanpa Keterangan';
+                     const defaultLower = ['SAKIT', 'IZIN', 'DINAS LUAR', 'DINAS DALAM', 'GASUH', 'KONTROL', 'KELAS'];
+                     if (defaultLower.includes(aStatus.toUpperCase())) {
+                         aStatus = aStatus.toLowerCase().replace(/(?:^|\s)\S/g, x => x.toUpperCase());
+                     } else if (aStatus.toUpperCase() === 'TANPA KETERANGAN') {
+                         aStatus = 'Tanpa Keterangan';
+                     } else {
+                         aStatus = aStatus.charAt(0).toUpperCase() + aStatus.slice(1);
+                     }
 
-                     text += `${a.cadetName} (${aStatus}${a.reason ? ': ' + a.reason : ''})\n`;
+                     // Bersihkan nama untuk rekapan per prodi juga
+                     let cleanName = a.cadetName.replace(/^(?:(?:SK|KK)\s+)?(?:KED|IF|FM|SM|BIO|RSDA|TS|TM|TE|KIM|MATH|FIS|IKOR)?\s+/i, '').trim();
+                     let eydName = cleanName.toLowerCase().replace(/(?:^|\s|\.|-)\S/g, match => match.toUpperCase());
+
+                     text += `${eydName} (${aStatus}${a.reason ? ': ' + a.reason : ''})\n`;
                  });
                  text += `\n`;
             }
@@ -4792,7 +4810,6 @@ currentRecapFilter = mode;
 
   return text.trim();
 }
-
 
     function viewLastRecapDetail() {
   if (appData.latestAttendance) { 
@@ -6937,7 +6954,7 @@ if (['dashboard', 'statistik'].includes(activeTab)) {
 <script>
 
 // --- UBAH ANGKA INI SETIAP KALI AKU DEPLOY HTML BARU ---
-const APP_VERSION = "v1.4.5"; 
+const APP_VERSION = "v1.4.6"; 
 // -------------------------------------------------------------------
 
 function forceClearCacheOnUpdate() {
