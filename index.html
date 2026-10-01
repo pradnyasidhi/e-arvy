@@ -5058,7 +5058,8 @@ const isAuthorized = ['Admin', 'Piket', 'Pokdo', 'Pengasuh'].includes(currentUse
 
 function cleanCadetName(name) {
   if(!name) return "";
-    return name.replace(/^(?:SK\s+)?(?:KED|IF|FM|SM|BIO|RSDA|TS|TM|TE|KIM|MATH|FIS|IKOR)?\s+/i, '').trim();
+  // Ubah regex agar bisa mengenali awalan SK maupun KK
+  return name.replace(/^(?:(?:SK|KK)\s+)?(?:KED|IF|FM|SM|BIO|RSDA|TS|TM|TE|KIM|MATH|FIS|IKOR)?\s+/i, '').trim();
 }
 
 function populateFilterProdiKadet() {
@@ -6695,13 +6696,20 @@ window.fetchDataKadetDariSupabase = async function() {
             finalGender = "Perempuan";
         }
 
+        // --- HARDCODE: OTOMATIS UBAH "KK " MENJADI "SK " ---
+        let namaKadetFix = kadet.nama_kadet;
+        if (namaKadetFix) {
+            // Regex ini mendeteksi awalan "KK" yang diikuti spasi, lalu menggantinya dengan "SK"
+            namaKadetFix = namaKadetFix.replace(/^KK\s+/i, 'SK ');
+        }
+        // ---------------------------------------------------
+
         const cadetObj = {
           no: formattedCadets[prodiName].length + 1,
-          name: kadet.nama_kadet,
+          name: namaKadetFix, // Gunakan variabel yang sudah difilter
           gender: finalGender,
           tempat_lahir: kadet.tempat_lahir || "Tidak diketahui",
           tanggal_lahir: kadet.tanggal_lahir || "",
-         
           telegram_id: kadet.telegram_id || "",
           foto_profile: kadet.foto_profile || ""
         };
@@ -6833,7 +6841,7 @@ window.fetchJadwalDefaultDariSupabase = async function() {
           if (newData.kunci.startsWith("saved_bundle_")) {
     // Matikan refresh paksa, ganti dengan notifikasi
     showToast('Data Masuk', 'Piket lain memperbarui data. Klik tombol putar (kanan bawah) untuk memuat jika perlu.', 'info');
-} {
+
             try {
               const bundle = JSON.parse(newData.jsonString);
               localStorage.setItem(`saved_present_cnt_${bundle.dateStr}_${bundle.act}_${bundle.prodiId}`, bundle.presentCnt);
@@ -6919,7 +6927,6 @@ if (['dashboard', 'statistik'].includes(activeTab)) {
                    showToast('Data Masuk!', 'Piket lain baru saja memverifikasi laporan presensi.', 'success');
                    sendDesktopNotification("Laporan Presensi Masuk", "Ada laporan kehadiran baru yang terverifikasi.", "bell");
                }
-            }
          });
       })
       .subscribe();
@@ -6930,7 +6937,7 @@ if (['dashboard', 'statistik'].includes(activeTab)) {
 <script>
 
 // --- UBAH ANGKA INI SETIAP KALI AKU DEPLOY HTML BARU ---
-const APP_VERSION = "v1.4.4"; 
+const APP_VERSION = "v1.4.5"; 
 // -------------------------------------------------------------------
 
 function forceClearCacheOnUpdate() {
